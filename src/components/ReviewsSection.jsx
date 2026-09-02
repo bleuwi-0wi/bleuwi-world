@@ -1,5 +1,21 @@
 import { useState, useEffect } from 'react'
-import { CheckCircle2, MessageCircle, Star, ThumbsUp, UserCheck, X, Plus, Edit3, Trash2, ShieldCheck, AlertCircle, Clock } from 'lucide-react'
+import {
+  CheckCircle2,
+  MessageCircle,
+  Star,
+  ThumbsUp,
+  UserCheck,
+  X,
+  Plus,
+  ShieldCheck,
+  AlertCircle,
+  Clock,
+  Heart,
+  MessageSquare,
+  Send,
+  CornerDownRight,
+  Crown
+} from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { verifiedReviews } from '../data/reviews'
 import { checkProfanity } from '../utils/profanityFilter'
@@ -18,7 +34,16 @@ export default function ReviewsSection() {
   const [daysRemaining, setDaysRemaining] = useState(0)
   const [isWithinWeek, setIsWithinWeek] = useState(false)
 
-  // Form states
+  // Likes tracking state (dictionary of { [reviewId]: true/false })
+  const [likedReviews, setLikedReviews] = useState({})
+
+  // Replies open state (dictionary of { [reviewId]: true/false })
+  const [openReplyReviewId, setOpenReplyReviewId] = useState(null)
+  const [replyName, setReplyName] = useState('')
+  const [replyComment, setReplyComment] = useState('')
+  const [replyProfanityError, setReplyProfanityError] = useState('')
+
+  // Form states for new review
   const [name, setName] = useState('')
   const [service, setService] = useState('Video Editing')
   const [rating, setRating] = useState(5)
@@ -35,9 +60,7 @@ export default function ReviewsSection() {
       .then((data) => {
         if (data && data.ip) setUserIp(data.ip)
       })
-      .catch(() => {
-        // Fallback silently if offline or blocked
-      })
+      .catch(() => {})
 
     // 2. Check last review timestamp
     const lastTimeStr = localStorage.getItem('bleuwi_last_review_time')
@@ -52,38 +75,56 @@ export default function ReviewsSection() {
       }
     }
 
-    // 3. Load user's review if exists
+    // 3. Load user's liked reviews
     try {
+      const savedLikes = localStorage.getItem('bleuwi_liked_reviews')
+      if (savedLikes) setLikedReviews(JSON.parse(savedLikes))
+    } catch {}
+
+    // 4. Load reviews from storage
+    try {
+      const savedReviewsStr = localStorage.getItem('bleuwi_community_reviews')
+      let loadedReviews = savedReviewsStr ? JSON.parse(savedReviewsStr) : []
+
+      // Merge verified static reviews
+      verifiedReviews.forEach((v) => {
+        if (!loadedReviews.some((r) => r.id === v.id)) {
+          loadedReviews.push(v)
+        }
+      })
+
+      // Load user's local review
       const savedMyReviewStr = localStorage.getItem('bleuwi_my_review')
-      let localUserReview = null
       if (savedMyReviewStr) {
-        localUserReview = JSON.parse(savedMyReviewStr)
+        const localUserReview = JSON.parse(savedMyReviewStr)
         setMyReview(localUserReview)
-        setName(localUserReview.name || '')
-        setService(localUserReview.service || 'Video Editing')
-        setRating(localUserReview.rating || 5)
-        setComment(localUserReview.comment || '')
+        if (!loadedReviews.some((r) => r.id === localUserReview.id)) {
+          loadedReviews.unshift(localUserReview)
+        }
       }
 
-      // Merge verified global reviews + user's local review
-      const allReviews = [...verifiedReviews]
-      if (localUserReview && !allReviews.some((r) => r.id === localUserReview.id)) {
-        allReviews.unshift(localUserReview)
-      }
-      setReviews(allReviews)
+      setReviews(loadedReviews)
     } catch {
       setReviews([...verifiedReviews])
     }
   }, [])
 
-  // Handle Review Submission (With 1-week limit and bad words filter for EN, AR, Darija)
+  // Helper to persist reviews list
+  const persistReviews = (newReviewsList) => {
+    setReviews(newReviewsList)
+    try {
+      localStorage.setItem('bleuwi_community_reviews', JSON.stringify(newReviewsList))
+    } catch {}
+  }
+
+  // Handle Review Submission: Permanent publish, no delete, no update
   const handleSaveReview = (e) => {
     e.preventDefault()
     setProfanityError('')
 
     if (!name.trim() || !comment.trim()) return
 
-    // 1. Check for bad words in English, Arabic, and Moroccan Darija
+    // Check for bad words in English, Arabic, and Moroccan Darija
     const nameCheck = checkProfanity(name)
     const commentCheck = checkProfanity(comment)
 
@@ -97,9 +138,9 @@ export default function ReviewsSection() {
       return
     }
 
-    // 2. Prepare Review Data
+    // Prepare Review Data (stays permanently on site)
     const newReview = {
-      id: myReview ? myReview.id : Date.now(),
+      id: Date.now(),
       name: name.trim(),
       service,
       rating,
@@ -112,9 +153,11 @@ export default function ReviewsSection() {
       verified: true,
       isMine: true,
       ip: userIp || 'device',
+      likes: 0,
+      replies: [],
     }
 
-    // 3. Save to localStorage with current timestamp for weekly rate-limiting
+    // Save to localStorage with current timestamp for weekly rate-limiting
     setMyReview(newReview)
     setIsWithinWeek(true)
     setDaysRemaining(7)
@@ -122,30 +165,90 @@ export default function ReviewsSection() {
     localStorage.setItem('bleuwi_last_review_time', Date.now().toString())
     if (userIp) localStorage.setItem('bleuwi_last_review_ip', userIp)
 
-    // Update list
-    setReviews((prev) => {
-      const filtered = prev.filter((r) => r.id !== newReview.id)
-      return [newReview, ...filtered]
-    })
+    // Update reviews list and persist
+    const updated = [newReview, ...reviews.filter((r) => r.id !== newReview.id)]
+    persistReviews(updated)
 
     setSubmittedSuccess(true)
   }
 
-  // Handle Delete Review
-  const handleDeleteMyReview = () => {
-    if (!myReview) return
-    localStorage.removeItem('bleuwi_my_review')
-    localStorage.removeItem('bleuwi_last_review_time')
-    setReviews((prev) => prev.filter((r) => r.id !== myReview.id))
-    setMyReview(null)
-    setIsWithinWeek(false)
-    setDaysRemaining(0)
-    setName('')
-    setComment('')
-    setRating(5)
-    setModalOpen(false)
-    setSubmittedSuccess(false)
-    setProfanityError('')
+  // Handle Heart / Like Toggle
+  const handleToggleLike = (reviewId) => {
+    const isCurrentlyLiked = !!likedReviews[reviewId]
+    const nextLikedState = !isCurrentlyLiked
+
+    const updatedLikesMap = {
+      ...likedReviews,
+      [reviewId]: nextLikedState,
+    }
+    setLikedReviews(updatedLikesMap)
+    try {
+      localStorage.setItem('bleuwi_liked_reviews', JSON.stringify(updatedLikesMap))
+    } catch {}
+
+    // Update review like count
+    const updatedReviews = reviews.map((r) => {
+      if (r.id === reviewId) {
+        const currentLikes = r.likes || 0
+        return {
+          ...r,
+          likes: nextLikedState ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
+        }
+      }
+      return r
+    })
+    persistReviews(updatedReviews)
+  }
+
+  // Handle Submit Reply
+  const handleAddReply = (reviewId) => {
+    setReplyProfanityError('')
+    if (!replyName.trim() || !replyComment.trim()) return
+
+    // Profanity check on reply
+    const nameCheck = checkProfanity(replyName)
+    const commentCheck = checkProfanity(replyComment)
+
+    if (nameCheck.hasBadWords || commentCheck.hasBadWords) {
+      const badWord = nameCheck.word || commentCheck.word
+      setReplyProfanityError(
+        lang === 'ar'
+          ? `⚠️ لفظ غير لائق ("${badWord}"). يرجى الكتابة باحترام.`
+          : `⚠️ Inappropriate word ("${badWord}"). Please keep it respectful.`
+      )
+      return
+    }
+
+    const isCreator =
+      replyName.trim().toLowerCase() === 'bleuwi' ||
+      replyName.trim().toLowerCase() === 'blue' ||
+      replyName.trim().toLowerCase() === 'admin'
+
+    const newReply = {
+      id: Date.now(),
+      author: replyName.trim(),
+      text: replyComment.trim(),
+      isCreator,
+      date: new Date().toLocaleDateString(lang === 'ar' ? 'ar-MA' : 'en-US', {
+        month: 'short',
+        day: 'numeric',
+      }),
+    }
+
+    const updatedReviews = reviews.map((r) => {
+      if (r.id === reviewId) {
+        const existingReplies = r.replies || []
+        return {
+          ...r,
+          replies: [...existingReplies, newReply],
+        }
+      }
+      return r
+    })
+
+    persistReviews(updatedReviews)
+    setReplyComment('')
+    setReplyProfanityError('')
   }
 
   const filteredReviews = filter === 'all'
@@ -161,8 +264,8 @@ export default function ReviewsSection() {
     const starsStr = '⭐'.repeat(revRating)
     const text = encodeURIComponent(
       lang === 'ar'
-        ? `السلام عليكم BLEUWI! أود إرسال وتوثيق تقييمي الرسمي:\n- الاسم: ${revName || 'عميل'}\n- الخدمة المطلوبة: ${revService}\n- التقييم: ${starsStr} (${revRating}/5)\n- الرأي والتجربة: ${revComment || ''}\n\nيرجى اعتماد ونشر تقييمي على الموقع!`
-        : `Hello BLEUWI! I would like to submit and verify my official review:\n- Name: ${revName || 'Client'}\n- Service: ${revService}\n- Rating: ${starsStr} (${revRating}/5)\n- Feedback: ${revComment || ''}\n\nPlease approve and feature my review on the website!`
+        ? `السلام عليكم BLEUWI! أود إرسال وتوثيق تقييمي الرسمي الدائم:\n- الاسم: ${revName || 'عميل'}\n- الخدمة المطلوبة: ${revService}\n- التقييم: ${starsStr} (${revRating}/5)\n- الرأي والتجربة: ${revComment || ''}\n\nيرجى اعتماد ونشر تقييمي على الموقع!`
+        : `Hello BLEUWI! I would like to submit and verify my official permanent review:\n- Name: ${revName || 'Client'}\n- Service: ${revService}\n- Rating: ${starsStr} (${revRating}/5)\n- Feedback: ${revComment || ''}\n\nPlease approve and feature my review on the website!`
     )
     return `https://wa.me/212762635587?text=${text}`
   }
@@ -183,8 +286,8 @@ export default function ReviewsSection() {
           </h2>
           <p>
             {lang === 'ar'
-              ? 'تقييمات صادقة من صناع المحتوى واللاعبين. يُسمح بتقييم واحد أسبوعياً من نفس الجهاز والـ IP مع فلتر تلقائي ضد الكلمات غير اللائقة.'
-              : 'Authentic feedback from verified clients. Strictly 1 review per week per IP/device with automatic profanity filter.'}
+              ? 'تقييمات دائمة لا تُحذف لضمان الصدق التام. يمكنك التفاعل بالإعجاب والرد على أي تقييم!'
+              : 'Permanent reviews with no deletion or editing to ensure transparency. Like and reply to any review!'}
           </p>
         </div>
 
@@ -218,7 +321,7 @@ export default function ReviewsSection() {
       {/* Filter tabs if reviews exist */}
       {reviews.length > 0 && (
         <div className="mt-8 flex flex-wrap gap-2">
-          {['all', 'Video Editing', 'Cheat Panels', 'Design', 'Digital Services'].map((f) => (
+          {['all', 'Video Editing', 'Cheat Panels', 'Design', 'Digital Services', 'Game Coins', 'Subscriptions', 'Sell Games'].map((f) => (
             <button
               key={f}
               type="button"
@@ -238,72 +341,176 @@ export default function ReviewsSection() {
       {/* Reviews Grid or Authentic Empty State */}
       {filteredReviews.length > 0 ? (
         <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {filteredReviews.map((rev) => (
-            <div
-              key={rev.id}
-              className={`relative flex flex-col justify-between rounded-2xl border p-6 shadow-xl backdrop-blur-sm transition ${
-                rev.isMine
-                  ? 'border-emerald-500/40 bg-gradient-to-b from-emerald-500/[0.08] to-white/[0.01]'
-                  : 'border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.015]'
-              }`}
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        size={14}
-                        className={star <= rev.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}
-                      />
-                    ))}
-                  </div>
+          {filteredReviews.map((rev) => {
+            const isLiked = !!likedReviews[rev.id]
+            const isRepliesOpen = openReplyReviewId === rev.id
+            const repliesList = rev.replies || []
 
-                  <div className="flex items-center gap-1.5">
-                    {rev.isMine && (
-                      <span className="rounded-full bg-sky-400/20 px-2 py-0.5 text-[10px] font-bold text-sky-300 border border-sky-400/30">
-                        {lang === 'ar' ? 'تقييمك' : 'Your Review'}
-                      </span>
-                    )}
-                    {rev.verified && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
-                        <CheckCircle2 size={11} />
-                        <span>{lang === 'ar' ? 'عميل موثق' : 'Verified'}</span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <p className="mt-3.5 text-sm leading-relaxed text-slate-200">
-                  "{rev.comment}"
-                </p>
-              </div>
-
-              <div className="mt-5 border-t border-white/[0.07] pt-3.5 flex items-center justify-between text-xs text-slate-400">
+            return (
+              <div
+                key={rev.id}
+                className={`relative flex flex-col justify-between rounded-2xl border p-6 shadow-xl backdrop-blur-sm transition ${
+                  rev.isMine
+                    ? 'border-emerald-500/40 bg-gradient-to-b from-emerald-500/[0.08] to-white/[0.01]'
+                    : 'border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.015]'
+                }`}
+              >
                 <div>
-                  <h4 className="font-semibold text-white">{rev.name}</h4>
-                  <span className="text-[11px] text-sky-300">{rev.service}</span>
+                  {/* Top Bar: Stars + Badges */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          size={14}
+                          className={star <= rev.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}
+                        />
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      {rev.isMine && (
+                        <span className="rounded-full bg-sky-400/20 px-2 py-0.5 text-[10px] font-bold text-sky-300 border border-sky-400/30">
+                          {lang === 'ar' ? 'تقييمك المنشور' : 'Your Review'}
+                        </span>
+                      )}
+                      {rev.verified && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
+                          <CheckCircle2 size={11} />
+                          <span>{lang === 'ar' ? 'عميل موثق' : 'Verified'}</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Review Text */}
+                  <p className="mt-3.5 text-sm leading-relaxed text-slate-200">
+                    "{rev.comment}"
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-500">{rev.date}</span>
-                  {rev.isMine && (
+
+                <div>
+                  {/* Author & Date Footer */}
+                  <div className="mt-5 border-t border-white/[0.07] pt-3.5 flex items-center justify-between text-xs text-slate-400">
+                    <div>
+                      <h4 className="font-semibold text-white">{rev.name}</h4>
+                      <span className="text-[11px] text-sky-300">{rev.service}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-500">{rev.date}</span>
+                  </div>
+
+                  {/* Interactive Heart Like + Reply Buttons */}
+                  <div className="mt-3.5 flex items-center justify-between border-t border-white/[0.05] pt-3 text-xs">
+                    {/* Heart Like Button */}
                     <button
                       type="button"
-                      onClick={() => {
-                        setSubmittedSuccess(false)
-                        setProfanityError('')
-                        setModalOpen(true)
-                      }}
-                      className="text-slate-400 hover:text-sky-300 cursor-pointer"
-                      title={lang === 'ar' ? 'تعديل التقييم' : 'Edit review'}
+                      onClick={() => handleToggleLike(rev.id)}
+                      className={`group flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                        isLiked
+                          ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30 shadow-sm shadow-rose-500/20'
+                          : 'bg-white/[0.03] text-slate-400 hover:text-rose-400 hover:bg-rose-500/[0.06] border border-white/5'
+                      }`}
+                      title={isLiked ? (lang === 'ar' ? 'إلغاء الإعجاب' : 'Unlike') : (lang === 'ar' ? 'إعجاب بالتقييم' : 'Like review')}
                     >
-                      <Edit3 size={13} />
+                      <Heart
+                        size={14}
+                        className={`transition ${isLiked ? 'fill-rose-500 text-rose-500 scale-110' : 'group-hover:scale-110'}`}
+                      />
+                      <span className="font-mono font-bold">{rev.likes || 0}</span>
+                      <span className="text-[10px]">{lang === 'ar' ? 'إعجاب' : 'Likes'}</span>
                     </button>
+
+                    {/* Reply Toggle Button */}
+                    <button
+                      type="button"
+                      onClick={() => setOpenReplyReviewId(isRepliesOpen ? null : rev.id)}
+                      className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.03] px-2.5 py-1 text-xs font-medium text-slate-300 hover:bg-white/[0.08] hover:text-white transition cursor-pointer"
+                    >
+                      <MessageSquare size={13} className="text-sky-400" />
+                      <span className="font-mono font-bold">{repliesList.length}</span>
+                      <span className="text-[10px]">{lang === 'ar' ? 'ردود' : 'Replies'}</span>
+                    </button>
+                  </div>
+
+                  {/* Replies Thread (Collapsible) */}
+                  {isRepliesOpen && (
+                    <div className="mt-3.5 space-y-2.5 rounded-xl border border-white/10 bg-black/40 p-3 text-xs animate-fade-up">
+                      {repliesList.length > 0 ? (
+                        <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                          {repliesList.map((rep) => (
+                            <div
+                              key={rep.id}
+                              className={`rounded-lg p-2.5 ${
+                                rep.isCreator
+                                  ? 'border border-amber-500/30 bg-amber-500/[0.08]'
+                                  : 'border border-white/5 bg-white/[0.03]'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-1 text-[11px]">
+                                <span className="flex items-center gap-1 font-bold text-white">
+                                  {rep.isCreator && <Crown size={12} className="text-amber-400" />}
+                                  <span className={rep.isCreator ? 'text-amber-300' : 'text-slate-200'}>
+                                    {rep.author}
+                                  </span>
+                                  {rep.isCreator && (
+                                    <span className="rounded bg-amber-400/20 px-1 py-0.2 text-[9px] font-semibold text-amber-300">
+                                      Creator
+                                    </span>
+                                  )}
+                                </span>
+                                <span className="text-[10px] text-slate-500">{rep.date}</span>
+                              </div>
+                              <p className="mt-1 text-slate-300 leading-relaxed">{rep.text}</p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-slate-500 text-center py-1">
+                          {lang === 'ar' ? 'لا توجد ردود بعد. كن أول من يرد!' : 'No replies yet. Be the first to reply!'}
+                        </p>
+                      )}
+
+                      {/* Profanity warning on reply */}
+                      {replyProfanityError && (
+                        <p className="text-[10px] text-rose-400">{replyProfanityError}</p>
+                      )}
+
+                      {/* Reply Input Form */}
+                      <div className="space-y-1.5 pt-1.5 border-t border-white/10">
+                        <input
+                          type="text"
+                          value={replyName}
+                          onChange={(e) => setReplyName(e.target.value)}
+                          placeholder={lang === 'ar' ? 'اسمك أو معرّفك' : 'Your name'}
+                          className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
+                        />
+                        <div className="flex gap-1.5">
+                          <input
+                            type="text"
+                            value={replyComment}
+                            onChange={(e) => setReplyComment(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleAddReply(rev.id)
+                            }}
+                            placeholder={lang === 'ar' ? 'اكتب رداً على هذا التقييم...' : 'Write a reply...'}
+                            className="flex-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleAddReply(rev.id)}
+                            className="rounded-lg bg-sky-400 px-3 py-1 text-xs font-bold text-slate-950 hover:bg-sky-300 transition cursor-pointer flex items-center gap-1"
+                          >
+                            <Send size={11} />
+                            <span>{lang === 'ar' ? 'رد' : 'Reply'}</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       ) : (
         /* Authentic Zero-Fake Empty State Card */
@@ -312,12 +519,12 @@ export default function ReviewsSection() {
             <ThumbsUp size={26} />
           </div>
           <h3 className="mt-5 text-lg font-bold text-white">
-            {lang === 'ar' ? 'كن أول من يشاركنا تقييمه الرسمي!' : 'Be the first to share an official review!'}
+            {lang === 'ar' ? 'كن أول من يشاركنا تقييمه الدائم!' : 'Be the first to share a permanent review!'}
           </h3>
           <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
             {lang === 'ar'
-              ? 'نحن نلتزم بالشفافية المطلقة وبدون تقييمات وهمية. يُسمح بتقييم واحد أسبوعياً من نفس الجهاز والـ IP لمنع التكرار.'
-              : 'We strictly avoid fake reviews. 1 review per week per IP/device is allowed. Share your experience!'}
+              ? 'التقييمات هنا حقيقية ودائمة لضمان المصداقية. يُسمح بتقييم واحد أسبوعياً من نفس الجهاز والـ IP.'
+              : 'Reviews here are authentic and permanent for full transparency. 1 review per week per IP/device.'}
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <button
@@ -345,7 +552,7 @@ export default function ReviewsSection() {
         </div>
       )}
 
-      {/* Modal: Write / Edit Review (With 1-Week Rate Limit & Profanity Filter) */}
+      {/* Modal: Write Permanent Review (No Edit / No Delete) */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-up">
           <div className="relative w-full max-w-md rounded-2xl border border-white/15 bg-[#080d1a] p-6 shadow-2xl">
@@ -360,7 +567,53 @@ export default function ReviewsSection() {
               <X size={18} />
             </button>
 
-            {submittedSuccess ? (
+            {/* If user already submitted this week: Block new submission & explain it's permanently published */}
+            {isWithinWeek && !submittedSuccess ? (
+              <div className="text-center py-4 space-y-4">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/40">
+                  <Clock size={26} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">
+                    {lang === 'ar' ? 'تقييمك منشور بشكل دائم!' : 'Your Review is Permanently Published!'}
+                  </h3>
+                  <p className="mt-2 text-xs text-slate-300 leading-relaxed">
+                    {lang === 'ar'
+                      ? `لقد قمت بنشر تقييمك بالفعل لهذا الأسبوع، وتقييمك منشور في الموقع بشكل دائم وثابت (لا يمكن حذفه أو تغييره لضمان المصداقية). يتبقى ${daysRemaining} ${daysRemaining === 1 ? 'يوم' : 'أيام'} لنشر تقييم جديد.`
+                      : `You have already posted your review for this week. All reviews stay permanently on the website for transparency (no editing or deletion). You can post another review in ${daysRemaining} day(s).`}
+                  </p>
+                </div>
+
+                {myReview && (
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-left text-xs">
+                    <div className="flex items-center justify-between text-slate-400">
+                      <span className="font-bold text-white">{myReview.name}</span>
+                      <span className="text-amber-400">{'⭐'.repeat(myReview.rating)}</span>
+                    </div>
+                    <p className="mt-2 text-slate-200 italic">"{myReview.comment}"</p>
+                  </div>
+                )}
+
+                <div className="pt-2 flex flex-col gap-2">
+                  <a
+                    href={getWhatsAppReviewLink()}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition"
+                  >
+                    <MessageCircle size={15} />
+                    <span>{lang === 'ar' ? 'توثيق التقييم عبر واتساب' : 'Verify on WhatsApp'}</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setModalOpen(false)}
+                    className="rounded-xl border border-white/10 py-2 text-xs font-medium text-slate-300 hover:bg-white/5"
+                  >
+                    {lang === 'ar' ? 'إغلاق' : 'Close'}
+                  </button>
+                </div>
+              </div>
+            ) : submittedSuccess ? (
               /* Success & WhatsApp Forward Prompt */
               <div className="text-center py-4 space-y-4">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
@@ -368,12 +621,12 @@ export default function ReviewsSection() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white">
-                    {lang === 'ar' ? 'تم تسجيل تقييمك بنجاح!' : 'Review Submitted Successfully!'}
+                    {lang === 'ar' ? 'تم نشر تقييمك الدائم بنجاح!' : 'Review Published Permanently!'}
                   </h3>
                   <p className="mt-1.5 text-xs text-slate-300">
                     {lang === 'ar'
-                      ? 'تم تسجيل تقييمك أسبوعياً من هذا الجهاز. أرسله أيضاً عبر واتساب ليصل لـ BLEUWI مباشرة!'
-                      : 'Saved for this week. Send it to WhatsApp to forward it directly to BLEUWI!'}
+                      ? 'تقييمك الآن منشور بشكل دائم وثابت على الموقع. يمكنك أيضاً إرساله إلى واتساب لتوثيقه رسمياً لدى BLEUWI!'
+                      : 'Your review is now permanently live on the website! Forward it to WhatsApp for official verification.'}
                   </p>
                 </div>
 
@@ -402,30 +655,18 @@ export default function ReviewsSection() {
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={20} className="text-sky-400" />
                   <h3 className="text-lg font-bold text-white">
-                    {isWithinWeek && myReview
-                      ? (lang === 'ar' ? 'تعديل تقييمك لهذا الأسبوع' : 'Update Your Review for This Week')
-                      : (lang === 'ar' ? 'أضف تقييمك الرسمي' : 'Submit Official Review')}
+                    {lang === 'ar' ? 'أضف تقييمك الرسمي (دائم ولا يُحذف)' : 'Submit Official Review (Permanent)'}
                   </h3>
                 </div>
 
-                {/* 1-Week Notice Banner */}
-                {isWithinWeek && (
-                  <div className="mt-2.5 flex items-start gap-2 rounded-xl border border-amber-400/30 bg-amber-400/[0.08] p-2.5 text-xs text-amber-200">
-                    <Clock size={15} className="text-amber-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-semibold">
-                        {lang === 'ar'
-                          ? `قفل التكرار الأسبوعي: يتبقى ${daysRemaining} ${daysRemaining === 1 ? 'يوم' : 'أيام'} لإرسال تقييم جديد تماماً.`
-                          : `Weekly Limit: ${daysRemaining} day${daysRemaining > 1 ? 's' : ''} left before posting another new review.`}
-                      </p>
-                      <p className="mt-0.5 text-[11px] text-amber-200/80">
-                        {lang === 'ar'
-                          ? 'يمكنك تحديث تقييمك الحالي في أي وقت، أو حذفه.'
-                          : 'You can edit or update your existing review anytime.'}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                <div className="mt-2 flex items-center gap-1.5 rounded-lg border border-sky-400/20 bg-sky-400/[0.05] p-2 text-[11px] text-sky-200">
+                  <AlertCircle size={13} className="text-sky-400 flex-shrink-0" />
+                  <span>
+                    {lang === 'ar'
+                      ? 'ملاحظة: التقييمات تبقى في الموقع بشكل دائم وثابت. يُسمح بتقييم واحد أسبوعياً.'
+                      : 'Notice: Reviews stay permanently on the site. Limited to 1 review per week.'}
+                  </span>
+                </div>
 
                 {/* Bad words profanity warning alert */}
                 {profanityError && (
@@ -526,39 +767,23 @@ export default function ReviewsSection() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between pt-2">
-                    {myReview ? (
-                      <button
-                        type="button"
-                        onClick={handleDeleteMyReview}
-                        className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 cursor-pointer"
-                        title={lang === 'ar' ? 'حذف تقييمي' : 'Delete my review'}
-                      >
-                        <Trash2 size={13} />
-                        <span>{lang === 'ar' ? 'حذف تقييمي' : 'Delete'}</span>
-                      </button>
-                    ) : <span />}
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setModalOpen(false)
-                          setProfanityError('')
-                        }}
-                        className="rounded-xl px-3.5 py-2 text-xs font-medium text-slate-400 hover:text-white cursor-pointer"
-                      >
-                        {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-                      </button>
-                      <button
-                        type="submit"
-                        className="rounded-xl bg-sky-400 px-4 py-2 text-xs font-bold text-slate-950 shadow-md hover:bg-sky-300 cursor-pointer"
-                      >
-                        {isWithinWeek && myReview
-                          ? (lang === 'ar' ? 'حفظ التعديل' : 'Update Review')
-                          : (lang === 'ar' ? 'نشر التقييم' : 'Post Review')}
-                      </button>
-                    </div>
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setModalOpen(false)
+                        setProfanityError('')
+                      }}
+                      className="rounded-xl px-3.5 py-2 text-xs font-medium text-slate-400 hover:text-white cursor-pointer"
+                    >
+                      {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+                    </button>
+                    <button
+                      type="submit"
+                      className="rounded-xl bg-sky-400 px-4 py-2 text-xs font-bold text-slate-950 shadow-md hover:bg-sky-300 cursor-pointer"
+                    >
+                      {lang === 'ar' ? 'نشر التقييم الدائم' : 'Post Permanent Review'}
+                    </button>
                   </div>
                 </form>
               </>
