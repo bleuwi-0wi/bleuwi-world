@@ -5,6 +5,7 @@ import Hero from './components/Hero'
 import PreviewCard from './components/PreviewCard'
 import WorkShowcase from './components/WorkShowcase'
 import LinksSection from './components/LinksSection'
+import ReviewsSection from './components/ReviewsSection'
 import Footer from './components/Footer'
 import OrderModal from './components/OrderModal'
 import SettingsModal from './components/SettingsModal'
@@ -97,6 +98,7 @@ function MainApp() {
               onSelectShowcase={navigateToShowcase}
               onOpenOrder={handleOpenOrder}
             />
+            <ReviewsSection />
             <LinksSection />
           </>
         )}

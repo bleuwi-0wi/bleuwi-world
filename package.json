@@ -16,7 +16,8 @@
     "vite": "latest"
   },
   "devDependencies": {
-    "tailwindcss": "latest",
-    "@tailwindcss/vite": "latest"
+    "@tailwindcss/vite": "latest",
+    "sharp": "^0.35.4",
+    "tailwindcss": "latest"
   }
 }

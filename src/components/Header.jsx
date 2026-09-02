@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Globe, Menu, Settings as SettingsIcon, X } from 'lucide-react'
 import BrandMark from './BrandMark'
+import VisitorCounter from './VisitorCounter'
 import { useLanguage } from '../context/LanguageContext'
 
 export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) {
@@ -60,6 +61,13 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           </a>
           <a
             className="nav-link cursor-pointer"
+            href="#reviews"
+            onClick={(e) => handleNavClick(e, 'reviews')}
+          >
+            {lang === 'ar' ? 'التقييمات' : 'Reviews'}
+          </a>
+          <a
+            className="nav-link cursor-pointer"
             href="#links"
             onClick={(e) => handleNavClick(e, 'links')}
           >
@@ -67,8 +75,11 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           </a>
         </nav>
 
-        {/* Action Controls: Language toggle + Settings + Explore */}
+        {/* Action Controls: Visitor Counter + Language toggle + Settings + Explore */}
         <div className="hidden items-center gap-3 md:flex">
+          {/* Live Visitor Counter Badge */}
+          <VisitorCounter compact={true} />
+
           {/* Quick Language Switcher Button */}
           <button
             type="button"
@@ -103,6 +114,7 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
 
         {/* Mobile controls */}
         <div className="flex items-center gap-2 md:hidden">
+          <VisitorCounter compact={true} />
           <button
             type="button"
             onClick={toggleLanguage}
@@ -141,6 +153,13 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
               onClick={(e) => handleNavClick(e, 'home')}
             >
               {t('navHome')}
+            </a>
+            <a
+              className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
+              href="#reviews"
+              onClick={(e) => handleNavClick(e, 'reviews')}
+            >
+              {lang === 'ar' ? 'التقييمات' : 'Reviews'}
             </a>
             <a
               className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"

@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { Check, Copy, Download, ExternalLink, Eye, Image as ImageIcon, MessageCircle, Send, User, X, Sparkles, Gamepad2, Coins, CreditCard, Clapperboard, Palette, ShieldAlert } from 'lucide-react'
 import { orderPresets, WHATSAPP_NUMBER } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
-import refCoins from '../assets/1.png'
-import refAbonnements from '../assets/2.png'
-import refGames from '../assets/3.png'
+import refCoins from '../assets/1.webp'
+import refAbonnements from '../assets/2.webp'
+import refGames from '../assets/3.webp'
 
 const referenceImages = {
   'Game Coins': {
