@@ -1,9 +1,18 @@
-import { ArrowDownRight, ArrowRight, MessageCircle, Play } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, MessageCircle, Play, CreditCard } from 'lucide-react'
 import HeroVideo from './HeroVideo'
 import { useLanguage } from '../context/LanguageContext'
 
 export default function Hero() {
-  const { t, isRTL } = useLanguage()
+  const { t, isRTL, lang } = useLanguage()
+
+  const heroPayments = [
+    'CIH Bank',
+    'Attijariwafa',
+    'Cash Plus',
+    'PayPal',
+    'Binance USDT',
+    'Visa / MC',
+  ]
 
   return (
     <section id="home" className="relative isolate overflow-hidden pt-32 sm:pt-40">
@@ -36,7 +45,31 @@ export default function Hero() {
               <span>{t('heroCtaWhatsApp')}</span>
             </a>
           </div>
-          <div className="mt-12 flex items-center gap-4 text-sm text-slate-500">
+
+          {/* Top Payment Methods Banner (NUM 4) */}
+          <div className="mt-7 flex flex-wrap items-center gap-2 pt-1 text-xs">
+            <a
+              href="#payments"
+              className="group flex items-center gap-1.5 font-medium text-slate-400 transition hover:text-sky-300"
+              title={lang === 'ar' ? 'عرض تفاصيل طرق الدفع' : 'View Payment Methods'}
+            >
+              <CreditCard size={14} className="text-sky-400 transition group-hover:scale-110" />
+              <span>{lang === 'ar' ? 'طرق الدفع المعتمدة:' : 'Accepted Payments:'}</span>
+            </a>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {heroPayments.map((method) => (
+                <a
+                  key={method}
+                  href="#payments"
+                  className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-slate-300 transition hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-white"
+                >
+                  {method}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-9 flex items-center gap-4 text-sm text-slate-500">
             <span className="h-px w-12 bg-slate-700" />
             <span>{t('sessionsHeadingEyebrow')}</span>
             <ArrowDownRight size={15} className={isRTL ? 'rotate-90' : ''} />

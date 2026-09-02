@@ -12,6 +12,7 @@ import editTwo from '../assets/editing-sample-2.mp4'
 import refCoins from '../assets/1.webp'
 import refAbonnements from '../assets/2.webp'
 import refGames from '../assets/3.webp'
+import refPayment from '../assets/4.webp'
 
 const designSamples = [designOne, designTwo, designThree, designFour, designFive]
 const videoSamples = [editOne, editTwo]
@@ -72,6 +73,11 @@ const serviceImages = {
     alt: 'Sell Games & Digital Keys Official Reference Picture',
     label: 'Games & Keys Reference',
   },
+  'payment-methods': {
+    src: refPayment,
+    alt: 'BLEUWI Official Accepted Payment Methods Reference Picture',
+    label: 'Payment Methods Reference',
+  },
 }
 
 export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpenOrder }) {
@@ -86,7 +92,8 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
   const getDigitalCategoryKey = (id) => {
     if (id === 'game-coins') return 'Game Coins'
     if (id === 'abonnements') return 'Abonnements'
-    return 'Sell Games'
+    if (id === 'sell-games') return 'Sell Games'
+    return 'Payment Methods'
   }
 
   const getCardTitle = (service) => {
@@ -94,6 +101,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
     if (service.id === 'game-coins') return t('digitalCoinsTitle')
     if (service.id === 'abonnements') return t('digitalAbonnementsTitle')
     if (service.id === 'sell-games') return t('digitalSellGamesTitle')
+    if (service.id === 'payment-methods') return 'طرق الدفع المقبولة'
     return service.title
   }
 
@@ -102,6 +110,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
     if (service.id === 'game-coins') return t('digitalCoinsTagline')
     if (service.id === 'abonnements') return t('digitalAbonnementsTagline')
     if (service.id === 'sell-games') return t('digitalSellGamesTagline')
+    if (service.id === 'payment-methods') return 'البنوك المغربية وبوابات الدفع العالمية المعتمدة مع تسليم وتأكيد فوري.'
     return service.tagline
   }
 
@@ -215,7 +224,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                   : 'border border-white/10 bg-white/5 text-slate-300 hover:border-sky-300/30 hover:text-white'
               }`}
             >
-              {lang === 'ar' ? 'الخدمات الرقمية' : 'Degital Servises'}
+              {lang === 'ar' ? 'الخدمات وطرق الدفع' : 'Digital Services & Payments'}
             </button>
             <button
               type="button"

@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext'
 import refCoins from '../assets/1.webp'
 import refAbonnements from '../assets/2.webp'
 import refGames from '../assets/3.webp'
+import refPayment from '../assets/4.webp'
 
 const referenceImages = {
   'Game Coins': {
@@ -27,6 +28,13 @@ const referenceImages = {
     name: 'Sell Games & Digital Keys Reference Sheet',
     badge: 'Official Sheet #03 (Game Keys)',
     filename: 'BLEUWI-GameKeys-Reference.png',
+  },
+  'Payment Methods': {
+    src: refPayment,
+    publicUrl: 'https://files.catbox.moe/c16w5k.png',
+    name: 'Accepted Payment Methods Reference Sheet',
+    badge: 'Official Sheet #04 (Payments)',
+    filename: 'BLEUWI-Payment-Methods-Reference.png',
   },
 }
 

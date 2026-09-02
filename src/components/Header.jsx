@@ -61,6 +61,13 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           </a>
           <a
             className="nav-link cursor-pointer"
+            href="#payments"
+            onClick={(e) => handleNavClick(e, 'payments')}
+          >
+            {lang === 'ar' ? 'طرق الدفع' : 'Payments'}
+          </a>
+          <a
+            className="nav-link cursor-pointer"
             href="#reviews"
             onClick={(e) => handleNavClick(e, 'reviews')}
           >
@@ -153,6 +160,13 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
               onClick={(e) => handleNavClick(e, 'home')}
             >
               {t('navHome')}
+            </a>
+            <a
+              className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
+              href="#payments"
+              onClick={(e) => handleNavClick(e, 'payments')}
+            >
+              {lang === 'ar' ? 'طرق الدفع' : 'Payments'}
             </a>
             <a
               className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"

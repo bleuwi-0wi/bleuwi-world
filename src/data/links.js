@@ -16,7 +16,7 @@ export const featuredLinks = [
   { name: 'VIDEO EDITING SESSION', detail: 'Edits built for standout content.', icon: Clapperboard, href: '/?showcase=video' },
   { name: 'CHEAT PANELS SESSION', detail: 'Private panel session & game tool requests.', icon: Gamepad2, href: '/?showcase=panels' },
   { name: 'DESIGN / DEV SESSION', detail: 'Creative design and web support.', icon: Palette, href: '/?showcase=design' },
-  { name: 'DEGITAL SERVISES', detail: 'Online services: Sell games, coin, abonnement & keys.', icon: Coins, href: '/?showcase=digital' },
+  { name: 'DIGITAL SERVICES & PAYMENT METHODS', detail: 'Game coins, subscriptions, digital keys & accepted payment methods.', icon: CreditCard, href: '/?showcase=digital' },
 ]
 
 export const digitalServices = [
@@ -67,6 +67,24 @@ export const digitalServices = [
     ],
     cta: 'Buy Game Keys',
   },
+  {
+    id: 'payment-methods',
+    title: 'Accepted Payment Methods',
+    category: 'Payment Methods',
+    badge: '0% Extra Fees',
+    tagline: 'Official Moroccan banks & global payment gateways supported with instant activation.',
+    icon: CreditCard,
+    items: [
+      { name: 'CIH Bank', desc: 'Direct instant RIB transfer with 0 extra fees' },
+      { name: 'Attijariwafa bank', desc: 'Instant Moroccan bank transfer & deposit' },
+      { name: 'Barid Bank', desc: 'Poste Maroc & direct account transfer' },
+      { name: 'Cash Plus & Wafacash', desc: 'Cash payment across all agencies in Morocco' },
+      { name: 'PayPal (Global)', desc: 'Instant worldwide checkout (Friends & Family)' },
+      { name: 'Binance USDT (Crypto)', desc: 'Zero fee crypto transfer via Binance Pay' },
+      { name: 'Visa & Mastercard', desc: 'Direct online international card payment' },
+    ],
+    cta: 'Confirm Payment on WhatsApp',
+  },
 ]
 
 
@@ -113,7 +131,7 @@ export const cheatPanels = [
 export const orderPresets = {
   'Game Coins': {
     category: 'Game Coins & Currencies',
-    sessionName: 'DEGITAL SERVISES',
+    sessionName: 'DIGITAL SERVICES',
     games: [
       'Robux Packs (Roblox)',
       'FC / FIFA Coins (EA FC)',
@@ -127,7 +145,7 @@ export const orderPresets = {
   },
   'Abonnements': {
     category: 'Subscriptions & Abonnements',
-    sessionName: 'DEGITAL SERVISES',
+    sessionName: 'DIGITAL SERVICES',
     games: [
       'Discord Nitro (1 Month + 2 Boosts)',
       'Discord Nitro (1 Year + 2 Boosts)',
@@ -141,7 +159,7 @@ export const orderPresets = {
   },
   'Sell Games': {
     category: 'Sell Games & Digital Keys',
-    sessionName: 'DEGITAL SERVISES',
+    sessionName: 'DIGITAL SERVICES',
     games: [
       'Steam Digital Game Key',
       'Epic Games Key / Activation',
@@ -149,6 +167,20 @@ export const orderPresets = {
       'PlayStation / Xbox Store Code',
       'Fresh Ranked-Ready Aged Account',
       'Other Game Title / Platform Key',
+    ],
+  },
+  'Payment Methods': {
+    category: 'Accepted Payment Methods',
+    sessionName: 'DIGITAL SERVICES & PAYMENT METHODS',
+    games: [
+      'CIH Bank (Morocco - Direct RIB)',
+      'Attijariwafa bank (Morocco)',
+      'Barid Bank / Poste Maroc',
+      'Cash Plus & Wafacash (Cash Agencies)',
+      'PayPal (International - USD/EUR)',
+      'Binance USDT (Crypto - Zero Fee)',
+      'Visa / Mastercard (Direct Cards)',
+      'Other Payment Inquiry',
     ],
   },
   'Cheat Panels': {
