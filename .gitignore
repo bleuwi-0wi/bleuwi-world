@@ -3,3 +3,7 @@ node_modules
 *.local
 .vscode
 .idea
+
+work/
+.cache/
+
