@@ -73,11 +73,6 @@ const serviceImages = {
     alt: 'Sell Games & Digital Keys Official Reference Picture',
     label: 'Games & Keys Reference',
   },
-  'payment-methods': {
-    src: refPayment,
-    alt: 'BLEUWI Official Accepted Payment Methods Reference Picture',
-    label: 'Payment Methods Reference',
-  },
 }
 
 export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpenOrder }) {
@@ -92,8 +87,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
   const getDigitalCategoryKey = (id) => {
     if (id === 'game-coins') return 'Game Coins'
     if (id === 'abonnements') return 'Abonnements'
-    if (id === 'sell-games') return 'Sell Games'
-    return 'Payment Methods'
+    return 'Sell Games'
   }
 
   const getCardTitle = (service) => {
@@ -101,7 +95,6 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
     if (service.id === 'game-coins') return t('digitalCoinsTitle')
     if (service.id === 'abonnements') return t('digitalAbonnementsTitle')
     if (service.id === 'sell-games') return t('digitalSellGamesTitle')
-    if (service.id === 'payment-methods') return 'طرق الدفع المقبولة'
     return service.title
   }
 
@@ -110,7 +103,6 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
     if (service.id === 'game-coins') return t('digitalCoinsTagline')
     if (service.id === 'abonnements') return t('digitalAbonnementsTagline')
     if (service.id === 'sell-games') return t('digitalSellGamesTagline')
-    if (service.id === 'payment-methods') return 'البنوك المغربية وبوابات الدفع العالمية المعتمدة مع تسليم وتأكيد فوري.'
     return service.tagline
   }
 
@@ -224,7 +216,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                   : 'border border-white/10 bg-white/5 text-slate-300 hover:border-sky-300/30 hover:text-white'
               }`}
             >
-              {lang === 'ar' ? 'الخدمات وطرق الدفع' : 'Digital Services & Payments'}
+              {lang === 'ar' ? 'الخدمات الرقمية' : 'Digital Services'}
             </button>
             <button
               type="button"
@@ -518,6 +510,55 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                 </div>
               )
             })}
+          </div>
+
+          {/* Accepted Payment Methods Banner (Visual Reference Sheet #04 - NOT AN ORDER) */}
+          <div className="mt-8 overflow-hidden rounded-2xl border border-sky-400/20 bg-gradient-to-r from-sky-400/[0.08] via-white/[0.02] to-transparent p-5 sm:p-6 backdrop-blur-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div
+                  className="group/pay relative h-20 w-36 flex-shrink-0 overflow-hidden rounded-xl border border-white/20 bg-black/80 cursor-pointer shadow-md"
+                  onClick={() => setLightboxImage({
+                    src: refPayment,
+                    title: lang === 'ar' ? 'طرق الدفع الرسمية (اللوحة #04)' : 'Official Payment Methods (Sheet #04)',
+                    categoryKey: 'Payment Methods',
+                    subtitle: lang === 'ar' ? 'البنوك المغربية وبوابات الدفع المعتمدة لجميع الطلبات' : 'Accepted payment gateways for all orders',
+                    alt: 'BLEUWI Official Accepted Payment Methods Reference Picture',
+                  })}
+                  title="Click to zoom Sheet #04"
+                >
+                  <img src={refPayment} alt="Payment Methods Sheet #04" className="h-full w-full object-cover transition-transform duration-300 group-hover/pay:scale-105" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover/pay:opacity-100">
+                    <ZoomIn size={16} className="text-sky-300" />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-sky-400 uppercase tracking-wider">
+                    <CreditCard size={14} />
+                    <span>{lang === 'ar' ? 'طرق الدفع المعتمدة لجميع الطلبات' : 'Accepted Payment Gateways For Orders'}</span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-300 max-w-lg">
+                    {lang === 'ar'
+                      ? 'ندعم التحويل البنكي المباشر (CIH Bank، التجاري وفا بنك، بريد بنك)، وكالات كاش بلس ووفاكاش، بالإضافة إلى PayPal وكريبتو USDT بدون أي رسوم إضافية.'
+                      : 'We support direct Moroccan bank transfer (CIH, Attijariwafa, Barid Bank), Cash Plus, Wafacash, PayPal, and Binance USDT.'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLightboxImage({
+                  src: refPayment,
+                  title: lang === 'ar' ? 'طرق الدفع الرسمية (اللوحة #04)' : 'Official Payment Methods (Sheet #04)',
+                  categoryKey: 'Payment Methods',
+                  subtitle: lang === 'ar' ? 'البنوك المغربية وبوابات الدفع المعتمدة لجميع الطلبات' : 'Accepted payment gateways for all orders',
+                  alt: 'BLEUWI Official Accepted Payment Methods Reference Picture',
+                })}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:border-sky-400 hover:bg-sky-400/10 cursor-pointer flex-shrink-0"
+              >
+                <Eye size={13} className="text-sky-400" />
+                <span>{lang === 'ar' ? 'معاينة لوحة الدفع #04' : 'View Payment Sheet #04'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
