@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
-import { CheckCircle2, MessageCircle, Star, ThumbsUp, UserCheck, X, Plus, Edit3, Trash2, ShieldCheck, AlertCircle } from 'lucide-react'
+import { CheckCircle2, MessageCircle, Star, ThumbsUp, UserCheck, X, Plus, Edit3, Trash2, ShieldCheck, AlertCircle, Clock } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { verifiedReviews } from '../data/reviews'
+import { checkProfanity } from '../utils/profanityFilter'
+
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
 
 export default function ReviewsSection() {
   const { t, lang, isRTL } = useLanguage()
@@ -9,9 +12,11 @@ export default function ReviewsSection() {
   const [modalOpen, setModalOpen] = useState(false)
   const [filter, setFilter] = useState('all')
 
-  // One-time review protection states
-  const [hasReviewed, setHasReviewed] = useState(false)
+  // Weekly review & device/IP tracking states
+  const [userIp, setUserIp] = useState('')
   const [myReview, setMyReview] = useState(null)
+  const [daysRemaining, setDaysRemaining] = useState(0)
+  const [isWithinWeek, setIsWithinWeek] = useState(false)
 
   // Form states
   const [name, setName] = useState('')
@@ -20,23 +25,47 @@ export default function ReviewsSection() {
   const [comment, setComment] = useState('')
   const [hoverRating, setHoverRating] = useState(0)
   const [submittedSuccess, setSubmittedSuccess] = useState(false)
+  const [profanityError, setProfanityError] = useState('')
 
-  // Load reviews on mount
+  // Load reviews, check 1-week limit, and fetch IP
   useEffect(() => {
+    // 1. Fetch IP address for rate limiting
+    fetch('https://api.ipify.org?format=json')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.ip) setUserIp(data.ip)
+      })
+      .catch(() => {
+        // Fallback silently if offline or blocked
+      })
+
+    // 2. Check last review timestamp
+    const lastTimeStr = localStorage.getItem('bleuwi_last_review_time')
+    if (lastTimeStr) {
+      const timePassed = Date.now() - Number(lastTimeStr)
+      if (timePassed < ONE_WEEK_MS) {
+        setIsWithinWeek(true)
+        setDaysRemaining(Math.ceil((ONE_WEEK_MS - timePassed) / (24 * 60 * 60 * 1000)))
+      } else {
+        setIsWithinWeek(false)
+        setDaysRemaining(0)
+      }
+    }
+
+    // 3. Load user's review if exists
     try {
       const savedMyReviewStr = localStorage.getItem('bleuwi_my_review')
       let localUserReview = null
       if (savedMyReviewStr) {
         localUserReview = JSON.parse(savedMyReviewStr)
         setMyReview(localUserReview)
-        setHasReviewed(true)
         setName(localUserReview.name || '')
         setService(localUserReview.service || 'Video Editing')
         setRating(localUserReview.rating || 5)
         setComment(localUserReview.comment || '')
       }
 
-      // Merge verified global reviews + user's own review (if exists and not duplicated)
+      // Merge verified global reviews + user's local review
       const allReviews = [...verifiedReviews]
       if (localUserReview && !allReviews.some((r) => r.id === localUserReview.id)) {
         allReviews.unshift(localUserReview)
@@ -47,11 +76,28 @@ export default function ReviewsSection() {
     }
   }, [])
 
-  // Handle Review Submission (Strictly 1 review per user)
+  // Handle Review Submission (With 1-week limit and bad words filter for EN, AR, Darija)
   const handleSaveReview = (e) => {
     e.preventDefault()
+    setProfanityError('')
+
     if (!name.trim() || !comment.trim()) return
 
+    // 1. Check for bad words in English, Arabic, and Moroccan Darija
+    const nameCheck = checkProfanity(name)
+    const commentCheck = checkProfanity(comment)
+
+    if (nameCheck.hasBadWords || commentCheck.hasBadWords) {
+      const badWord = nameCheck.word || commentCheck.word
+      setProfanityError(
+        lang === 'ar'
+          ? `⚠️ تم اكتشاف كلمة أو لفظ غير لائق ("${badWord}"). يرجى الالتزام بالاحترام (العربية، الإنجليزية، أو الدارجة).`
+          : `⚠️ Inappropriate word detected ("${badWord}"). Please keep your review respectful (English, Arabic & Darija).`
+      )
+      return
+    }
+
+    // 2. Prepare Review Data
     const newReview = {
       id: myReview ? myReview.id : Date.now(),
       name: name.trim(),
@@ -65,13 +111,16 @@ export default function ReviewsSection() {
       }),
       verified: true,
       isMine: true,
+      ip: userIp || 'device',
     }
 
-    // Save strictly as this device's ONE review
+    // 3. Save to localStorage with current timestamp for weekly rate-limiting
     setMyReview(newReview)
-    setHasReviewed(true)
+    setIsWithinWeek(true)
+    setDaysRemaining(7)
     localStorage.setItem('bleuwi_my_review', JSON.stringify(newReview))
-    localStorage.setItem('bleuwi_has_reviewed', 'true')
+    localStorage.setItem('bleuwi_last_review_time', Date.now().toString())
+    if (userIp) localStorage.setItem('bleuwi_last_review_ip', userIp)
 
     // Update list
     setReviews((prev) => {
@@ -82,19 +131,21 @@ export default function ReviewsSection() {
     setSubmittedSuccess(true)
   }
 
-  // Handle Delete Review (allows user to clear their one review if they made a mistake)
+  // Handle Delete Review
   const handleDeleteMyReview = () => {
     if (!myReview) return
     localStorage.removeItem('bleuwi_my_review')
-    localStorage.removeItem('bleuwi_has_reviewed')
+    localStorage.removeItem('bleuwi_last_review_time')
     setReviews((prev) => prev.filter((r) => r.id !== myReview.id))
     setMyReview(null)
-    setHasReviewed(false)
+    setIsWithinWeek(false)
+    setDaysRemaining(0)
     setName('')
     setComment('')
     setRating(5)
     setModalOpen(false)
     setSubmittedSuccess(false)
+    setProfanityError('')
   }
 
   const filteredReviews = filter === 'all'
@@ -132,38 +183,25 @@ export default function ReviewsSection() {
           </h2>
           <p>
             {lang === 'ar'
-              ? 'تقييمات صادقة من صناع المحتوى واللاعبين. يُسمح بتقييم واحد فقط لكل عميل لمنع التكرار والتقييمات الوهمية.'
-              : 'Authentic feedback from verified clients. Strictly limited to 1 review per person to eliminate spam.'}
+              ? 'تقييمات صادقة من صناع المحتوى واللاعبين. يُسمح بتقييم واحد أسبوعياً من نفس الجهاز والـ IP مع فلتر تلقائي ضد الكلمات غير اللائقة.'
+              : 'Authentic feedback from verified clients. Strictly 1 review per week per IP/device with automatic profanity filter.'}
           </p>
         </div>
 
-        {/* Action Buttons: Write a Review (or View My Review) & WhatsApp */}
+        {/* Action Buttons: Clean Write a Review & WhatsApp */}
         <div className="flex flex-wrap items-center gap-3">
-          {hasReviewed ? (
-            <button
-              type="button"
-              onClick={() => {
-                setSubmittedSuccess(false)
-                setModalOpen(true)
-              }}
-              className="inline-flex items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-2.5 text-xs font-bold text-emerald-300 transition hover:bg-emerald-400/20 cursor-pointer"
-            >
-              <CheckCircle2 size={15} className="text-emerald-400" />
-              <span>{lang === 'ar' ? 'تم تسجيل تقييمك (انقر للتعديل)' : 'Review Submitted (Click to edit)'}</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setSubmittedSuccess(false)
-                setModalOpen(true)
-              }}
-              className="inline-flex items-center gap-2 rounded-xl bg-sky-400 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-sky-400/20 transition hover:bg-sky-300 cursor-pointer"
-            >
-              <Plus size={15} />
-              <span>{lang === 'ar' ? 'أضف تقييمك (مرة واحدة)' : 'Write a Review (1 Time)'}</span>
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => {
+              setSubmittedSuccess(false)
+              setProfanityError('')
+              setModalOpen(true)
+            }}
+            className="inline-flex items-center gap-2 rounded-xl bg-sky-400 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-sky-400/20 transition hover:bg-sky-300 cursor-pointer"
+          >
+            <Plus size={15} />
+            <span>{lang === 'ar' ? 'أضف تقييمك' : 'Write a Review'}</span>
+          </button>
 
           <a
             href={getWhatsAppReviewLink()}
@@ -253,6 +291,7 @@ export default function ReviewsSection() {
                       type="button"
                       onClick={() => {
                         setSubmittedSuccess(false)
+                        setProfanityError('')
                         setModalOpen(true)
                       }}
                       className="text-slate-400 hover:text-sky-300 cursor-pointer"
@@ -277,14 +316,15 @@ export default function ReviewsSection() {
           </h3>
           <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
             {lang === 'ar'
-              ? 'نحن نلتزم بالشفافية المطلقة ولا نضع تقييمات وهمية. يُسمح بتقييم واحد فقط لكل عميل. هل طلبت مونتاجاً، كوينز، أو اشتراكاً مؤخراً؟ شارك رأيك الصادق!'
-              : 'We strictly avoid fake reviews. Each client can submit exactly 1 review. If you recently ordered editing, coins, or game keys, share your experience!'}
+              ? 'نحن نلتزم بالشفافية المطلقة وبدون تقييمات وهمية. يُسمح بتقييم واحد أسبوعياً من نفس الجهاز والـ IP لمنع التكرار.'
+              : 'We strictly avoid fake reviews. 1 review per week per IP/device is allowed. Share your experience!'}
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <button
               type="button"
               onClick={() => {
                 setSubmittedSuccess(false)
+                setProfanityError('')
                 setModalOpen(true)
               }}
               className="inline-flex items-center gap-2 rounded-xl bg-sky-400 px-5 py-2.5 text-xs font-bold text-slate-950 shadow-md transition hover:bg-sky-300 cursor-pointer"
@@ -305,13 +345,16 @@ export default function ReviewsSection() {
         </div>
       )}
 
-      {/* Modal: Write / Edit Review (One Time Only Lock) */}
+      {/* Modal: Write / Edit Review (With 1-Week Rate Limit & Profanity Filter) */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-up">
           <div className="relative w-full max-w-md rounded-2xl border border-white/15 bg-[#080d1a] p-6 shadow-2xl">
             <button
               type="button"
-              onClick={() => setModalOpen(false)}
+              onClick={() => {
+                setModalOpen(false)
+                setProfanityError('')
+              }}
               className="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"
             >
               <X size={18} />
@@ -329,8 +372,8 @@ export default function ReviewsSection() {
                   </h3>
                   <p className="mt-1.5 text-xs text-slate-300">
                     {lang === 'ar'
-                      ? 'تم قفل التقييم (تقييم واحد لكل عميل لمنع التكرار). يمكنك أيضاً إرساله إلى واتساب لتأكيد توثيقه الدائم.'
-                      : 'Locked to 1 review per client. Send it to WhatsApp to get it verified permanently!'}
+                      ? 'تم تسجيل تقييمك أسبوعياً من هذا الجهاز. أرسله أيضاً عبر واتساب ليصل لـ BLEUWI مباشرة!'
+                      : 'Saved for this week. Send it to WhatsApp to forward it directly to BLEUWI!'}
                   </p>
                 </div>
 
@@ -359,20 +402,38 @@ export default function ReviewsSection() {
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={20} className="text-sky-400" />
                   <h3 className="text-lg font-bold text-white">
-                    {hasReviewed
-                      ? (lang === 'ar' ? 'تعديل تقييمك المسجل' : 'Edit Your Submitted Review')
-                      : (lang === 'ar' ? 'شاركنا تقييمك (مرة واحدة)' : 'Submit Official Review (1 Time)')}
+                    {isWithinWeek && myReview
+                      ? (lang === 'ar' ? 'تعديل تقييمك لهذا الأسبوع' : 'Update Your Review for This Week')
+                      : (lang === 'ar' ? 'أضف تقييمك الرسمي' : 'Submit Official Review')}
                   </h3>
                 </div>
 
-                <div className="mt-2 flex items-center gap-1.5 rounded-lg border border-sky-400/20 bg-sky-400/[0.05] p-2 text-[11px] text-sky-200">
-                  <AlertCircle size={13} className="text-sky-400 flex-shrink-0" />
-                  <span>
-                    {lang === 'ar'
-                      ? 'نظام الحماية: يُسمح بتقييم واحد فقط لكل شخص لمنع التقييمات الوهمية والمكررة.'
-                      : 'Protection: Exactly 1 review per visitor is allowed to prevent fake spam reviews.'}
-                  </span>
-                </div>
+                {/* 1-Week Notice Banner */}
+                {isWithinWeek && (
+                  <div className="mt-2.5 flex items-start gap-2 rounded-xl border border-amber-400/30 bg-amber-400/[0.08] p-2.5 text-xs text-amber-200">
+                    <Clock size={15} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">
+                        {lang === 'ar'
+                          ? `قفل التكرار الأسبوعي: يتبقى ${daysRemaining} ${daysRemaining === 1 ? 'يوم' : 'أيام'} لإرسال تقييم جديد تماماً.`
+                          : `Weekly Limit: ${daysRemaining} day${daysRemaining > 1 ? 's' : ''} left before posting another new review.`}
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-amber-200/80">
+                        {lang === 'ar'
+                          ? 'يمكنك تحديث تقييمك الحالي في أي وقت، أو حذفه.'
+                          : 'You can edit or update your existing review anytime.'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bad words profanity warning alert */}
+                {profanityError && (
+                  <div className="mt-3 flex items-start gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-200 animate-pulse">
+                    <AlertCircle size={15} className="text-rose-400 flex-shrink-0 mt-0.5" />
+                    <span>{profanityError}</span>
+                  </div>
+                )}
 
                 <form onSubmit={handleSaveReview} className="mt-4 space-y-3.5">
                   <div>
@@ -383,7 +444,10 @@ export default function ReviewsSection() {
                       type="text"
                       required
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => {
+                        setName(e.target.value)
+                        if (profanityError) setProfanityError('')
+                      }}
                       placeholder={lang === 'ar' ? 'مثال: أنس أو Viper_Gamer' : 'e.g. Alex or Viper_99'}
                       className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
                     />
@@ -445,18 +509,25 @@ export default function ReviewsSection() {
                       required
                       rows={3}
                       value={comment}
-                      onChange={(e) => setComment(e.target.value)}
+                      onChange={(e) => {
+                        setComment(e.target.value)
+                        if (profanityError) setProfanityError('')
+                      }}
                       placeholder={
                         lang === 'ar'
                           ? 'اكتب عن سرعة التسليم، جودة المونتاج أو الخدمة...'
                           : 'Tell us about delivery speed, quality, support...'
                       }
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none resize-none"
+                      className={`w-full rounded-xl border bg-white/5 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none resize-none ${
+                        profanityError
+                          ? 'border-rose-500/70 focus:border-rose-400 ring-1 ring-rose-500/40'
+                          : 'border-white/10 focus:border-sky-400'
+                      }`}
                     />
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
-                    {hasReviewed ? (
+                    {myReview ? (
                       <button
                         type="button"
                         onClick={handleDeleteMyReview}
@@ -471,7 +542,10 @@ export default function ReviewsSection() {
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => setModalOpen(false)}
+                        onClick={() => {
+                          setModalOpen(false)
+                          setProfanityError('')
+                        }}
                         className="rounded-xl px-3.5 py-2 text-xs font-medium text-slate-400 hover:text-white cursor-pointer"
                       >
                         {lang === 'ar' ? 'إلغاء' : 'Cancel'}
@@ -480,9 +554,9 @@ export default function ReviewsSection() {
                         type="submit"
                         className="rounded-xl bg-sky-400 px-4 py-2 text-xs font-bold text-slate-950 shadow-md hover:bg-sky-300 cursor-pointer"
                       >
-                        {hasReviewed
+                        {isWithinWeek && myReview
                           ? (lang === 'ar' ? 'حفظ التعديل' : 'Update Review')
-                          : (lang === 'ar' ? 'تسجيل التقييم' : 'Submit Review')}
+                          : (lang === 'ar' ? 'نشر التقييم' : 'Post Review')}
                       </button>
                     </div>
                   </div>
