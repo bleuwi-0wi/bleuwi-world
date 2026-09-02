@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ArrowLeft, ArrowRight, CheckCircle2, Coins, CreditCard, Eye, Gamepad2, MessageCircle, ShieldCheck, Sparkles, X, Zap, ZoomIn } from 'lucide-react'
 import { digitalServices, cheatPanels } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
@@ -15,6 +15,46 @@ import refGames from '../assets/3.png'
 
 const designSamples = [designOne, designTwo, designThree, designFour, designFive]
 const videoSamples = [editOne, editTwo]
+
+function LazyShowcaseVideo({ sample, index }) {
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || !('IntersectionObserver' in window)) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {})
+        } else {
+          video.pause()
+        }
+      },
+      { threshold: 0.15 }
+    )
+
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <figure className="portfolio-card video-card">
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="metadata"
+        aria-label={`BLEUWI video editing example ${index + 1}`}
+      >
+        <source src={sample} type="video/mp4" />
+      </video>
+      <figcaption>VIDEO SAMPLE {String(index + 1).padStart(2, '0')}</figcaption>
+    </figure>
+  )
+}
 
 const serviceImages = {
   'game-coins': {
@@ -201,19 +241,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
           </div>
           <div className="video-grid">
             {videoSamples.map((sample, index) => (
-              <figure className="portfolio-card video-card" key={sample}>
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
-                  aria-label={`BLEUWI video editing example ${index + 1}`}
-                >
-                  <source src={sample} type="video/mp4" />
-                </video>
-                <figcaption>VIDEO SAMPLE {String(index + 1).padStart(2, '0')}</figcaption>
-              </figure>
+              <LazyShowcaseVideo key={sample} sample={sample} index={index} />
             ))}
           </div>
 
@@ -309,7 +337,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
           <div className="design-grid">
             {designSamples.map((sample, index) => (
               <figure className="portfolio-card" key={sample}>
-                <img src={sample} alt={`BLEUWI design example ${index + 1}`} loading="lazy" />
+                <img src={sample} alt={`BLEUWI design example ${index + 1}`} loading="lazy" decoding="async" />
               </figure>
             ))}
           </div>
@@ -376,6 +404,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                           alt={refImg.alt}
                           className="h-full w-full object-cover object-top transition-transform duration-500 group-hover/img:scale-105"
                           loading="lazy"
+                          decoding="async"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#080d18] via-black/20 to-black/30 opacity-70 group-hover/img:opacity-40 transition-opacity" />
 
