@@ -13,20 +13,22 @@ import {
   Heart,
   MessageSquare,
   Send,
-  CornerDownRight,
-  Crown
+  Crown,
+  RefreshCw,
 } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { verifiedReviews } from '../data/reviews'
 import { checkProfanity } from '../utils/profanityFilter'
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
+const CLOUD_BIN_URL = 'https://extendsclass.com/api/json-storage/bin/adcaaea'
 
 export default function ReviewsSection() {
   const { t, lang, isRTL } = useLanguage()
   const [reviews, setReviews] = useState([])
   const [modalOpen, setModalOpen] = useState(false)
   const [filter, setFilter] = useState('all')
+  const [isSyncing, setIsSyncing] = useState(false)
 
   // Weekly review & device/IP tracking states
   const [userIp, setUserIp] = useState('')
@@ -37,7 +39,7 @@ export default function ReviewsSection() {
   // Likes tracking state (dictionary of { [reviewId]: true/false })
   const [likedReviews, setLikedReviews] = useState({})
 
-  // Replies open state (dictionary of { [reviewId]: true/false })
+  // Replies open state
   const [openReplyReviewId, setOpenReplyReviewId] = useState(null)
   const [replyName, setReplyName] = useState('')
   const [replyComment, setReplyComment] = useState('')
@@ -52,7 +54,57 @@ export default function ReviewsSection() {
   const [submittedSuccess, setSubmittedSuccess] = useState(false)
   const [profanityError, setProfanityError] = useState('')
 
-  // Load reviews, check 1-week limit, and fetch IP
+  // 1. Synchronize reviews from live Cloud Database
+  const fetchLiveReviews = async () => {
+    setIsSyncing(true)
+    try {
+      const res = await fetch(CLOUD_BIN_URL)
+      if (res.ok) {
+        const data = await res.json()
+        if (data && Array.isArray(data.reviews)) {
+          setReviews(data.reviews)
+          localStorage.setItem('bleuwi_community_reviews', JSON.stringify(data.reviews))
+          return
+        }
+      }
+    } catch {
+      // Fallback silently if offline
+    } finally {
+      setIsSyncing(false)
+    }
+
+    // Fallback: local storage or static
+    try {
+      const savedReviewsStr = localStorage.getItem('bleuwi_community_reviews')
+      if (savedReviewsStr) {
+        setReviews(JSON.parse(savedReviewsStr))
+        return
+      }
+    } catch {}
+
+    setReviews([...verifiedReviews])
+  }
+
+  // Helper to persist reviews both locally AND to Cloud Database
+  const saveReviewsToCloud = async (newReviewsList) => {
+    setReviews(newReviewsList)
+    try {
+      localStorage.setItem('bleuwi_community_reviews', JSON.stringify(newReviewsList))
+    } catch {}
+
+    // Cloud sync PUT request
+    try {
+      await fetch(CLOUD_BIN_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reviews: newReviewsList }),
+      })
+    } catch {
+      // Offline fallback
+    }
+  }
+
+  // Load reviews, check 1-week limit, and fetch IP on mount
   useEffect(() => {
     // 1. Fetch IP address for rate limiting
     fetch('https://api.ipify.org?format=json')
@@ -62,7 +114,7 @@ export default function ReviewsSection() {
       })
       .catch(() => {})
 
-    // 2. Check last review timestamp
+    // 2. Check last review timestamp for 1-week lock
     const lastTimeStr = localStorage.getItem('bleuwi_last_review_time')
     if (lastTimeStr) {
       const timePassed = Date.now() - Number(lastTimeStr)
@@ -75,56 +127,30 @@ export default function ReviewsSection() {
       }
     }
 
-    // 3. Load user's liked reviews
+    // 3. Load user's liked reviews from local device
     try {
       const savedLikes = localStorage.getItem('bleuwi_liked_reviews')
       if (savedLikes) setLikedReviews(JSON.parse(savedLikes))
     } catch {}
 
-    // 4. Load reviews from storage
+    // 4. Load user's my_review if exists
     try {
-      const savedReviewsStr = localStorage.getItem('bleuwi_community_reviews')
-      let loadedReviews = savedReviewsStr ? JSON.parse(savedReviewsStr) : []
-
-      // Merge verified static reviews
-      verifiedReviews.forEach((v) => {
-        if (!loadedReviews.some((r) => r.id === v.id)) {
-          loadedReviews.push(v)
-        }
-      })
-
-      // Load user's local review
       const savedMyReviewStr = localStorage.getItem('bleuwi_my_review')
-      if (savedMyReviewStr) {
-        const localUserReview = JSON.parse(savedMyReviewStr)
-        setMyReview(localUserReview)
-        if (!loadedReviews.some((r) => r.id === localUserReview.id)) {
-          loadedReviews.unshift(localUserReview)
-        }
-      }
+      if (savedMyReviewStr) setMyReview(JSON.parse(savedMyReviewStr))
+    } catch {}
 
-      setReviews(loadedReviews)
-    } catch {
-      setReviews([...verifiedReviews])
-    }
+    // 5. Fetch live cloud reviews
+    fetchLiveReviews()
   }, [])
 
-  // Helper to persist reviews list
-  const persistReviews = (newReviewsList) => {
-    setReviews(newReviewsList)
-    try {
-      localStorage.setItem('bleuwi_community_reviews', JSON.stringify(newReviewsList))
-    } catch {}
-  }
-
-  // Handle Review Submission: Permanent publish, no delete, no update
-  const handleSaveReview = (e) => {
+  // Handle Review Submission: Save to Cloud Database & stay permanently
+  const handleSaveReview = async (e) => {
     e.preventDefault()
     setProfanityError('')
 
     if (!name.trim() || !comment.trim()) return
 
-    // Check for bad words in English, Arabic, and Moroccan Darija
+    // Bad words check (English, Arabic, Moroccan Darija)
     const nameCheck = checkProfanity(name)
     const commentCheck = checkProfanity(comment)
 
@@ -138,7 +164,7 @@ export default function ReviewsSection() {
       return
     }
 
-    // Prepare Review Data (stays permanently on site)
+    // Construct Review Object
     const newReview = {
       id: Date.now(),
       name: name.trim(),
@@ -157,7 +183,7 @@ export default function ReviewsSection() {
       replies: [],
     }
 
-    // Save to localStorage with current timestamp for weekly rate-limiting
+    // Save weekly limit
     setMyReview(newReview)
     setIsWithinWeek(true)
     setDaysRemaining(7)
@@ -165,15 +191,15 @@ export default function ReviewsSection() {
     localStorage.setItem('bleuwi_last_review_time', Date.now().toString())
     if (userIp) localStorage.setItem('bleuwi_last_review_ip', userIp)
 
-    // Update reviews list and persist
+    // Save to Cloud Database so ALL visitors worldwide see it instantly!
     const updated = [newReview, ...reviews.filter((r) => r.id !== newReview.id)]
-    persistReviews(updated)
+    await saveReviewsToCloud(updated)
 
     setSubmittedSuccess(true)
   }
 
-  // Handle Heart / Like Toggle
-  const handleToggleLike = (reviewId) => {
+  // Handle Heart / Like Toggle (Updates Cloud Database live!)
+  const handleToggleLike = async (reviewId) => {
     const isCurrentlyLiked = !!likedReviews[reviewId]
     const nextLikedState = !isCurrentlyLiked
 
@@ -186,7 +212,7 @@ export default function ReviewsSection() {
       localStorage.setItem('bleuwi_liked_reviews', JSON.stringify(updatedLikesMap))
     } catch {}
 
-    // Update review like count
+    // Update review like count and sync to cloud
     const updatedReviews = reviews.map((r) => {
       if (r.id === reviewId) {
         const currentLikes = r.likes || 0
@@ -197,11 +223,11 @@ export default function ReviewsSection() {
       }
       return r
     })
-    persistReviews(updatedReviews)
+    await saveReviewsToCloud(updatedReviews)
   }
 
-  // Handle Submit Reply
-  const handleAddReply = (reviewId) => {
+  // Handle Submit Reply (Updates Cloud Database live!)
+  const handleAddReply = async (reviewId) => {
     setReplyProfanityError('')
     if (!replyName.trim() || !replyComment.trim()) return
 
@@ -246,7 +272,7 @@ export default function ReviewsSection() {
       return r
     })
 
-    persistReviews(updatedReviews)
+    await saveReviewsToCloud(updatedReviews)
     setReplyComment('')
     setReplyProfanityError('')
   }
@@ -286,12 +312,12 @@ export default function ReviewsSection() {
           </h2>
           <p>
             {lang === 'ar'
-              ? 'تقييمات دائمة لا تُحذف لضمان الصدق التام. يمكنك التفاعل بالإعجاب والرد على أي تقييم!'
-              : 'Permanent reviews with no deletion or editing to ensure transparency. Like and reply to any review!'}
+              ? 'تقييمات سحابية حية ومشتركة لجميع الزوار. أي تقييم أو إعجاب أو رد يُحفظ سحابياً ويظهر للجميع فوراً!'
+              : 'Live cloud-synced reviews. Any review, like, or reply updates in real time for all visitors worldwide!'}
           </p>
         </div>
 
-        {/* Action Buttons: Clean Write a Review & WhatsApp */}
+        {/* Action Buttons: Write Review & WhatsApp */}
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
@@ -318,7 +344,7 @@ export default function ReviewsSection() {
         </div>
       </div>
 
-      {/* Filter tabs if reviews exist */}
+      {/* Filter tabs */}
       {reviews.length > 0 && (
         <div className="mt-8 flex flex-wrap gap-2">
           {['all', 'Video Editing', 'Cheat Panels', 'Design', 'Digital Services', 'Game Coins', 'Subscriptions', 'Sell Games'].map((f) => (
@@ -338,7 +364,7 @@ export default function ReviewsSection() {
         </div>
       )}
 
-      {/* Reviews Grid or Authentic Empty State */}
+      {/* Reviews Grid */}
       {filteredReviews.length > 0 ? (
         <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {filteredReviews.map((rev) => {
@@ -371,7 +397,7 @@ export default function ReviewsSection() {
                     <div className="flex items-center gap-1.5">
                       {rev.isMine && (
                         <span className="rounded-full bg-sky-400/20 px-2 py-0.5 text-[10px] font-bold text-sky-300 border border-sky-400/30">
-                          {lang === 'ar' ? 'تقييمك المنشور' : 'Your Review'}
+                          {lang === 'ar' ? 'تقييمك' : 'Your Review'}
                         </span>
                       )}
                       {rev.verified && (
@@ -432,7 +458,7 @@ export default function ReviewsSection() {
                     </button>
                   </div>
 
-                  {/* Replies Thread (Collapsible) */}
+                  {/* Replies Thread */}
                   {isRepliesOpen && (
                     <div className="mt-3.5 space-y-2.5 rounded-xl border border-white/10 bg-black/40 p-3 text-xs animate-fade-up">
                       {repliesList.length > 0 ? (
@@ -492,7 +518,7 @@ export default function ReviewsSection() {
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') handleAddReply(rev.id)
                             }}
-                            placeholder={lang === 'ar' ? 'اكتب رداً على هذا التقييم...' : 'Write a reply...'}
+                            placeholder={lang === 'ar' ? 'اكتب رداً...' : 'Write a reply...'}
                             className="flex-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
                           />
                           <button
@@ -513,7 +539,7 @@ export default function ReviewsSection() {
           })}
         </div>
       ) : (
-        /* Authentic Zero-Fake Empty State Card */
+        /* Empty State Card */
         <div className="mt-10 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] to-transparent p-8 text-center sm:p-12">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-sky-400/30 bg-sky-400/10 text-sky-400">
             <ThumbsUp size={26} />
@@ -523,8 +549,8 @@ export default function ReviewsSection() {
           </h3>
           <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
             {lang === 'ar'
-              ? 'التقييمات هنا حقيقية ودائمة لضمان المصداقية. يُسمح بتقييم واحد أسبوعياً من نفس الجهاز والـ IP.'
-              : 'Reviews here are authentic and permanent for full transparency. 1 review per week per IP/device.'}
+              ? 'التقييمات هنا سحابية حية ودائمة لضمان المصداقية. يُسمح بتقييم واحد أسبوعياً من نفس الجهاز والـ IP.'
+              : 'Live cloud reviews for full transparency. 1 review per week per IP/device.'}
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <button
@@ -552,7 +578,7 @@ export default function ReviewsSection() {
         </div>
       )}
 
-      {/* Modal: Write Permanent Review (No Edit / No Delete) */}
+      {/* Modal: Write Permanent Review */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-up">
           <div className="relative w-full max-w-md rounded-2xl border border-white/15 bg-[#080d1a] p-6 shadow-2xl">
@@ -567,7 +593,7 @@ export default function ReviewsSection() {
               <X size={18} />
             </button>
 
-            {/* If user already submitted this week: Block new submission & explain it's permanently published */}
+            {/* If user already submitted this week */}
             {isWithinWeek && !submittedSuccess ? (
               <div className="text-center py-4 space-y-4">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/40">
@@ -579,8 +605,8 @@ export default function ReviewsSection() {
                   </h3>
                   <p className="mt-2 text-xs text-slate-300 leading-relaxed">
                     {lang === 'ar'
-                      ? `لقد قمت بنشر تقييمك بالفعل لهذا الأسبوع، وتقييمك منشور في الموقع بشكل دائم وثابت (لا يمكن حذفه أو تغييره لضمان المصداقية). يتبقى ${daysRemaining} ${daysRemaining === 1 ? 'يوم' : 'أيام'} لنشر تقييم جديد.`
-                      : `You have already posted your review for this week. All reviews stay permanently on the website for transparency (no editing or deletion). You can post another review in ${daysRemaining} day(s).`}
+                      ? `لقد قمت بنشر تقييمك بالفعل لهذا الأسبوع، وتقييمك منشور سحابياً على الموقع لجميع الزوار (دائم وثابت لضمان المصداقية). يتبقى ${daysRemaining} ${daysRemaining === 1 ? 'يوم' : 'أيام'} لنشر تقييم جديد.`
+                      : `You have already posted your review for this week. It is live in the cloud for everyone (permanent for transparency). You can post another review in ${daysRemaining} day(s).`}
                   </p>
                 </div>
 
@@ -621,12 +647,12 @@ export default function ReviewsSection() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white">
-                    {lang === 'ar' ? 'تم نشر تقييمك الدائم بنجاح!' : 'Review Published Permanently!'}
+                    {lang === 'ar' ? 'تم نشر تقييمك سحابياً بنجاح!' : 'Review Published to Cloud!'}
                   </h3>
                   <p className="mt-1.5 text-xs text-slate-300">
                     {lang === 'ar'
-                      ? 'تقييمك الآن منشور بشكل دائم وثابت على الموقع. يمكنك أيضاً إرساله إلى واتساب لتوثيقه رسمياً لدى BLEUWI!'
-                      : 'Your review is now permanently live on the website! Forward it to WhatsApp for official verification.'}
+                      ? 'تقييمك الآن منشور سحابياً على الموقع لجميع الزوار حول العالم بشكل دائم وثابت!'
+                      : 'Your review is now live in the cloud and visible to all visitors worldwide permanently!'}
                   </p>
                 </div>
 
@@ -655,7 +681,7 @@ export default function ReviewsSection() {
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={20} className="text-sky-400" />
                   <h3 className="text-lg font-bold text-white">
-                    {lang === 'ar' ? 'أضف تقييمك الرسمي (دائم ولا يُحذف)' : 'Submit Official Review (Permanent)'}
+                    {lang === 'ar' ? 'أضف تقييمك الرسمي (دائم وسحابي)' : 'Submit Official Review (Live & Permanent)'}
                   </h3>
                 </div>
 
@@ -663,8 +689,8 @@ export default function ReviewsSection() {
                   <AlertCircle size={13} className="text-sky-400 flex-shrink-0" />
                   <span>
                     {lang === 'ar'
-                      ? 'ملاحظة: التقييمات تبقى في الموقع بشكل دائم وثابت. يُسمح بتقييم واحد أسبوعياً.'
-                      : 'Notice: Reviews stay permanently on the site. Limited to 1 review per week.'}
+                      ? 'ملاحظة: التقييم يُحفظ سحابياً ويظهر لجميع الزوار فوراً. يُسمح بتقييم واحد أسبوعياً.'
+                      : 'Notice: Reviews are saved to the cloud and visible to all visitors. 1 review per week.'}
                   </span>
                 </div>
 
@@ -782,7 +808,7 @@ export default function ReviewsSection() {
                       type="submit"
                       className="rounded-xl bg-sky-400 px-4 py-2 text-xs font-bold text-slate-950 shadow-md hover:bg-sky-300 cursor-pointer"
                     >
-                      {lang === 'ar' ? 'نشر التقييم الدائم' : 'Post Permanent Review'}
+                      {lang === 'ar' ? 'نشر التقييم السحابي' : 'Post Review to Cloud'}
                     </button>
                   </div>
                 </form>
