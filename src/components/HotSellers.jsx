@@ -39,7 +39,7 @@ export const freeFirePacks = [
     id: 'ff-530',
     name: 'Free Fire 530 Diamonds',
     shortName: '530 Diamonds',
-    categoryKey: 'Free Fire Diamonds',
+    categoryKey: 'Free Fire Diamond',
     price: '60 DH',
     priceUsd: '6$',
     diamonds: '530',
@@ -73,7 +73,7 @@ export const freeFirePacks = [
     id: 'ff-1080',
     name: 'Free Fire 1080 Diamonds',
     shortName: '1080 Diamonds',
-    categoryKey: 'Free Fire Diamonds',
+    categoryKey: 'Free Fire Diamond',
     price: '120 DH',
     priceUsd: '12$',
     diamonds: '1080',
@@ -107,7 +107,7 @@ export const freeFirePacks = [
     id: 'ff-2420',
     name: 'Free Fire 2420 Diamonds',
     shortName: '2420 Diamonds',
-    categoryKey: 'Free Fire Diamonds',
+    categoryKey: 'Free Fire Diamond',
     price: '250 DH',
     priceUsd: '25$',
     diamonds: '2420',
@@ -141,7 +141,7 @@ export const freeFirePacks = [
     id: 'ff-6160',
     name: 'Free Fire 6160 Diamonds',
     shortName: '6160 Diamonds',
-    categoryKey: 'Free Fire Diamonds',
+    categoryKey: 'Free Fire Diamond',
     price: '600 DH',
     priceUsd: '60$',
     diamonds: '6160',
@@ -492,7 +492,7 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
               }`}
             >
               <Gem size={13} className={filter === 'freefire' ? 'text-amber-400 animate-bounce' : 'text-amber-400/70'} />
-              <span>{lang === 'ar' ? 'جواهر فري فاير (4)' : 'Free Fire (4)'}</span>
+              <span>{lang === 'ar' ? 'جواهر فري فاير (Free Fire Diamond)' : 'Free Fire Diamond'}</span>
               <span className="rounded-md bg-amber-400/20 px-1.5 py-0.2 text-[10px] text-amber-300 font-mono font-bold">1$=10DH</span>
             </button>
 
@@ -524,16 +524,114 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
           </div>
         </div>
 
+        {/* Annonce alert for Free Fire Diamond category when browsing other tabs */}
+        {filter !== 'all' && filter !== 'freefire' && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/15 p-3 px-4 shadow-md backdrop-blur-md">
+            <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
+              <Gem size={15} className="text-amber-400 animate-bounce" />
+              <span>
+                {lang === 'ar' 
+                  ? 'إعلان: فئة جواهر فري فاير (Free Fire Diamond) متوفرة الآن مع أقوى العروض بـ 1$ = 10 دراهم!' 
+                  : 'Annonce: Free Fire Diamond category is now live with top trending offers at 1$ = 10 DH!'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFilter('freefire')}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-amber-400/60 bg-amber-400 px-3 py-1 text-xs font-black text-slate-950 shadow transition hover:scale-105 cursor-pointer"
+            >
+              <span>{lang === 'ar' ? 'الانتقال لفئة Free Fire Diamond' : 'Switch to Free Fire Diamond'}</span>
+              <ArrowRight size={12} className={isRTL ? 'rotate-180' : ''} />
+            </button>
+          </div>
+        )}
+
         {/* 1. FREE FIRE DIAMONDS SECTION (1$ = 10 DH) */}
         {showFreeFire && (
           <div className="mt-8">
+            {/* Free Fire Diamond Official Announcement / Annonce Card */}
+            <div className="mb-6 overflow-hidden rounded-2xl sm:rounded-3xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-yellow-500/15 p-4 sm:p-6 backdrop-blur-xl shadow-[0_10px_35px_rgba(251,191,36,0.15)]">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="relative grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl border border-amber-400/60 bg-gradient-to-br from-amber-400 to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/30">
+                    <Gem size={26} className="fill-slate-950 text-slate-950 animate-pulse" />
+                    <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-400" />
+                    </span>
+                  </div>
+
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-amber-300 border border-amber-400/30 uppercase tracking-wider">
+                        <Sparkles size={11} className="text-amber-400" />
+                        <span>{lang === 'ar' ? 'إعلان فئة: Free Fire Diamond' : 'OFFICIAL ANNONCE: Free Fire Diamond'}</span>
+                      </span>
+                      <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
+                        {lang === 'ar' ? 'سعر الصرف: 1$ = 10 دراهم (6$ = 60 DH)' : 'Exchange Rate: 1$ = 10 DH (6$ = 60 DH)'}
+                      </span>
+                    </div>
+
+                    <h4 className="mt-1 text-base sm:text-lg font-black text-white">
+                      {lang === 'ar' 
+                        ? 'إعلان فئة Free Fire Diamond — شحن فوري لجواهر فري فاير عبر الآيدي (Player ID)' 
+                        : 'Free Fire Diamond Annonce — Instant Player ID Top-Up with Top Trending Offers'}
+                    </h4>
+                    <p className="text-xs text-slate-300 leading-relaxed mt-0.5">
+                      {lang === 'ar'
+                        ? 'فئة جديدة ضمن العروض الأكثر طلباً! باقات 530، 1080، 2420 و 6160 جوهرة (6$ = 60 درهم) مع تسليم فوري في 5 دقائق والضمان الذهبي 100%.'
+                        : 'New category alongside top trending offers! Packs of 530, 1080, 2420 & 6160 Diamonds (6$ = 60 DH) with instant 5-minute delivery & 100% Golden Warranty.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Annonce Quick Rates Summary */}
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 text-center text-xs">
+                    <button 
+                      type="button"
+                      onClick={() => handleOrder(freeFirePacks[0])}
+                      className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/10 transition cursor-pointer"
+                    >
+                      <div className="text-[10px] text-slate-400">530 💎</div>
+                      <div className="font-bold text-amber-300">60 DH (6$)</div>
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => handleOrder(freeFirePacks[1])}
+                      className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/10 transition cursor-pointer"
+                    >
+                      <div className="text-[10px] text-slate-400">1080 💎</div>
+                      <div className="font-bold text-amber-300">120 DH (12$)</div>
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => handleOrder(freeFirePacks[2])}
+                      className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/10 transition cursor-pointer"
+                    >
+                      <div className="text-[10px] text-slate-400">2420 💎</div>
+                      <div className="font-bold text-amber-300">250 DH (25$)</div>
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => handleOrder(freeFirePacks[3])}
+                      className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/10 transition cursor-pointer"
+                    >
+                      <div className="text-[10px] text-slate-400">6160 💎</div>
+                      <div className="font-bold text-amber-300">600 DH (60$)</div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-amber-400/40 bg-amber-500/15 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]">
                   <Gem size={15} />
                 </span>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span>{lang === 'ar' ? 'شحن جواهر فري فاير (Free Fire Diamonds)' : 'Free Fire Diamonds ID Top-Up'}</span>
+                  <span>{lang === 'ar' ? 'باقات فئة Free Fire Diamond' : 'Free Fire Diamond Category Packs'}</span>
                 </h3>
               </div>
 

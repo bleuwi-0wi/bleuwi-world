@@ -216,6 +216,16 @@ export const productRegistry = [
 ]
 
 const categoryFallbacks = {
+  'Free Fire Diamond': {
+    title: 'Free Fire Diamond (Game Coins)',
+    badge: '1$ = 10 DH',
+    badgeAr: '1$ = 10 دراهم',
+    image: imgFf19,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/19.jpeg',
+    tagline: 'Official Free Fire Diamonds instant ID top-up (1$ = 10 DH)',
+    taglineAr: 'شحن فوري لجواهر فري فاير بالأيدي بمعدل صرف 1$ = 10 دراهم',
+    filename: 'BLEUWI-FreeFire-Diamonds.jpeg',
+  },
   'Free Fire Diamonds': {
     title: 'Free Fire Diamonds (Game Coins)',
     badge: '1$ = 10 DH',
@@ -289,6 +299,7 @@ const categoryFallbacks = {
 }
 
 const categoryIcons = {
+  'Free Fire Diamond': Gem,
   'Free Fire Diamonds': Gem,
   'Game Coins': Coins,
   'Abonnements': Sparkles,

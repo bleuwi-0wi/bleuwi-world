@@ -201,6 +201,17 @@ export const cheatPanels = [
 ]
 
 export const orderPresets = {
+  'Free Fire Diamond': {
+    category: 'Free Fire Diamond (Game Coins)',
+    sessionName: 'DIGITAL SERVICES',
+    games: [
+      'Free Fire 530 Diamonds - 60 DH (6$)',
+      'Free Fire 1080 Diamonds - 120 DH (12$)',
+      'Free Fire 2420 Diamonds - 250 DH (25$)',
+      'Free Fire 6160 Diamonds - 600 DH (60$)',
+      'Custom Free Fire Diamond Amount',
+    ],
+  },
   'Free Fire Diamonds': {
     category: 'Free Fire Diamonds (Game Coins)',
     sessionName: 'DIGITAL SERVICES',
