@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   Flame, 
   Sparkles, 
@@ -16,7 +16,12 @@ import {
   Disc3,
   Crown,
   Gem,
-  Coins
+  Coins,
+  Maximize2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2
 } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { WHATSAPP_NUMBER } from '../data/links'
@@ -404,6 +409,40 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
   const { lang, isRTL } = useLanguage()
   const [filter, setFilter] = useState('all') // 'all' | 'freefire' | 'games' | 'subscriptions'
   const [hoveredItem, setHoveredItem] = useState(null)
+  const [selectedBigOffer, setSelectedBigOffer] = useState(null)
+
+  const allOffers = [
+    ...freeFirePacks,
+    ...hotSellerGames,
+    ...hotSubscriptionOffers,
+  ]
+
+  const currentBigIndex = selectedBigOffer 
+    ? allOffers.findIndex((o) => o.id === selectedBigOffer.id) 
+    : -1
+
+  const handlePrevBigOffer = () => {
+    if (currentBigIndex === -1) return
+    const prevIdx = (currentBigIndex - 1 + allOffers.length) % allOffers.length
+    setSelectedBigOffer(allOffers[prevIdx])
+  }
+
+  const handleNextBigOffer = () => {
+    if (currentBigIndex === -1) return
+    const nextIdx = (currentBigIndex + 1) % allOffers.length
+    setSelectedBigOffer(allOffers[nextIdx])
+  }
+
+  useEffect(() => {
+    if (!selectedBigOffer) return
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedBigOffer(null)
+      if (e.key === 'ArrowLeft') handlePrevBigOffer()
+      if (e.key === 'ArrowRight') handleNextBigOffer()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedBigOffer, currentBigIndex])
 
   const handleOrder = (item) => {
     if (onOpenOrder) {
@@ -590,34 +629,50 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                   <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 text-center text-xs">
                     <button 
                       type="button"
-                      onClick={() => handleOrder(freeFirePacks[0])}
-                      className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/10 transition cursor-pointer"
+                      onClick={() => setSelectedBigOffer(freeFirePacks[0])}
+                      className="group rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/15 transition cursor-pointer"
+                      title={lang === 'ar' ? 'عرض تفاصيل باقة 530 جوهرة مكبّرة' : 'Click to view 530 Diamonds offer big'}
                     >
-                      <div className="text-[10px] text-slate-400">530 💎</div>
+                      <div className="text-[10px] text-slate-400 group-hover:text-amber-300 flex items-center justify-center gap-1">
+                        <span>530 💎</span>
+                        <Maximize2 size={10} className="text-amber-400 opacity-70 group-hover:opacity-100" />
+                      </div>
                       <div className="font-bold text-amber-300">60 DH (6$)</div>
                     </button>
                     <button 
                       type="button"
-                      onClick={() => handleOrder(freeFirePacks[1])}
-                      className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/10 transition cursor-pointer"
+                      onClick={() => setSelectedBigOffer(freeFirePacks[1])}
+                      className="group rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/15 transition cursor-pointer"
+                      title={lang === 'ar' ? 'عرض تفاصيل باقة 1080 جوهرة مكبّرة' : 'Click to view 1080 Diamonds offer big'}
                     >
-                      <div className="text-[10px] text-slate-400">1080 💎</div>
+                      <div className="text-[10px] text-slate-400 group-hover:text-amber-300 flex items-center justify-center gap-1">
+                        <span>1080 💎</span>
+                        <Maximize2 size={10} className="text-amber-400 opacity-70 group-hover:opacity-100" />
+                      </div>
                       <div className="font-bold text-amber-300">120 DH (12$)</div>
                     </button>
                     <button 
                       type="button"
-                      onClick={() => handleOrder(freeFirePacks[2])}
-                      className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/10 transition cursor-pointer"
+                      onClick={() => setSelectedBigOffer(freeFirePacks[2])}
+                      className="group rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/15 transition cursor-pointer"
+                      title={lang === 'ar' ? 'عرض تفاصيل باقة 2420 جوهرة مكبّرة' : 'Click to view 2420 Diamonds offer big'}
                     >
-                      <div className="text-[10px] text-slate-400">2420 💎</div>
+                      <div className="text-[10px] text-slate-400 group-hover:text-amber-300 flex items-center justify-center gap-1">
+                        <span>2420 💎</span>
+                        <Maximize2 size={10} className="text-amber-400 opacity-70 group-hover:opacity-100" />
+                      </div>
                       <div className="font-bold text-amber-300">250 DH (25$)</div>
                     </button>
                     <button 
                       type="button"
-                      onClick={() => handleOrder(freeFirePacks[3])}
-                      className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/10 transition cursor-pointer"
+                      onClick={() => setSelectedBigOffer(freeFirePacks[3])}
+                      className="group rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 hover:border-amber-400/60 hover:bg-amber-500/15 transition cursor-pointer"
+                      title={lang === 'ar' ? 'عرض تفاصيل باقة 6160 جوهرة مكبّرة' : 'Click to view 6160 Diamonds offer big'}
                     >
-                      <div className="text-[10px] text-slate-400">6160 💎</div>
+                      <div className="text-[10px] text-slate-400 group-hover:text-amber-300 flex items-center justify-center gap-1">
+                        <span>6160 💎</span>
+                        <Maximize2 size={10} className="text-amber-400 opacity-70 group-hover:opacity-100" />
+                      </div>
                       <div className="font-bold text-amber-300">600 DH (60$)</div>
                     </button>
                   </div>
@@ -655,12 +710,16 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                   onMouseLeave={() => setHoveredItem(null)}
                   className="group relative flex flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] via-slate-950/80 to-[#05070d] p-4 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-amber-400/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_35px_rgba(251,191,36,0.3)]"
                 >
-                  {/* Top Image Container */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/15 bg-black/60">
+                  {/* Top Image Container with Click to View Big */}
+                  <div 
+                    onClick={() => setSelectedBigOffer(pack)}
+                    className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/15 bg-black/60 cursor-pointer group/img"
+                    title={lang === 'ar' ? 'انقر لتكبير العرض وقراءة التفاصيل' : 'Click to view full offer big'}
+                  >
                     <img
                       src={pack.image}
                       alt={pack.name}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-108"
                       loading="lazy"
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
@@ -684,6 +743,14 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                       <span className="text-white/40">·</span>
                       <span className="text-emerald-400">1$=10DH</span>
                     </div>
+
+                    {/* Hover Zoom Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 group-hover/img:opacity-100 transition-opacity backdrop-blur-[2px]">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-black/85 border border-amber-400/60 px-3 py-1.5 text-xs font-black text-amber-300 shadow-xl backdrop-blur-md">
+                        <Maximize2 size={13} className="text-amber-400" />
+                        <span>{lang === 'ar' ? 'عرض مكبّر وكامل' : 'View Full Offer Big'}</span>
+                      </span>
+                    </div>
                   </div>
 
                   {/* Content & Features */}
@@ -691,7 +758,10 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                     <div>
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h4 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
+                          <h4 
+                            onClick={() => setSelectedBigOffer(pack)}
+                            className="text-base font-bold text-white group-hover:text-amber-300 transition-colors cursor-pointer"
+                          >
                             {pack.name}
                           </h4>
                           <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
@@ -721,8 +791,18 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                       </ul>
                     </div>
 
-                    {/* Action Buttons */}
+                    {/* Action Buttons with View Big Option */}
                     <div className="mt-4 flex items-center gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBigOffer(pack)}
+                        className="flex h-9 items-center justify-center gap-1 rounded-xl border border-amber-400/30 bg-amber-500/10 px-2.5 text-xs font-bold text-amber-300 transition hover:border-amber-400 hover:bg-amber-500/20 hover:scale-105 active:scale-95 cursor-pointer flex-none"
+                        title={lang === 'ar' ? 'تكبير العرض لقراءة أسهل' : 'View full offer big for easy reading'}
+                      >
+                        <Maximize2 size={13} />
+                        <span className="hidden sm:inline">{lang === 'ar' ? 'تكبير' : 'Big'}</span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => handleOrder(pack)}
@@ -772,12 +852,16 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                   onMouseLeave={() => setHoveredItem(null)}
                   className="group relative flex flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] via-slate-950/80 to-[#05070d] p-4 sm:p-5 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-sky-400/50 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(56,189,248,0.25)]"
                 >
-                  {/* Top Image Container */}
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/15 bg-black/60">
+                  {/* Top Image Container with Click to View Big */}
+                  <div 
+                    onClick={() => setSelectedBigOffer(game)}
+                    className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/15 bg-black/60 cursor-pointer group/img"
+                    title={lang === 'ar' ? 'انقر لتكبير العرض وقراءة التفاصيل' : 'Click to view full offer big'}
+                  >
                     <img
                       src={game.image}
                       alt={game.name}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-108"
                       loading="lazy"
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
@@ -802,6 +886,14 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                       <Monitor size={12} className="text-sky-400" />
                       <span>{lang === 'ar' ? game.platformAr : game.platform}</span>
                     </div>
+
+                    {/* Hover Zoom Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 group-hover/img:opacity-100 transition-opacity backdrop-blur-[2px]">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-black/85 border border-sky-400/60 px-3 py-1.5 text-xs font-black text-sky-300 shadow-xl backdrop-blur-md">
+                        <Maximize2 size={13} className="text-sky-400" />
+                        <span>{lang === 'ar' ? 'عرض مكبّر وكامل' : 'View Full Offer Big'}</span>
+                      </span>
+                    </div>
                   </div>
 
                   {/* Content & Features */}
@@ -809,7 +901,10 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                     <div>
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <h4 className="text-lg font-bold text-white group-hover:text-sky-300 transition-colors">
+                          <h4 
+                            onClick={() => setSelectedBigOffer(game)}
+                            className="text-lg font-bold text-white group-hover:text-sky-300 transition-colors cursor-pointer"
+                          >
                             {game.name}
                           </h4>
                           <p className="mt-1 text-xs text-slate-400 line-clamp-1">
@@ -839,8 +934,18 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                       </ul>
                     </div>
 
-                    {/* Order Action Buttons */}
+                    {/* Order Action Buttons with View Big Option */}
                     <div className="mt-5 flex items-center gap-2.5 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBigOffer(game)}
+                        className="flex h-10 items-center justify-center gap-1 rounded-xl border border-sky-400/30 bg-sky-500/10 px-3 text-xs font-bold text-sky-300 transition hover:border-sky-400 hover:bg-sky-500/20 hover:scale-105 active:scale-95 cursor-pointer flex-none"
+                        title={lang === 'ar' ? 'تكبير العرض لقراءة أسهل' : 'View full offer big for easy reading'}
+                      >
+                        <Maximize2 size={14} />
+                        <span className="hidden sm:inline">{lang === 'ar' ? 'تكبير' : 'Big'}</span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => handleOrder(game)}
@@ -893,12 +998,16 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                     onMouseLeave={() => setHoveredItem(null)}
                     className="group relative flex flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] via-slate-950/80 to-[#05070d] p-4 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-purple-400/50 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(168,85,247,0.25)]"
                   >
-                    {/* Top Image Container */}
-                    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/15 bg-black/60">
+                    {/* Top Image Container with Click to View Big */}
+                    <div 
+                      onClick={() => setSelectedBigOffer(offer)}
+                      className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/15 bg-black/60 cursor-pointer group/img"
+                      title={lang === 'ar' ? 'انقر لتكبير العرض وقراءة التفاصيل' : 'Click to view full offer big'}
+                    >
                       <img
                         src={offer.image}
                         alt={offer.name}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-108"
                         loading="lazy"
                       />
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
@@ -914,6 +1023,14 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                         <Icon size={11} className="text-purple-400" />
                         <span>{lang === 'ar' ? offer.typeTagAr : offer.typeTag}</span>
                       </div>
+
+                      {/* Hover Zoom Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 group-hover/img:opacity-100 transition-opacity backdrop-blur-[2px]">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-black/85 border border-purple-400/60 px-3 py-1.5 text-xs font-black text-purple-300 shadow-xl backdrop-blur-md">
+                          <Maximize2 size={13} className="text-purple-400" />
+                          <span>{lang === 'ar' ? 'عرض مكبّر وكامل' : 'View Full Offer Big'}</span>
+                        </span>
+                      </div>
                     </div>
 
                     {/* Content & Features */}
@@ -921,7 +1038,10 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                       <div>
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <h4 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
+                            <h4 
+                              onClick={() => setSelectedBigOffer(offer)}
+                              className="text-base font-bold text-white group-hover:text-purple-300 transition-colors cursor-pointer"
+                            >
                               {offer.name}
                             </h4>
                             <p className="mt-1 text-xs text-slate-400 line-clamp-1">
@@ -948,8 +1068,18 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                         </ul>
                       </div>
 
-                      {/* Action Buttons */}
+                      {/* Action Buttons with View Big Option */}
                       <div className="mt-4 flex items-center gap-2 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedBigOffer(offer)}
+                          className="flex h-9 items-center justify-center gap-1 rounded-xl border border-purple-400/30 bg-purple-500/10 px-2.5 text-xs font-bold text-purple-300 transition hover:border-purple-400 hover:bg-purple-500/20 hover:scale-105 active:scale-95 cursor-pointer flex-none"
+                          title={lang === 'ar' ? 'تكبير العرض لقراءة أسهل' : 'View full offer big for easy reading'}
+                        >
+                          <Maximize2 size={13} />
+                          <span className="hidden sm:inline">{lang === 'ar' ? 'تكبير' : 'Big'}</span>
+                        </button>
+
                         <button
                           type="button"
                           onClick={() => handleOrder(offer)}
@@ -977,6 +1107,185 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
           </div>
         )}
       </div>
+
+      {/* ========================================================================= */}
+      {/* BIG OFFER DETAIL MODAL (FULL OFFER BIG FOR EASY READING)                  */}
+      {/* ========================================================================= */}
+      {selectedBigOffer && (
+        <div 
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-black/85 p-3 sm:p-6 backdrop-blur-md overflow-y-auto animate-fade-in"
+          onClick={() => setSelectedBigOffer(null)}
+        >
+          <div 
+            className="relative max-w-2xl sm:max-w-3xl w-full max-h-[92vh] overflow-y-auto rounded-3xl border border-amber-400/40 bg-gradient-to-b from-slate-900 via-slate-950 to-[#05070d] p-5 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.95)] text-white scrollbar-thin"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Controls: Badges, Navigation Counter & Close Button */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5 gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/50 bg-amber-500/15 px-3 py-1 text-xs font-black text-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                  <Sparkles size={12} className="text-amber-400 animate-pulse" />
+                  <span>{lang === 'ar' ? 'تفاصيل العرض بالكامل (عرض مكبّر)' : 'Full Big Offer Details'}</span>
+                </span>
+                <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 text-xs text-slate-300 font-mono">
+                  {currentBigIndex + 1} / {allOffers.length}
+                </span>
+              </div>
+
+              {/* Navigation & Close */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={handlePrevBigOffer}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.05] text-slate-300 hover:text-white hover:bg-white/[0.1] transition cursor-pointer"
+                  title={lang === 'ar' ? 'العرض السابق' : 'Previous Offer'}
+                >
+                  <ChevronLeft size={16} className={isRTL ? 'rotate-180' : ''} />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextBigOffer}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.05] text-slate-300 hover:text-white hover:bg-white/[0.1] transition cursor-pointer"
+                  title={lang === 'ar' ? 'العرض التالي' : 'Next Offer'}
+                >
+                  <ChevronRight size={16} className={isRTL ? 'rotate-180' : ''} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedBigOffer(null)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/20 bg-white/[0.08] text-white hover:bg-red-500 hover:border-red-500 transition cursor-pointer ml-1"
+                  title={lang === 'ar' ? 'إغلاق' : 'Close'}
+                  aria-label="Close"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Main Content Grid: Big Image & Info */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+              {/* Big Image Container (5 cols on md) */}
+              <div className="md:col-span-5 relative aspect-[4/3] sm:aspect-square w-full overflow-hidden rounded-2xl border-2 border-white/20 bg-black/80 shadow-xl">
+                <img
+                  src={selectedBigOffer.image}
+                  alt={selectedBigOffer.name}
+                  className="h-full w-full object-cover"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+                
+                {/* Top Badge */}
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-3 py-1 text-xs font-black text-slate-950 shadow-md">
+                  <span>{lang === 'ar' ? (selectedBigOffer.badgeAr || selectedBigOffer.badge) : selectedBigOffer.badge}</span>
+                </div>
+
+                {/* Diamonds / Platform Pill */}
+                {selectedBigOffer.diamonds && (
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full border border-amber-400/60 bg-black/85 px-3 py-1 text-xs font-black text-amber-300 backdrop-blur-md">
+                    <Gem size={13} className="text-amber-400 animate-pulse" />
+                    <span>{selectedBigOffer.diamonds} 💎</span>
+                  </div>
+                )}
+
+                {/* Exchange Rate / Platform bottom pill */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2">
+                  <span className="rounded-lg border border-white/20 bg-slate-950/90 px-2.5 py-1 text-xs font-mono font-bold text-emerald-300 backdrop-blur-md">
+                    {selectedBigOffer.priceUsd ? `1$ = 10 DH (${selectedBigOffer.priceUsd})` : (selectedBigOffer.platform || 'OFFICIAL DEAL')}
+                  </span>
+                  <span className="rounded-lg border border-amber-400/40 bg-amber-500/20 px-2.5 py-1 text-xs font-bold text-amber-300 backdrop-blur-md">
+                    ⭐ {selectedBigOffer.rating || '5.0'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Big Details & Features (7 cols on md) */}
+              <div className="md:col-span-7 flex flex-col justify-between h-full">
+                <div>
+                  <div className="flex flex-wrap items-baseline justify-between gap-3">
+                    <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                      {selectedBigOffer.name}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-2xl border border-amber-400/60 bg-gradient-to-r from-amber-500/25 to-yellow-500/20 px-4 py-1.5 text-2xl sm:text-3xl font-black text-amber-300 shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+                        {selectedBigOffer.price}
+                      </span>
+                    </div>
+                  </div>
+
+                  <p className="mt-2 text-sm sm:text-base text-slate-300 leading-relaxed font-medium">
+                    {lang === 'ar' ? selectedBigOffer.taglineAr : selectedBigOffer.tagline}
+                  </p>
+
+                  {/* Guarantees & Speed Banner */}
+                  <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-2.5 text-emerald-300">
+                      <Zap size={16} className="text-emerald-400 flex-none" />
+                      <div>
+                        <div className="font-bold">{lang === 'ar' ? 'تسليم فوري (5 دقائق)' : 'Instant 5-Min Delivery'}</div>
+                        <div className="text-[10px] text-emerald-400/80">{lang === 'ar' ? 'مباشرة عبر واتساب' : 'Direct on WhatsApp'}</div>
+                      </div>
+                    </div>
+
+                    <div 
+                      onClick={onOpenWarranty}
+                      className="flex items-center gap-2 rounded-xl border border-amber-400/35 bg-amber-500/10 p-2.5 text-amber-300 cursor-pointer hover:bg-amber-500/20 transition"
+                    >
+                      <Crown size={16} className="text-amber-400 flex-none" />
+                      <div>
+                        <div className="font-bold">{lang === 'ar' ? 'الضمان الذهبي 100%' : '100% Golden Warranty'}</div>
+                        <div className="text-[10px] text-amber-400/80">{lang === 'ar' ? 'استبدال ودعم مستمر' : 'Full Swap & Support'}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* FULL FEATURES LIST IN BIG CLEAR COMFORTABLE FONT */}
+                  <div className="mt-5 border-t border-white/10 pt-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+                      <ShieldCheck size={14} className="text-sky-400" />
+                      <span>{lang === 'ar' ? 'مميزات وتفاصيل العرض بالكامل:' : 'Full Offer Features & Benefits:'}</span>
+                    </h4>
+
+                    <ul className="space-y-2.5">
+                      {(lang === 'ar' ? selectedBigOffer.featuresAr : selectedBigOffer.features).map((feat, idx) => (
+                        <li key={idx} className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5 sm:p-3 text-sm sm:text-base font-semibold text-slate-100 shadow-sm">
+                          <CheckCircle2 size={18} className="text-amber-400 flex-none mt-0.5" />
+                          <span className="leading-snug">{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Action Buttons in Modal */}
+                <div className="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleOrder(selectedBigOffer)
+                      setSelectedBigOffer(null)
+                    }}
+                    className="flex-1 w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 py-3.5 px-6 text-sm sm:text-base font-black text-slate-950 shadow-[0_0_25px_rgba(251,191,36,0.4)] transition hover:from-white hover:to-white hover:scale-[1.02] active:scale-95 cursor-pointer"
+                  >
+                    <ShoppingCart size={18} />
+                    <span>{lang === 'ar' ? `اطلب هذا العرض الآن (${selectedBigOffer.price})` : `Order This Offer Now (${selectedBigOffer.price})`}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const text = encodeURIComponent(`Hello BLEUWI, I want to order ${selectedBigOffer.name} (${selectedBigOffer.price}).`)
+                      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank')
+                    }}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl border border-emerald-500/40 bg-emerald-500/15 py-3.5 px-5 text-sm font-bold text-emerald-300 hover:bg-emerald-500/25 transition cursor-pointer"
+                  >
+                    <MessageCircle size={18} className="text-emerald-400" />
+                    <span>{lang === 'ar' ? 'واتساب مباشر' : 'WhatsApp'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

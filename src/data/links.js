@@ -209,7 +209,6 @@ export const orderPresets = {
       'Free Fire 1080 Diamonds - 120 DH (12$)',
       'Free Fire 2420 Diamonds - 250 DH (25$)',
       'Free Fire 6160 Diamonds - 600 DH (60$)',
-      'Custom Free Fire Diamond Amount',
     ],
   },
   'Free Fire Diamonds': {
@@ -220,7 +219,6 @@ export const orderPresets = {
       'Free Fire 1080 Diamonds - 120 DH (12$)',
       'Free Fire 2420 Diamonds - 250 DH (25$)',
       'Free Fire 6160 Diamonds - 600 DH (60$)',
-      'Custom Free Fire Diamond Amount',
     ],
   },
   'Game Coins': {

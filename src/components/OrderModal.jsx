@@ -657,7 +657,7 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
                 {t('categoryLabel')}
               </label>
               <div className="flex flex-wrap gap-1.5">
-                {Object.keys(orderPresets).map((key) => {
+                {Object.keys(orderPresets).filter((k) => k !== 'Free Fire Diamonds').map((key) => {
                   const Icon = categoryIcons[key] || Sparkles
                   const isSelected = selectedCategoryKey === key
                   return (
@@ -728,29 +728,31 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
                   )
                 })}
 
-                <button
-                  type="button"
-                  onClick={() => setSelectedGame('Other')}
-                  className={`group flex items-center justify-between rounded-xl border p-2.5 text-left text-xs transition-all duration-200 cursor-pointer ${
-                    selectedGame === 'Other'
-                      ? 'border-sky-400/80 bg-gradient-to-r from-sky-400/15 to-emerald-400/10 text-white font-semibold shadow-sm ring-1 ring-sky-400/25'
-                      : 'border-white/[0.08] bg-white/[0.025] text-slate-300 hover:border-white/20 hover:bg-white/[0.05]'
-                  }`}
-                >
-                  <span className="truncate pr-2">{t('otherItemOption')}</span>
-                  <span
-                    className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border text-[9px] transition-colors ${
+                {selectedCategoryKey !== 'Free Fire Diamond' && selectedCategoryKey !== 'Free Fire Diamonds' && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedGame('Other')}
+                    className={`group flex items-center justify-between rounded-xl border p-2.5 text-left text-xs transition-all duration-200 cursor-pointer ${
                       selectedGame === 'Other'
-                        ? 'border-sky-400 bg-sky-400 text-slate-950 font-bold'
-                        : 'border-slate-600 group-hover:border-slate-400'
+                        ? 'border-sky-400/80 bg-gradient-to-r from-sky-400/15 to-emerald-400/10 text-white font-semibold shadow-sm ring-1 ring-sky-400/25'
+                        : 'border-white/[0.08] bg-white/[0.025] text-slate-300 hover:border-white/20 hover:bg-white/[0.05]'
                     }`}
                   >
-                    {selectedGame === 'Other' ? '✓' : ''}
-                  </span>
-                </button>
+                    <span className="truncate pr-2">{t('otherItemOption')}</span>
+                    <span
+                      className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border text-[9px] transition-colors ${
+                        selectedGame === 'Other'
+                          ? 'border-sky-400 bg-sky-400 text-slate-950 font-bold'
+                          : 'border-slate-600 group-hover:border-slate-400'
+                      }`}
+                    >
+                      {selectedGame === 'Other' ? '✓' : ''}
+                    </span>
+                  </button>
+                )}
               </div>
 
-              {selectedGame === 'Other' && (
+              {selectedCategoryKey !== 'Free Fire Diamond' && selectedCategoryKey !== 'Free Fire Diamonds' && selectedGame === 'Other' && (
                 <div className="mt-2.5 animate-fade-in">
                   <input
                     type="text"
