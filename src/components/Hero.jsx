@@ -1,8 +1,8 @@
-import { ArrowDownRight, ArrowRight, MessageCircle, Play, CreditCard, Flame } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, MessageCircle, Play, CreditCard, Flame, Gem, Sparkles } from 'lucide-react'
 import HeroVideo from './HeroVideo'
 import { useLanguage } from '../context/LanguageContext'
 
-export default function Hero() {
+export default function Hero({ onOpenWarranty, onOpenOrder }) {
   const { t, isRTL, lang } = useLanguage()
 
   const heroPayments = [
@@ -12,6 +12,86 @@ export default function Hero() {
     'PayPal',
     'Binance USDT',
     'Visa / MC',
+  ]
+
+  const topOffers = [
+    {
+      id: 'freefire',
+      name: 'Free Fire 💎',
+      nameAr: 'جواهر فري فاير 💎',
+      price: '60 DH',
+      sub: '1$=10DH',
+      color: 'border-amber-400/50 bg-amber-500/15 text-amber-300 hover:border-amber-400 hover:bg-amber-500/25',
+      categoryKey: 'Free Fire Diamonds',
+      productName: 'Free Fire 530 Diamonds',
+      productPrice: '60 DH',
+    },
+    {
+      id: 'gta-v',
+      name: 'GTA V (PC)',
+      nameAr: 'قراند GTA V',
+      price: '200 DH',
+      sub: 'PC ONLY',
+      color: 'border-sky-400/40 bg-sky-500/15 text-sky-300 hover:border-sky-400 hover:bg-sky-500/25',
+      categoryKey: 'Sell Games',
+      productName: 'Grand Theft Auto V',
+      productPrice: '200 DH',
+    },
+    {
+      id: 'red-dead-2',
+      name: 'Red Dead 2',
+      nameAr: 'ريد ديد 2',
+      price: '250 DH',
+      sub: 'PC ONLY',
+      color: 'border-rose-400/40 bg-rose-500/15 text-rose-300 hover:border-rose-400 hover:bg-rose-500/25',
+      categoryKey: 'Sell Games',
+      productName: 'Red Dead Redemption 2',
+      productPrice: '250 DH',
+    },
+    {
+      id: 'fifa',
+      name: 'FIFA (PC)',
+      nameAr: 'فيفا FIFA',
+      price: '200 DH',
+      sub: 'PC ONLY',
+      color: 'border-teal-400/40 bg-teal-500/15 text-teal-300 hover:border-teal-400 hover:bg-teal-500/25',
+      categoryKey: 'Sell Games',
+      productName: 'EA SPORTS FC / FIFA',
+      productPrice: '200 DH',
+    },
+    {
+      id: 'discord-nitro',
+      name: 'Discord Nitro',
+      nameAr: 'دسكورد نيترو',
+      price: '70 DH',
+      sub: 'Full Nitro',
+      color: 'border-indigo-400/40 bg-indigo-500/15 text-indigo-300 hover:border-indigo-400 hover:bg-indigo-500/25',
+      categoryKey: 'Abonnements',
+      productName: 'Discord Nitro',
+      productPrice: '70 DH',
+    },
+    {
+      id: 'capcut-pro',
+      name: 'CapCut Pro',
+      nameAr: 'كاب كات برو',
+      price: '90 DH',
+      sub: '1M VIP',
+      color: 'border-blue-400/40 bg-blue-500/15 text-blue-300 hover:border-blue-400 hover:bg-blue-500/25',
+      categoryKey: 'Abonnements',
+      productName: 'CapCut Pro (1 Month)',
+      productPrice: '90 DH',
+    },
+    {
+      id: 'spotify-1m',
+      name: 'Spotify Premium',
+      nameAr: 'سبوتيفاي بريميوم',
+      price: '70 DH',
+      sub: '1M Ad-Free',
+      color: 'border-green-400/40 bg-green-500/15 text-green-300 hover:border-green-400 hover:bg-green-500/25',
+      categoryKey: 'Abonnements',
+      productName: 'Spotify Premium (1 Month)',
+      productPrice: '70 DH',
+    },
   ]
 
   return (
@@ -46,17 +126,58 @@ export default function Hero() {
             </a>
           </div>
 
-          {/* Top Hot Sellers Quick Banner */}
-          <div className="mt-6 flex flex-wrap items-center gap-2">
+          {/* Top Hot Sellers Quick Banner with Free Fire & GTA */}
+          <div className="mt-6 flex flex-col gap-2.5">
             <a
               href="#hot-sellers"
-              className="group inline-flex flex-wrap items-center gap-1.5 sm:gap-2 rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold text-amber-300 shadow-[0_0_16px_rgba(251,191,36,0.15)] transition hover:scale-[1.02] hover:border-amber-400/80 hover:bg-amber-500/25 hover:text-white"
+              className="group inline-flex flex-wrap items-center gap-1.5 sm:gap-2 rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold text-amber-300 shadow-[0_0_16px_rgba(251,191,36,0.15)] transition hover:scale-[1.01] hover:border-amber-400/80 hover:bg-amber-500/25 hover:text-white"
             >
               <Flame size={14} className="text-amber-400 animate-pulse flex-none" />
-              <span>{lang === 'ar' ? '🔥 عروض حصرية:' : '🔥 Hot Offers:'}</span>
-              <span className="text-white font-semibold">GTA (200DH) · RDR2 (250DH) · FIFA (200DH) · Discord (70DH) · CapCut (90DH) · Spotify (70DH)</span>
+              <span>{lang === 'ar' ? '🔥 أقوى العروض في الأعلى:' : '🔥 Hot Offers at Top:'}</span>
+              <span className="text-white font-semibold">
+                {lang === 'ar'
+                  ? 'جواهر فري فاير (60DH / 1$=10DH) · قراند GTA V (200DH) · ريد ديد (250DH) · فيفا (200DH) · دسكورد (70DH) · كاب كات (90DH) · سبوتيفاي (70DH)'
+                  : 'Free Fire 💎 (60DH / 1$=10DH) · GTA V (200DH) · RDR2 (250DH) · FIFA (200DH) · Discord (70DH) · CapCut (90DH) · Spotify (70DH)'}
+              </span>
               <ArrowRight size={13} className={`text-amber-400 transition-transform group-hover:translate-x-0.5 flex-none ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
             </a>
+
+            {/* Quick Interactive Offer Chips */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              {topOffers.map((offer) => (
+                <button
+                  key={offer.id}
+                  type="button"
+                  onClick={() => {
+                    if (onOpenOrder) {
+                      onOpenOrder({
+                        categoryKey: offer.categoryKey,
+                        specificItem: offer.productName,
+                        productName: offer.productName,
+                        productPrice: offer.productPrice,
+                      })
+                    } else {
+                      const el = document.getElementById('hot-sellers')
+                      if (el) el.scrollIntoView({ behavior: 'smooth' })
+                    }
+                  }}
+                  className={`group/chip flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-bold transition-all hover:scale-105 shadow-sm cursor-pointer ${offer.color}`}
+                  title={`${offer.name} - ${offer.price}`}
+                >
+                  {offer.id === 'freefire' ? (
+                    <Gem size={12} className="text-amber-400 animate-bounce" />
+                  ) : offer.id === 'gta-v' ? (
+                    <Flame size={12} className="text-sky-300" />
+                  ) : (
+                    <Sparkles size={11} className="opacity-80" />
+                  )}
+                  <span>{lang === 'ar' ? offer.nameAr : offer.name}</span>
+                  <span className="rounded bg-black/40 px-1.5 py-0.2 text-[10px] font-mono text-white">
+                    {offer.price}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Top Payment Methods Banner (NUM 4) */}

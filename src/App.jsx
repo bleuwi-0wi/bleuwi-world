@@ -107,7 +107,7 @@ function MainApp() {
           />
         ) : (
           <>
-            <Hero onOpenWarranty={handleOpenWarranty} />
+            <Hero onOpenWarranty={handleOpenWarranty} onOpenOrder={handleOpenOrder} />
             <WarrantyBanner onOpenWarranty={handleOpenWarranty} />
             <HotSellers
               onOpenOrder={handleOpenOrder}
