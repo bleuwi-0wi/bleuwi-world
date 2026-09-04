@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CheckCircle2, CreditCard, MessageCircle, ShieldCheck, ZoomIn, X, ExternalLink } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
+import { WHATSAPP_NUMBER } from '../data/links'
 import refPayment from '../assets/4.webp'
 
 export default function PaymentMethodsSection({ onOpenOrder }) {
@@ -23,7 +24,7 @@ export default function PaymentMethodsSection({ onOpenOrder }) {
         ? 'السلام عليكم BLEUWI! أود تأكيد الدفع لطلبي:\n- طريقة الدفع المختارة: \n- المبلغ: \n- الخدمة المطلوبة: \nيرجى تزويدي بمعلومات الحساب / RIB لإتمام الدفع.'
         : 'Hello BLEUWI! I would like to confirm payment for my order:\n- Chosen Payment Method: \n- Amount: \n- Service: \nPlease send me account details / RIB to complete payment.'
     )
-    return `https://wa.me/212762635587?text=${msg}`
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`
   }
 
   return (

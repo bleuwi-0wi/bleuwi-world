@@ -13,11 +13,20 @@ import iconTikTok from '../assets/icon-tiktok.png'
 import iconDiscord from '../assets/icon-discord.png'
 import iconKick from '../assets/icon-kick.jpeg'
 
-// Default WhatsApp Number for BLEUWI
-export const WHATSAPP_NUMBER = '212762635587'
+// Default Official WhatsApp Number for BLEUWI (Immutable / Tamper-proof)
+export const WHATSAPP_NUMBER = Object.freeze('212762635587')
+
+// Security helper: Generates tamper-proof, sanitized WhatsApp URL with safe phone number
+export const getSecureWhatsAppUrl = (message = '') => {
+  const safePhone = '212762635587'
+  const sanitized = String(message || '')
+    .slice(0, 1500)
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+  return `https://wa.me/${safePhone}?text=${encodeURIComponent(sanitized)}`
+}
 
 export const links = [
-  { name: 'WhatsApp', description: 'Direct message BLEUWI (+212 762-635587).', icon: MessageCircle, image: iconWhatsApp, href: 'https://wa.me/212762635587' },
+  { name: 'WhatsApp', description: 'Direct message BLEUWI (+212 762-635587).', icon: MessageCircle, image: iconWhatsApp, href: getSecureWhatsAppUrl('Hello BLEUWI!') },
   { name: 'YouTube', description: 'Watch the latest videos and streams.', icon: Video, image: iconYouTube, href: 'https://www.youtube.com/@blue_bleuwi' },
   { name: 'Instagram', description: 'Behind the scenes, captured daily.', icon: Camera, image: iconInstagram, href: 'https://www.instagram.com/blue.bluewi/' },
   { name: 'TikTok', description: 'Short-form moments from the world.', icon: Music2, image: iconTikTok, href: 'https://www.tiktok.com/@bleuwi_wizi0' },

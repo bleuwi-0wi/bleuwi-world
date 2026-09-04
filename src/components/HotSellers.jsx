@@ -457,7 +457,7 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
       })
     } else {
       const text = encodeURIComponent(`Hello BLEUWI, I would like to order ${item.name} (${item.price}).`)
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank')
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer')
     }
   }
 
@@ -1273,7 +1273,7 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                     type="button"
                     onClick={() => {
                       const text = encodeURIComponent(`Hello BLEUWI, I want to order ${selectedBigOffer.name} (${selectedBigOffer.price}).`)
-                      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank')
+                      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer')
                     }}
                     className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl border border-emerald-500/40 bg-emerald-500/15 py-3.5 px-5 text-sm font-bold text-emerald-300 hover:bg-emerald-500/25 transition cursor-pointer"
                   >

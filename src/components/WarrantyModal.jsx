@@ -83,7 +83,7 @@ export default function WarrantyModal({ isOpen, onClose, onOpenOrder }) {
         ? 'السلام عليكم BLEUWI! أريد الاستفسار عن الضمان الذهبي لطلبات الألعاب والاشتراكات.'
         : 'Hello BLEUWI! I would like to inquire about the Golden Warranty Guarantee for my order.'
     )
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank')
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer')
   }
 
   const handleOrderWithWarranty = () => {

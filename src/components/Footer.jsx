@@ -2,6 +2,7 @@ import { ShieldCheck } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VisitorCounter from './VisitorCounter'
 import { useLanguage } from '../context/LanguageContext'
+import { WHATSAPP_NUMBER } from '../data/links'
 import iconWhatsApp from '../assets/icon-whatsapp.png'
 import iconInstagram from '../assets/icon-instagram.png'
 import iconYouTube from '../assets/icon-youtube.png'
@@ -41,9 +42,9 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <a
               className="social-button transition-transform hover:scale-105"
-              href="https://wa.me/212762635587"
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               aria-label="WhatsApp BLEUWI"
               title="WhatsApp"
             >
@@ -53,7 +54,7 @@ export default function Footer() {
               className="social-button transition-transform hover:scale-105"
               href="https://www.instagram.com/blue.bluewi/"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               aria-label="Instagram"
               title="Instagram"
             >
@@ -63,7 +64,7 @@ export default function Footer() {
               className="social-button transition-transform hover:scale-105"
               href="https://www.youtube.com/@blue_bleuwi"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               aria-label="YouTube"
               title="YouTube"
             >

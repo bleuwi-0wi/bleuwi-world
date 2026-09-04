@@ -1,6 +1,7 @@
 import { ArrowDownRight, ArrowRight, MessageCircle, Play, CreditCard, Flame, Gem, Sparkles } from 'lucide-react'
 import HeroVideo from './HeroVideo'
 import { useLanguage } from '../context/LanguageContext'
+import { WHATSAPP_NUMBER } from '../data/links'
 
 export default function Hero({ onOpenWarranty, onOpenOrder }) {
   const { t, isRTL, lang } = useLanguage()
@@ -117,9 +118,9 @@ export default function Hero({ onOpenWarranty, onOpenOrder }) {
             </a>
             <a
               className="button-secondary"
-              href="https://wa.me/212762635587"
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               <MessageCircle size={16} className="text-emerald-400" />
               <span>{t('heroCtaWhatsApp')}</span>

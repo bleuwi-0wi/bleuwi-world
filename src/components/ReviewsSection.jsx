@@ -19,6 +19,7 @@ import {
 import { useLanguage } from '../context/LanguageContext'
 import { verifiedReviews } from '../data/reviews'
 import { checkProfanity } from '../utils/profanityFilter'
+import { WHATSAPP_NUMBER, getSecureWhatsAppUrl } from '../data/links'
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
 const CLOUD_BIN_URL = 'https://extendsclass.com/api/json-storage/bin/adcaaea'
@@ -288,12 +289,12 @@ export default function ReviewsSection() {
     const revComment = comment || (myReview ? myReview.comment : '')
 
     const starsStr = '⭐'.repeat(revRating)
-    const text = encodeURIComponent(
+    const text =
       lang === 'ar'
         ? `السلام عليكم BLEUWI! أود إرسال وتوثيق تقييمي الرسمي الدائم:\n- الاسم: ${revName || 'عميل'}\n- الخدمة المطلوبة: ${revService}\n- التقييم: ${starsStr} (${revRating}/5)\n- الرأي والتجربة: ${revComment || ''}\n\nيرجى اعتماد ونشر تقييمي على الموقع!`
         : `Hello BLEUWI! I would like to submit and verify my official permanent review:\n- Name: ${revName || 'Client'}\n- Service: ${revService}\n- Rating: ${starsStr} (${revRating}/5)\n- Feedback: ${revComment || ''}\n\nPlease approve and feature my review on the website!`
-    )
-    return `https://wa.me/212762635587?text=${text}`
+
+    return getSecureWhatsAppUrl(text)
   }
 
   return (
@@ -335,7 +336,7 @@ export default function ReviewsSection() {
           <a
             href={getWhatsAppReviewLink()}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-200 transition hover:bg-emerald-500/20 hover:border-emerald-400 cursor-pointer"
           >
             <MessageCircle size={15} className="text-emerald-400" />
@@ -568,7 +569,7 @@ export default function ReviewsSection() {
             <a
               href={getWhatsAppReviewLink()}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 py-2.5 text-xs font-bold text-white transition hover:border-emerald-400/40 hover:bg-emerald-400/10 cursor-pointer"
             >
               <MessageCircle size={15} className="text-emerald-400" />
@@ -624,7 +625,7 @@ export default function ReviewsSection() {
                   <a
                     href={getWhatsAppReviewLink()}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition"
                   >
                     <MessageCircle size={15} />
@@ -660,7 +661,7 @@ export default function ReviewsSection() {
                   <a
                     href={getWhatsAppReviewLink()}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition"
                   >
                     <MessageCircle size={15} />

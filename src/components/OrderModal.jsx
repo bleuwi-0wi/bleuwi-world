@@ -361,11 +361,12 @@ export default function OrderModal({ isOpen, onClose, initialData = {}, onOpenWa
     setPreviewZoom(false)
   }, [isOpen, initialData])
 
-  // Save name when changed
+  // Save name when changed (sanitized & length capped)
   const handleNameChange = (val) => {
-    setName(val)
+    const clean = String(val || '').replace(/<[^>]*>?/gm, '').slice(0, 60)
+    setName(clean)
     try {
-      localStorage.setItem('bleuwi_customer_name', val)
+      localStorage.setItem('bleuwi_customer_name', clean)
     } catch {
       // ignore
     }
@@ -575,7 +576,7 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
     const cleanPhone = WHATSAPP_NUMBER.replace(/[^0-9]/g, '')
     const encoded = encodeURIComponent(generatedMessage)
     const waUrl = `https://wa.me/${cleanPhone}?text=${encoded}`
-    window.open(waUrl, '_blank')
+    window.open(waUrl, '_blank', 'noopener,noreferrer')
   }
 
   const handleCopyTextMessage = () => {
