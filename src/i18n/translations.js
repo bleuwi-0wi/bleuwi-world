@@ -45,6 +45,8 @@ export const translations = {
     sessionDesignDesc: 'Creative brand design and creator web support.',
     sessionDigital: 'DEGITAL SERVISES',
     sessionDigitalDesc: 'Online services: Sell games, coins & abonnements.',
+    sessionFreeFire: 'FREE FIRE DIAMONDS',
+    sessionFreeFireDesc: 'Instant Free Fire ID top-up at 1$ = 10 DH official exchange rate.',
 
     // Links section
     linksHeadingEyebrow: 'Direct Links',
@@ -163,6 +165,8 @@ export const translations = {
     sessionDesignDesc: 'تصاميم إبداعية وتطوير مواقع الويب المخصصة لصناع المحتوى.',
     sessionDigital: 'الخدمات الرقمية',
     sessionDigitalDesc: 'خدمات أونلاين: بيع الألعاب، الكوينز، والاشتراكات الشهرية.',
+    sessionFreeFire: 'قسم جواهر فري فاير (Free Fire)',
+    sessionFreeFireDesc: 'شحن فوري لجواهر فري فاير عبر الآيدي (ID) بمعدل صرف رسمي 1$ = 10 دراهم.',
 
     // Links section
     linksHeadingEyebrow: 'الروابط المباشرة',

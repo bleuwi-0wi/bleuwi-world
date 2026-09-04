@@ -20,6 +20,7 @@ import {
   Tag,
   Monitor,
   Crown,
+  Gem,
 } from 'lucide-react'
 import { orderPresets, WHATSAPP_NUMBER } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
@@ -31,6 +32,10 @@ import imgDiscord from '../assets/offer-discord.webp'
 import imgCapcut from '../assets/offer-capcut.jpg'
 import imgSpotify3M from '../assets/offer-spotify-3m.jpg'
 import imgSpotify1M from '../assets/offer-spotify-1m.jpg'
+import imgFf16 from '../assets/freefire-16.jpeg'
+import imgFf17 from '../assets/freefire-17.jpeg'
+import imgFf18 from '../assets/freefire-18.jpeg'
+import imgFf19 from '../assets/freefire-19.jpeg'
 import cardVideo from '../assets/card-video-5.jpg'
 import cardPanels from '../assets/card-panels-7.jpg'
 import cardDesign from '../assets/card-design-8.jpg'
@@ -40,6 +45,76 @@ import refGames from '../assets/3.webp'
 
 // Comprehensive Product Registry for exact product image & WhatsApp message matching
 export const productRegistry = [
+  {
+    matches: (name) => /free fire.*530/i.test(name) || /530.*diamond/i.test(name) || (/530/i.test(name) && /free fire|diamond|جواهر/i.test(name)),
+    title: 'Free Fire 530 Diamonds (60 DH / 6$)',
+    shortName: '530 Diamonds',
+    price: '60 DH',
+    platform: 'FREE FIRE ID',
+    badge: 'STARTER PACK',
+    badgeAr: 'باقة المبتدئين',
+    image: imgFf16,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/16.jpeg',
+    tagline: '530 Diamonds instant recharge by Player ID (1$ = 10 DH)',
+    taglineAr: 'شحن فوري 530 جوهرة عبر الآيدي (1 دولار = 10 دراهم)',
+    filename: 'BLEUWI-FreeFire-530.jpeg',
+  },
+  {
+    matches: (name) => /free fire.*1080/i.test(name) || /1080.*diamond/i.test(name) || (/1080/i.test(name) && /free fire|diamond|جواهر/i.test(name)),
+    title: 'Free Fire 1080 Diamonds (120 DH / 12$)',
+    shortName: '1080 Diamonds',
+    price: '120 DH',
+    platform: 'FREE FIRE ID',
+    badge: 'MOST POPULAR',
+    badgeAr: 'الأكثر طلباً',
+    image: imgFf17,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/17.jpeg',
+    tagline: '1080 Diamonds instant recharge by Player ID (1$ = 10 DH)',
+    taglineAr: 'شحن فوري 1080 جوهرة عبر الآيدي (1 دولار = 10 دراهم)',
+    filename: 'BLEUWI-FreeFire-1080.jpeg',
+  },
+  {
+    matches: (name) => /free fire.*2420/i.test(name) || /2420.*diamond/i.test(name) || (/2420/i.test(name) && /free fire|diamond|جواهر/i.test(name)),
+    title: 'Free Fire 2420 Diamonds (250 DH / 25$)',
+    shortName: '2420 Diamonds',
+    price: '250 DH',
+    platform: 'FREE FIRE ID',
+    badge: 'BEST VALUE',
+    badgeAr: 'أفضل توفير',
+    image: imgFf18,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/18.jpeg',
+    tagline: '2420 Diamonds instant recharge by Player ID (1$ = 10 DH)',
+    taglineAr: 'شحن فوري 2420 جوهرة عبر الآيدي (1 دولار = 10 دراهم)',
+    filename: 'BLEUWI-FreeFire-2420.jpeg',
+  },
+  {
+    matches: (name) => /free fire.*6160/i.test(name) || /6160.*diamond/i.test(name) || (/6160/i.test(name) && /free fire|diamond|جواهر/i.test(name)),
+    title: 'Free Fire 6160 Diamonds (600 DH / 60$)',
+    shortName: '6160 Diamonds',
+    price: '600 DH',
+    platform: 'FREE FIRE ID (VIP)',
+    badge: 'VIP MEGA PACK',
+    badgeAr: 'الباقة الملكية VIP',
+    image: imgFf19,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/19.jpeg',
+    tagline: '6160 Diamonds instant recharge by Player ID (1$ = 10 DH)',
+    taglineAr: 'شحن فوري 6160 جوهرة عبر الآيدي (1 دولار = 10 دراهم)',
+    filename: 'BLEUWI-FreeFire-6160.jpeg',
+  },
+  {
+    matches: (name) => /free fire/i.test(name) || /diamond/i.test(name) || /جواهر/i.test(name),
+    title: 'Free Fire Diamonds (Game Coins)',
+    shortName: 'Free Fire Diamonds',
+    price: '1$ = 10 DH',
+    platform: 'FREE FIRE ID',
+    badge: '1$ = 10 DH',
+    badgeAr: '1$ = 10 دراهم',
+    image: imgFf19,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/19.jpeg',
+    tagline: 'Official Free Fire Diamonds instant recharge (1$ = 10 DH)',
+    taglineAr: 'شحن فوري لجواهر فري فاير بالآيدي بسعر 1 دولار = 10 دراهم',
+    filename: 'BLEUWI-FreeFire-Diamonds.jpeg',
+  },
   {
     matches: (name) => /gta/i.test(name) || /grand theft auto/i.test(name),
     title: 'Grand Theft Auto V (PC ONLY)',
@@ -141,6 +216,16 @@ export const productRegistry = [
 ]
 
 const categoryFallbacks = {
+  'Free Fire Diamonds': {
+    title: 'Free Fire Diamonds (Game Coins)',
+    badge: '1$ = 10 DH',
+    badgeAr: '1$ = 10 دراهم',
+    image: imgFf19,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/19.jpeg',
+    tagline: 'Official Free Fire Diamonds instant ID top-up (1$ = 10 DH)',
+    taglineAr: 'شحن فوري لجواهر فري فاير بالأيدي بمعدل صرف 1$ = 10 دراهم',
+    filename: 'BLEUWI-FreeFire-Diamonds.jpeg',
+  },
   'Game Coins': {
     title: 'Game Coins & Currencies',
     badge: 'Instant Delivery',
@@ -204,6 +289,7 @@ const categoryFallbacks = {
 }
 
 const categoryIcons = {
+  'Free Fire Diamonds': Gem,
   'Game Coins': Coins,
   'Abonnements': Sparkles,
   'Sell Games': Gamepad2,

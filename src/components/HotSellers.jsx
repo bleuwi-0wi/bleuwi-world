@@ -14,7 +14,9 @@ import {
   Video,
   Music,
   Disc3,
-  Crown
+  Crown,
+  Gem,
+  Coins
 } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { WHATSAPP_NUMBER } from '../data/links'
@@ -26,6 +28,150 @@ import imgDiscord from '../assets/offer-discord.webp'
 import imgCapcut from '../assets/offer-capcut.jpg'
 import imgSpotify3M from '../assets/offer-spotify-3m.jpg'
 import imgSpotify1M from '../assets/offer-spotify-1m.jpg'
+
+import imgFf16 from '../assets/freefire-16.jpeg'
+import imgFf17 from '../assets/freefire-17.jpeg'
+import imgFf18 from '../assets/freefire-18.jpeg'
+import imgFf19 from '../assets/freefire-19.jpeg'
+
+export const freeFirePacks = [
+  {
+    id: 'ff-530',
+    name: 'Free Fire 530 Diamonds',
+    shortName: '530 Diamonds',
+    categoryKey: 'Free Fire Diamonds',
+    price: '60 DH',
+    priceUsd: '6$',
+    diamonds: '530',
+    priceNum: 60,
+    badge: 'STARTER PACK',
+    badgeAr: 'باقة المبتدئين',
+    badgeColor: 'from-amber-500 to-yellow-500',
+    image: imgFf16,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/16.jpeg',
+    tagline: '530 Diamonds instant recharge by Player ID (1$ = 10 DH)',
+    taglineAr: 'شحن فوري 530 جوهرة عبر الآيدي (1 دولار = 10 دراهم)',
+    platform: 'FREE FIRE ID',
+    platformAr: 'آيدي فري فاير (ID)',
+    features: [
+      '530 Official Diamonds directly to ID',
+      '1$ = 10 DH Rate (6$ = 60 DH)',
+      'Instant 5-Minute Delivery on WhatsApp',
+      '100% Safe with Golden Guarantee'
+    ],
+    featuresAr: [
+      '530 جوهرة رسمية مباشرة على حسابك بالأيدي (ID)',
+      'سعر رسمي: 1$ = 10 دراهم (6$ = 60 درهم)',
+      'شحن فوري وسريع في أقل من 5 دقائق عبر واتساب',
+      'آمن 100% ومشمول بالضمان الذهبي للدعم والاستبدال'
+    ],
+    rating: '5.0',
+    salesCount: '450+ sold',
+    salesCountAr: '+450 شحنة',
+  },
+  {
+    id: 'ff-1080',
+    name: 'Free Fire 1080 Diamonds',
+    shortName: '1080 Diamonds',
+    categoryKey: 'Free Fire Diamonds',
+    price: '120 DH',
+    priceUsd: '12$',
+    diamonds: '1080',
+    priceNum: 120,
+    badge: 'MOST POPULAR',
+    badgeAr: 'الأكثر طلباً',
+    badgeColor: 'from-cyan-500 to-blue-600',
+    image: imgFf17,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/17.jpeg',
+    tagline: '1080 Diamonds instant recharge by Player ID (1$ = 10 DH)',
+    taglineAr: 'شحن فوري 1080 جوهرة عبر الآيدي (1 دولار = 10 دراهم)',
+    platform: 'FREE FIRE ID',
+    platformAr: 'آيدي فري فاير (ID)',
+    features: [
+      '1080 Official Diamonds directly to ID',
+      '1$ = 10 DH Rate (12$ = 120 DH)',
+      'Instant 5-Minute Delivery on WhatsApp',
+      'Ready for Elite Pass & Events'
+    ],
+    featuresAr: [
+      '1080 جوهرة رسمية مباشرة على حسابك بالأيدي (ID)',
+      'سعر رسمي: 1$ = 10 دراهم (12$ = 120 درهم)',
+      'شحن فوري وسريع في أقل من 5 دقائق عبر واتساب',
+      'جاهز للفاير باس والفعاليات وسكنات الحظ'
+    ],
+    rating: '5.0',
+    salesCount: '620+ sold',
+    salesCountAr: '+620 شحنة',
+  },
+  {
+    id: 'ff-2420',
+    name: 'Free Fire 2420 Diamonds',
+    shortName: '2420 Diamonds',
+    categoryKey: 'Free Fire Diamonds',
+    price: '250 DH',
+    priceUsd: '25$',
+    diamonds: '2420',
+    priceNum: 250,
+    badge: 'BEST VALUE',
+    badgeAr: 'أفضل توفير',
+    badgeColor: 'from-emerald-500 to-teal-500',
+    image: imgFf18,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/18.jpeg',
+    tagline: '2420 Diamonds instant recharge by Player ID (1$ = 10 DH)',
+    taglineAr: 'شحن فوري 2420 جوهرة عبر الآيدي (1 دولار = 10 دراهم)',
+    platform: 'FREE FIRE ID',
+    platformAr: 'آيدي فري فاير (ID)',
+    features: [
+      '2420 Official Diamonds directly to ID',
+      '1$ = 10 DH Rate (25$ = 250 DH)',
+      'Instant 5-Minute Delivery on WhatsApp',
+      'Top-up Bonus Rewards Included'
+    ],
+    featuresAr: [
+      '2420 جوهرة رسمية مباشرة على حسابك بالأيدي (ID)',
+      'سعر رسمي: 1$ = 10 دراهم (25$ = 250 درهم)',
+      'شحن فوري وسريع في أقل من 5 دقائق عبر واتساب',
+      'تفعيل مكافآت وجوائز فعاليات الشحن الإضافية'
+    ],
+    rating: '5.0',
+    salesCount: '380+ sold',
+    salesCountAr: '+380 شحنة',
+  },
+  {
+    id: 'ff-6160',
+    name: 'Free Fire 6160 Diamonds',
+    shortName: '6160 Diamonds',
+    categoryKey: 'Free Fire Diamonds',
+    price: '600 DH',
+    priceUsd: '60$',
+    diamonds: '6160',
+    priceNum: 600,
+    badge: 'VIP MEGA PACK',
+    badgeAr: 'الباقة الملكية VIP',
+    badgeColor: 'from-amber-400 via-orange-500 to-red-600',
+    image: imgFf19,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/19.jpeg',
+    tagline: '6160 Diamonds instant recharge by Player ID (1$ = 10 DH)',
+    taglineAr: 'شحن فوري 6160 جوهرة عبر الآيدي (1 دولار = 10 دراهم)',
+    platform: 'FREE FIRE ID (VIP)',
+    platformAr: 'آيدي فري فاير (VIP)',
+    features: [
+      '6160 Official Diamonds directly to ID',
+      '1$ = 10 DH Rate (60$ = 600 DH)',
+      'Instant VIP Priority 5-Min Delivery',
+      'Max Evolution Guns & Rare Bundles'
+    ],
+    featuresAr: [
+      '6160 جوهرة رسمية مباشرة على حسابك بالأيدي (ID)',
+      'سعر رسمي: 1$ = 10 دراهم (60$ = 600 درهم)',
+      'أولوية تسليم VIP فورية وسريعة خلال دقائق',
+      'تطوير الأسلحة التطورية إلى الماكس والسكنات النادرة'
+    ],
+    rating: '5.0',
+    salesCount: '290+ sold',
+    salesCountAr: '+290 شحنة',
+  },
+]
 
 export const hotSellerGames = [
   {
@@ -256,7 +402,7 @@ export const hotSubscriptionOffers = [
 
 export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
   const { lang, isRTL } = useLanguage()
-  const [filter, setFilter] = useState('all') // 'all' | 'games' | 'subscriptions'
+  const [filter, setFilter] = useState('all') // 'all' | 'freefire' | 'games' | 'subscriptions'
   const [hoveredItem, setHoveredItem] = useState(null)
 
   const handleOrder = (item) => {
@@ -276,6 +422,7 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
     }
   }
 
+  const showFreeFire = filter === 'all' || filter === 'freefire'
   const showGames = filter === 'all' || filter === 'games'
   const showSubs = filter === 'all' || filter === 'subscriptions'
 
@@ -289,7 +436,7 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
               <Flame size={14} className="text-amber-400 animate-pulse" />
               <span>{lang === 'ar' ? 'أقوى العروض الحصرية' : 'HOT EXCLUSIVE DEALS'}</span>
               <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-              <span className="text-white/80">{lang === 'ar' ? 'ألعاب واشتراكات بأفضل الأسعار' : 'GAMES & SUBSCRIPTIONS'}</span>
+              <span className="text-white/80">{lang === 'ar' ? 'ألعاب، جواهر واشتراكات بأفضل الأسعار' : 'GAMES, DIAMONDS & SUBSCRIPTIONS'}</span>
             </div>
             <h2 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-white">
               {lang === 'ar' ? 'الأكثر مبيعاً وطلباً' : 'Top Trending Offers'}
@@ -315,8 +462,8 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
 
             <p className="mt-2 text-xs sm:text-sm text-slate-400 max-w-2xl">
               {lang === 'ar'
-                ? 'ألعاب كمبيوتر أصلية (PC) واشتراكات بريميوم رقمية (Discord, Spotify, CapCut) بأسعار خاصة مع تسليم فوري عبر واتساب.'
-                : 'Official PC Games & Premium Subscriptions (Discord, Spotify, CapCut) at special rates with instant WhatsApp delivery.'}
+                ? 'شحن جواهر فري فاير (1$ = 10 دراهم)، ألعاب كمبيوتر أصلية (PC)، واشتراكات بريميوم رقمية (Discord, Spotify, CapCut) مع تسليم فوري عبر واتساب.'
+                : 'Free Fire Diamonds (1$ = 10 DH), Official PC Games & Premium Subscriptions (Discord, Spotify, CapCut) with instant WhatsApp delivery.'}
             </p>
           </div>
 
@@ -332,7 +479,21 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
               }`}
             >
               <Flame size={13} className={filter === 'all' ? 'text-amber-400' : 'text-slate-500'} />
-              <span>{lang === 'ar' ? 'جميع العروض (7)' : 'All Deals (7)'}</span>
+              <span>{lang === 'ar' ? 'جميع العروض (11)' : 'All Deals (11)'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFilter('freefire')}
+              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                filter === 'freefire'
+                  ? 'bg-amber-500/25 text-amber-300 border border-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.35)]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+              }`}
+            >
+              <Gem size={13} className={filter === 'freefire' ? 'text-amber-400 animate-bounce' : 'text-amber-400/70'} />
+              <span>{lang === 'ar' ? 'جواهر فري فاير (4)' : 'Free Fire (4)'}</span>
+              <span className="rounded-md bg-amber-400/20 px-1.5 py-0.2 text-[10px] text-amber-300 font-mono font-bold">1$=10DH</span>
             </button>
 
             <button
@@ -363,9 +524,136 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
           </div>
         </div>
 
-        {/* 1. PC GAMES SECTION */}
-        {showGames && (
+        {/* 1. FREE FIRE DIAMONDS SECTION (1$ = 10 DH) */}
+        {showFreeFire && (
           <div className="mt-8">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-amber-400/40 bg-amber-500/15 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]">
+                  <Gem size={15} />
+                </span>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span>{lang === 'ar' ? 'شحن جواهر فري فاير (Free Fire Diamonds)' : 'Free Fire Diamonds ID Top-Up'}</span>
+                </h3>
+              </div>
+
+              {/* Exchange Rate Badge */}
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-500/15 px-3 py-1 text-xs font-black text-amber-300 shadow-sm">
+                  <Sparkles size={12} className="text-amber-400" />
+                  <span>{lang === 'ar' ? 'سعر الصرف الرسمي: 1$ = 10 دراهم (6$ = 60 DH)' : 'Official Rate: 1$ = 10 DH (6$ = 60 DH)'}</span>
+                </span>
+                <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-mono font-bold text-emerald-300">
+                  {lang === 'ar' ? 'شحن آيدي فوري (5 دقائق)' : 'Instant ID Delivery (5 min)'}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {freeFirePacks.map((pack) => (
+                <div
+                  key={pack.id}
+                  onMouseEnter={() => setHoveredItem(pack.id)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  className="group relative flex flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] via-slate-950/80 to-[#05070d] p-4 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-amber-400/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_35px_rgba(251,191,36,0.3)]"
+                >
+                  {/* Top Image Container */}
+                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/15 bg-black/60">
+                    <img
+                      src={pack.image}
+                      alt={pack.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+                    {/* Badge */}
+                    <div className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-gradient-to-r ${pack.badgeColor} px-2.5 py-0.5 text-[10px] font-black tracking-wider text-slate-950 shadow-lg`}>
+                      <Gem size={11} className="fill-slate-950" />
+                      <span>{lang === 'ar' ? pack.badgeAr : pack.badge}</span>
+                    </div>
+
+                    {/* Diamonds Pill */}
+                    <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full border border-amber-400/40 bg-black/80 px-2.5 py-0.5 text-[11px] font-black text-amber-300 backdrop-blur-md">
+                      <Gem size={12} className="text-amber-400 animate-pulse" />
+                      <span>{pack.diamonds} 💎</span>
+                    </div>
+
+                    {/* USD Tag pill bottom left */}
+                    <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-lg border border-amber-400/40 bg-slate-950/90 px-2 py-0.5 text-[11px] font-mono font-bold text-amber-300 backdrop-blur-md shadow-md">
+                      <span className="text-white/70">USD:</span>
+                      <span>{pack.priceUsd}</span>
+                      <span className="text-white/40">·</span>
+                      <span className="text-emerald-400">1$=10DH</span>
+                    </div>
+                  </div>
+
+                  {/* Content & Features */}
+                  <div className="mt-4 flex flex-1 flex-col justify-between">
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h4 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
+                            {pack.name}
+                          </h4>
+                          <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
+                            {lang === 'ar' ? pack.taglineAr : pack.tagline}
+                          </p>
+                        </div>
+
+                        {/* Price Tag in DH */}
+                        <div className="flex flex-col items-end flex-none">
+                          <span className="rounded-xl border border-amber-400/40 bg-amber-500/15 px-3 py-1 text-base sm:text-lg font-black text-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.25)]">
+                            {pack.price}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                            {pack.priceUsd} = {pack.price}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Features List */}
+                      <ul className="mt-3.5 space-y-1.5 border-t border-white/[0.08] pt-3 text-[11px] text-slate-300">
+                        {(lang === 'ar' ? pack.featuresAr : pack.features).map((feat, idx) => (
+                          <li key={idx} className="flex items-center gap-1.5">
+                            <Check size={11} className="text-amber-400 flex-none" />
+                            <span className="line-clamp-1">{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-4 flex items-center gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOrder(pack)}
+                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 px-3 py-2 text-xs font-black text-slate-950 shadow-[0_0_18px_rgba(251,191,36,0.35)] transition-all duration-200 hover:from-white hover:to-white hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-95 cursor-pointer"
+                      >
+                        <ShoppingCart size={13} />
+                        <span>{lang === 'ar' ? `اطلب الآن (${pack.price})` : `Order Now (${pack.price})`}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleOrder(pack)}
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 transition hover:border-emerald-500/50 hover:bg-emerald-500/20 hover:scale-105 active:scale-95 cursor-pointer flex-none"
+                        title={lang === 'ar' ? 'طلب عبر واتساب' : 'Order via WhatsApp'}
+                        aria-label="Order on WhatsApp"
+                      >
+                        <MessageCircle size={15} className="text-emerald-400" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 2. PC GAMES SECTION */}
+        {showGames && (
+          <div className={showFreeFire ? 'mt-12 pt-10 border-t border-white/[0.08]' : 'mt-8'}>
             <div className="flex items-center gap-2 mb-4">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-500/10 text-sky-400">
                 <Monitor size={15} />
@@ -481,9 +769,9 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
           </div>
         )}
 
-        {/* 2. SUBSCRIPTIONS & APPS SECTION */}
+        {/* 3. SUBSCRIPTIONS & APPS SECTION */}
         {showSubs && (
-          <div className={showGames ? 'mt-12 pt-10 border-t border-white/[0.08]' : 'mt-8'}>
+          <div className={(showGames || showFreeFire) ? 'mt-12 pt-10 border-t border-white/[0.08]' : 'mt-8'}>
             <div className="flex items-center gap-2 mb-4">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-purple-400/30 bg-purple-500/10 text-purple-400">
                 <Sparkles size={15} />

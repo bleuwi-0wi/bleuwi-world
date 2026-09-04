@@ -92,6 +92,7 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
     if (item.showcaseType === 'panels') return t('sessionPanels')
     if (item.showcaseType === 'design') return t('sessionDesign')
     if (item.showcaseType === 'digital') return t('sessionDigital')
+    if (item.showcaseType === 'freefire') return t('sessionFreeFire')
     return item.name
   }
 
@@ -101,6 +102,7 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
     if (item.showcaseType === 'panels') return t('sessionPanelsDesc')
     if (item.showcaseType === 'design') return t('sessionDesignDesc')
     if (item.showcaseType === 'digital') return t('sessionDigitalDesc')
+    if (item.showcaseType === 'freefire') return t('sessionFreeFireDesc')
     return item.detail
   }
 
@@ -213,43 +215,35 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
             const isActive = activeIndex === index
 
             // Fan transform parameters (responsive for small phone, mobile & desktop)
-            const angles = isSmallMobile 
-              ? [-10, -3.5, 3.5, 10] 
-              : isMobile 
-                ? [-12, -4, 4, 12] 
-                : [-16, -5.5, 5.5, 16]
-            const baseX = isSmallMobile 
-              ? [-64, -21, 21, 64] 
-              : isMobile 
-                ? [-85, -28, 28, 85] 
-                : [-135, -45, 45, 135]
-            const baseY = isSmallMobile 
-              ? [6, 0, 0, 6] 
-              : isMobile 
-                ? [8, 0, 0, 8] 
-                : [12, 0, 0, 12]
+            const count = featuredLinks.length
+            const mid = (count - 1) / 2
+            const norm = count > 1 ? (index - mid) / mid : 0 // -1 to +1
+
+            const maxAngle = isSmallMobile ? 12 : isMobile ? 14 : 18
+            const maxBaseX = isSmallMobile ? 70 : isMobile ? 95 : 145
+            const maxBaseY = isSmallMobile ? 8 : isMobile ? 10 : 14
 
             const rtl = isRTL ? -1 : 1
 
-            let angle = angles[index] * rtl
-            let x = baseX[index] * rtl
-            let y = baseY[index]
+            let angle = (norm * maxAngle) * rtl
+            let x = (norm * maxBaseX) * rtl
+            let y = Math.abs(norm) * Math.abs(norm) * maxBaseY
             let scale = 0.98
 
             if (isActive) {
               // Active card is elevated, straightens upright and scales up in front
               y -= isSmallMobile ? 26 : isMobile ? 32 : 44
-              angle = angles[index] * 0.2 * rtl
+              angle = angle * 0.15
               scale = isSmallMobile ? 1.04 : isMobile ? 1.05 : 1.10
             } else {
               // Non-active cards fan smoothly to the sides
               if (index < activeIndex) {
-                x -= (isSmallMobile ? 12 : isMobile ? 16 : 28) * rtl
-                angle -= 2.5 * rtl
+                x -= (isSmallMobile ? 10 : isMobile ? 14 : 22) * rtl
+                angle -= 2 * rtl
                 scale = 0.95
               } else if (index > activeIndex) {
-                x += (isSmallMobile ? 12 : isMobile ? 16 : 28) * rtl
-                angle += 2.5 * rtl
+                x += (isSmallMobile ? 10 : isMobile ? 14 : 22) * rtl
+                angle += 2 * rtl
                 scale = 0.95
               }
             }

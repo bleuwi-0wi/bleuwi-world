@@ -4,6 +4,7 @@ import cardVideo from '../assets/card-video-5.jpg'
 import cardDigital from '../assets/card-digital-6.jpg'
 import cardPanels from '../assets/card-panels-7.jpg'
 import cardDesign from '../assets/card-design-8.jpg'
+import cardFf19 from '../assets/freefire-19.jpeg'
 
 import iconWhatsApp from '../assets/icon-whatsapp.png'
 import iconYouTube from '../assets/icon-youtube.png'
@@ -25,6 +26,22 @@ export const links = [
 ]
 
 export const featuredLinks = [
+  {
+    name: 'FREE FIRE DIAMONDS',
+    detail: 'Official Free Fire Diamonds instant ID recharge at 1$ = 10 DH rate.',
+    icon: Coins,
+    href: '/?showcase=freefire',
+    showcaseType: 'freefire',
+    cardImage: cardFf19,
+    cardNum: 19,
+    cardRank: 'B',
+    suit: '♦',
+    badge: '1$ = 10 DH (Best Rate)',
+    badgeAr: '1 دولار = 10 دراهم (أفضل سعر)',
+    categoryKey: 'Free Fire Diamonds',
+    features: ['530 Diamonds - 60 DH (6$)', '1080 Diamonds - 120 DH (12$)', '2420 Diamonds - 250 DH (25$)', '6160 Diamonds - 600 DH (60$)'],
+    featuresAr: ['530 جوهرة - 60 درهم (6$)', '1080 جوهرة - 120 درهم (12$)', '2420 جوهرة - 250 درهم (25$)', '6160 جوهرة - 600 درهم (60$)'],
+  },
   {
     name: 'VIDEO EDITING SESSION',
     detail: 'Edits built for standout content.',
@@ -100,6 +117,7 @@ export const digitalServices = [
     tagline: 'Discounted in-game currencies delivered safely & quickly.',
     icon: Coins,
     items: [
+      { name: 'Free Fire Diamonds (530 - 6160)', desc: 'Instant ID top-up (60 DH - 600 DH / 1$ = 10 DH)' },
       { name: 'Robux Packs', desc: 'Fast & clean transfer with zero delays' },
       { name: 'FC / FIFA Coins', desc: 'Comfort trade & safe player auction' },
       { name: 'Fortnite V-Bucks', desc: 'Direct account gift / store top-up' },
@@ -183,17 +201,31 @@ export const cheatPanels = [
 ]
 
 export const orderPresets = {
+  'Free Fire Diamonds': {
+    category: 'Free Fire Diamonds (Game Coins)',
+    sessionName: 'DIGITAL SERVICES',
+    games: [
+      'Free Fire 530 Diamonds - 60 DH (6$)',
+      'Free Fire 1080 Diamonds - 120 DH (12$)',
+      'Free Fire 2420 Diamonds - 250 DH (25$)',
+      'Free Fire 6160 Diamonds - 600 DH (60$)',
+      'Custom Free Fire Diamond Amount',
+    ],
+  },
   'Game Coins': {
     category: 'Game Coins & Currencies',
     sessionName: 'DIGITAL SERVICES',
     games: [
+      'Free Fire 530 Diamonds - 60 DH (6$)',
+      'Free Fire 1080 Diamonds - 120 DH (12$)',
+      'Free Fire 2420 Diamonds - 250 DH (25$)',
+      'Free Fire 6160 Diamonds - 600 DH (60$)',
       'Robux Packs (Roblox)',
       'FC / FIFA Coins (EA FC)',
       'Fortnite V-Bucks',
       'GTA Online Cash Drop',
       'Valorant Points (VP)',
       'Brawl Stars Gems',
-      'Free Fire Diamonds',
       'Other Game Coin / Points',
     ],
   },

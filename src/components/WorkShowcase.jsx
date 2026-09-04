@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, ArrowRight, CheckCircle2, Coins, CreditCard, Eye, Gamepad2, MessageCircle, ShieldCheck, Sparkles, X, Zap, ZoomIn } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2, Coins, CreditCard, Eye, Gamepad2, MessageCircle, ShieldCheck, Sparkles, X, Zap, ZoomIn, Gem } from 'lucide-react'
 import { digitalServices, cheatPanels } from '../data/links'
+import { freeFirePacks } from './HotSellers'
 import { useLanguage } from '../context/LanguageContext'
 import designOne from '../assets/design-1.webp'
 import designTwo from '../assets/design-2.webp'
@@ -83,6 +84,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
   const showPanels = type === 'all' || type === 'panels'
   const showDesign = type === 'all' || type === 'design'
   const showDigital = type === 'all' || type === 'digital' || type === 'services'
+  const showFreeFire = type === 'all' || type === 'freefire'
 
   const getDigitalCategoryKey = (id) => {
     if (id === 'game-coins') return 'Game Coins'
@@ -145,6 +147,8 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
             ? (lang === 'ar' ? 'بانيل الألعاب ' : 'Cheat panels ')
             : type === 'design'
             ? (lang === 'ar' ? 'التصميم والتطوير ' : 'Design / dev ')
+            : type === 'freefire'
+            ? (lang === 'ar' ? 'شحن جواهر فري فاير ' : 'Free Fire Diamonds ')
             : type === 'digital' || type === 'services'
             ? (lang === 'ar' ? 'الخدمات ' : 'Degital ')
             : (lang === 'ar' ? 'استكشف ' : 'Explore all ')}
@@ -155,6 +159,8 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
               ? (lang === 'ar' ? 'والحماية.' : 'session.')
               : type === 'design'
               ? (lang === 'ar' ? 'الإبداعي.' : 'session.')
+              : type === 'freefire'
+              ? (lang === 'ar' ? '(1$ = 10 دراهم).' : '(1$ = 10 DH Rate).')
               : type === 'digital' || type === 'services'
               ? (lang === 'ar' ? 'الرقمية.' : 'servises.')
               : (lang === 'ar' ? 'جميع الأقسام.' : 'sessions.')}
@@ -167,6 +173,8 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
             ? t('sessionPanelsDesc')
             : type === 'design'
             ? t('sessionDesignDesc')
+            : type === 'freefire'
+            ? (lang === 'ar' ? 'شحن فوري عبر الأيدي (Player ID) بمعدل صرف رسمي 1$ = 10 دراهم مع ضمان ذهبي كامل.' : 'Official Free Fire Diamonds instant ID recharge at 1$ = 10 DH rate with golden guarantee.')
             : type === 'digital' || type === 'services'
             ? t('digitalCoinsTagline') + ' ' + (lang === 'ar' ? 'انقر على الصور المرجعية لمعاينة التفاصيل، أو اطلب مباشرة عبر واتساب!' : 'Click the picture references to inspect details, or order directly via WhatsApp!')
             : t('sessionsHeadingDesc')}
@@ -174,6 +182,17 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
 
         {onSelectType && (
           <div className="mt-6 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => onSelectType('freefire')}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
+                type === 'freefire'
+                  ? 'bg-amber-400 text-slate-950 shadow-lg shadow-amber-400/20'
+                  : 'border border-white/10 bg-white/5 text-slate-300 hover:border-amber-300/30 hover:text-white'
+              }`}
+            >
+              {lang === 'ar' ? 'جواهر فري فاير (1$=10DH)' : 'Free Fire Diamonds (1$=10DH)'}
+            </button>
             <button
               type="button"
               onClick={() => onSelectType('video')}
@@ -559,6 +578,106 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                 <span>{lang === 'ar' ? 'معاينة لوحة الدفع #04' : 'View Payment Sheet #04'}</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* SESSION 5: FREE FIRE DIAMONDS (1$ = 10 DH) */}
+      {showFreeFire && (
+        <div className="portfolio-group">
+          <div className="portfolio-label">
+            <span>05</span>
+            <h3>{lang === 'ar' ? 'جواهر فري فاير — شحن فوري بالأيدي (1$ = 10 دراهم)' : 'Free Fire Diamonds — Instant ID Top-Up (1$ = 10 DH)'}</h3>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {freeFirePacks.map((pack) => (
+              <div
+                key={pack.id}
+                className="group relative flex flex-col justify-between rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.015] p-4 sm:p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/50 hover:shadow-xl hover:shadow-amber-500/10"
+              >
+                <div>
+                  {/* Zoomable Reference Image Card */}
+                  <div
+                    className="group/img relative mb-3.5 aspect-[4/3] w-full overflow-hidden rounded-xl border border-white/15 bg-black/80 cursor-pointer shadow-lg transition-transform duration-300 hover:border-amber-400/60"
+                    onClick={() => setLightboxImage({
+                      src: pack.image,
+                      title: pack.name,
+                      categoryKey: 'Free Fire Diamonds',
+                      subtitle: `${pack.price} (${pack.priceUsd}) · 1$ = 10 DH Rate`,
+                      alt: pack.name,
+                    })}
+                    title="Click to zoom reference picture"
+                  >
+                    <img
+                      src={pack.image}
+                      alt={pack.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-2.5 py-0.5 text-[10px] font-black text-slate-950 shadow-md">
+                      <Gem size={10} className="fill-slate-950" />
+                      <span>{pack.diamonds} 💎</span>
+                    </div>
+
+                    <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-amber-300 bg-black/80 px-2 py-0.5 rounded backdrop-blur-sm border border-amber-400/30">
+                        {pack.priceUsd} = {pack.price}
+                      </span>
+                      <span className="text-[10px] text-emerald-300 font-bold bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                        1$=10DH
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-300">
+                      <Sparkles size={11} className="text-amber-400" />
+                      <span>{lang === 'ar' ? pack.badgeAr : pack.badge}</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">ID TOP-UP</span>
+                  </div>
+
+                  <h4 className="mt-2 text-base font-bold text-white group-hover:text-amber-300 transition-colors">
+                    {pack.name}
+                  </h4>
+                  <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
+                    {lang === 'ar' ? pack.taglineAr : pack.tagline}
+                  </p>
+
+                  <ul className="mt-3 space-y-1 border-t border-white/[0.08] pt-2.5 text-[11px] text-slate-300">
+                    {(lang === 'ar' ? pack.featuresAr : pack.features).slice(0, 3).map((feat, idx) => (
+                      <li key={idx} className="flex items-center gap-1.5">
+                        <CheckCircle2 size={11} className="text-amber-400 flex-none" />
+                        <span className="line-clamp-1">{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mt-4 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => onOpenOrder && onOpenOrder({
+                      categoryKey: 'Free Fire Diamonds',
+                      specificItem: pack.name,
+                      productName: pack.name,
+                      productPrice: pack.price,
+                      productImage: pack.image,
+                      productPlatform: 'FREE FIRE ID',
+                      defaultNotes: `Free Fire ID: (enter your ID here), Pack: ${pack.name} (${pack.price} / ${pack.priceUsd})`,
+                    })}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 py-2.5 text-xs font-black text-slate-950 shadow-md transition hover:from-white hover:to-white cursor-pointer"
+                  >
+                    <MessageCircle size={14} />
+                    <span>{lang === 'ar' ? `اطلب الآن (${pack.price})` : `Order Now (${pack.price})`}</span>
+                    <ArrowRight size={13} className={isRTL ? 'rotate-180' : ''} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
