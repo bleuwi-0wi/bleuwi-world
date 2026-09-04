@@ -23,11 +23,11 @@ export default function Hero() {
             <span className="pulse-dot" />
             <span>{t('heroEyebrow')}</span>
           </div>
-          <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-[0.95] tracking-[-0.06em] text-white sm:text-7xl lg:text-[5.35rem]">
+          <h1 className="mt-6 max-w-3xl text-4xl min-[400px]:text-5xl sm:text-7xl lg:text-[5.35rem] font-semibold leading-[0.95] tracking-[-0.06em] text-white">
             {t('heroTitlePrefix')}<br />
             <span className="text-gradient">{t('heroTitleGradient')}</span>
           </h1>
-          <p className="mt-7 max-w-xl text-lg leading-8 text-slate-400 sm:text-xl">
+          <p className="mt-7 max-w-xl text-base sm:text-lg lg:text-xl leading-relaxed sm:leading-8 text-slate-400">
             {t('heroSubtitle')}
           </p>
           <div className="mt-9 flex flex-wrap gap-4">
@@ -50,9 +50,9 @@ export default function Hero() {
           <div className="mt-6 flex flex-wrap items-center gap-2">
             <a
               href="#hot-sellers"
-              className="group inline-flex flex-wrap items-center gap-2 rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 px-3.5 py-2 text-xs font-bold text-amber-300 shadow-[0_0_16px_rgba(251,191,36,0.15)] transition hover:scale-[1.02] hover:border-amber-400/80 hover:bg-amber-500/25 hover:text-white"
+              className="group inline-flex flex-wrap items-center gap-1.5 sm:gap-2 rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold text-amber-300 shadow-[0_0_16px_rgba(251,191,36,0.15)] transition hover:scale-[1.02] hover:border-amber-400/80 hover:bg-amber-500/25 hover:text-white"
             >
-              <Flame size={15} className="text-amber-400 animate-pulse flex-none" />
+              <Flame size={14} className="text-amber-400 animate-pulse flex-none" />
               <span>{lang === 'ar' ? '🔥 عروض حصرية:' : '🔥 Hot Offers:'}</span>
               <span className="text-white font-semibold">GTA (200DH) · RDR2 (250DH) · FIFA (200DH) · Discord (70DH) · CapCut (90DH) · Spotify (70DH)</span>
               <ArrowRight size={13} className={`text-amber-400 transition-transform group-hover:translate-x-0.5 flex-none ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />

@@ -16,12 +16,19 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
   const { t, isRTL, lang } = useLanguage()
   const [activeIndex, setActiveIndex] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+  const [isSmallMobile, setIsSmallMobile] = useState(false)
   const [lightboxCard, setLightboxCard] = useState(null)
   const stageRef = useRef(null)
+  const touchStartX = useRef(0)
+  const touchEndX = useRef(0)
 
   // Track responsive screen size
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 640)
+    const handleResize = () => {
+      const width = window.innerWidth
+      setIsSmallMobile(width < 400)
+      setIsMobile(width < 640)
+    }
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
@@ -35,6 +42,31 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
 
   const handleNext = () => {
     setActiveIndex((prev) => (prev + 1) % featuredLinks.length)
+  }
+
+  // Mobile Touch Swipe Handlers for smooth thumb gestures
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return
+    const diff = touchStartX.current - touchEndX.current
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        if (isRTL) handlePrev()
+        else handleNext()
+      } else {
+        if (isRTL) handleNext()
+        else handlePrev()
+      }
+    }
+    touchStartX.current = 0
+    touchEndX.current = 0
   }
 
   // Keyboard navigation between cards
@@ -171,16 +203,31 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
         {/* Card Fan Stage */}
         <div
           ref={stageRef}
-          className="cards-stage relative mx-auto flex h-[390px] sm:h-[450px] w-full max-w-xl items-center justify-center select-none"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="cards-stage relative mx-auto flex h-[345px] min-[400px]:h-[390px] sm:h-[450px] w-full max-w-xl items-center justify-center select-none touch-pan-y"
           style={{ perspective: '1200px' }}
         >
           {featuredLinks.map((item, index) => {
             const isActive = activeIndex === index
 
-            // Fan transform parameters (responsive for mobile & desktop)
-            const angles = isMobile ? [-12, -4, 4, 12] : [-16, -5.5, 5.5, 16]
-            const baseX = isMobile ? [-85, -28, 28, 85] : [-135, -45, 45, 135]
-            const baseY = isMobile ? [8, 0, 0, 8] : [12, 0, 0, 12]
+            // Fan transform parameters (responsive for small phone, mobile & desktop)
+            const angles = isSmallMobile 
+              ? [-10, -3.5, 3.5, 10] 
+              : isMobile 
+                ? [-12, -4, 4, 12] 
+                : [-16, -5.5, 5.5, 16]
+            const baseX = isSmallMobile 
+              ? [-64, -21, 21, 64] 
+              : isMobile 
+                ? [-85, -28, 28, 85] 
+                : [-135, -45, 45, 135]
+            const baseY = isSmallMobile 
+              ? [6, 0, 0, 6] 
+              : isMobile 
+                ? [8, 0, 0, 8] 
+                : [12, 0, 0, 12]
 
             const rtl = isRTL ? -1 : 1
 
@@ -191,17 +238,17 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
 
             if (isActive) {
               // Active card is elevated, straightens upright and scales up in front
-              y -= isMobile ? 32 : 44
+              y -= isSmallMobile ? 26 : isMobile ? 32 : 44
               angle = angles[index] * 0.2 * rtl
-              scale = isMobile ? 1.05 : 1.10
+              scale = isSmallMobile ? 1.04 : isMobile ? 1.05 : 1.10
             } else {
               // Non-active cards fan smoothly to the sides
               if (index < activeIndex) {
-                x -= (isMobile ? 16 : 28) * rtl
+                x -= (isSmallMobile ? 12 : isMobile ? 16 : 28) * rtl
                 angle -= 2.5 * rtl
                 scale = 0.95
               } else if (index > activeIndex) {
-                x += (isMobile ? 16 : 28) * rtl
+                x += (isSmallMobile ? 12 : isMobile ? 16 : 28) * rtl
                 angle += 2.5 * rtl
                 scale = 0.95
               }
@@ -227,7 +274,7 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
                 aria-label={`${item.name} card`}
               >
                 <div
-                  className={`playing-card relative w-[190px] sm:w-[230px] aspect-[1/1.42] rounded-2xl overflow-hidden transition-all duration-300 ${
+                  className={`playing-card relative w-[160px] min-[400px]:w-[190px] sm:w-[230px] aspect-[1/1.42] rounded-2xl overflow-hidden transition-all duration-300 ${
                     isActive
                       ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-[#05070d] shadow-[0_25px_60px_rgba(0,0,0,0.9),0_0_35px_rgba(56,189,248,0.4)]'
                       : 'shadow-xl border border-white/20 hover:border-sky-400/40'

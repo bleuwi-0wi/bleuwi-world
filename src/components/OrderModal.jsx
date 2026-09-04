@@ -48,7 +48,7 @@ export const productRegistry = [
     badge: 'HOT SELLER',
     badgeAr: 'الأكثر مبيعاً',
     image: imgGta,
-    publicUrl: 'https://files.catbox.moe/meepvn.jpeg',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/gta-v.jpeg',
     tagline: 'PC Edition + GTA Online Criminal Starter Pack (FiveM Ready)',
     taglineAr: 'نسخة الكمبيوتر PC + باقة البداية أونلاين وجاهز لسيرفرات فايف إم',
     filename: 'BLEUWI-GTA-V.jpeg',
@@ -62,7 +62,7 @@ export const productRegistry = [
     badge: 'TOP RATED',
     badgeAr: 'الأعلى تقييماً',
     image: imgRedDead,
-    publicUrl: 'https://files.catbox.moe/vwjtsw.jpeg',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/red-dead-2.jpeg',
     tagline: 'Complete Story Mode + Red Dead Online (PC Masterpiece)',
     taglineAr: 'طور القصة الكامل + ريد ديد أونلاين بجرافيكس 4K أسطوري',
     filename: 'BLEUWI-RedDead2.jpeg',
@@ -76,7 +76,7 @@ export const productRegistry = [
     badge: 'BEST VALUE',
     badgeAr: 'أفضل عرض',
     image: imgFifa,
-    publicUrl: 'https://files.catbox.moe/1kfiwj.jpg',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/fifa-26.jpg',
     tagline: 'Ultimate Team & Online Clubs PC Global Key',
     taglineAr: 'لعبة كرة القدم العالمية للكمبيوتر مع ألتميت تيم والأندية',
     filename: 'BLEUWI-FIFA.jpg',
@@ -90,7 +90,7 @@ export const productRegistry = [
     badge: 'HOT OFFER',
     badgeAr: 'عرض حصري',
     image: imgDiscord,
-    publicUrl: 'https://files.catbox.moe/nhqovc.webp',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/offer-discord.webp',
     tagline: 'Full Nitro with 2 Server Boosts, 500MB Uploads & 4K 60FPS Streaming',
     taglineAr: 'دسكورد نيترو كامل مع 2 بوست سيرفر وبث 4K فائق الدقة',
     filename: 'BLEUWI-DiscordNitro.webp',
@@ -104,7 +104,7 @@ export const productRegistry = [
     badge: 'CREATOR VIP',
     badgeAr: 'اختيار المونتير',
     image: imgCapcut,
-    publicUrl: 'https://files.catbox.moe/1r88iz.jpg',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/offer-capcut.jpg',
     tagline: 'VIP Video Editing with AI Auto-Captions, 4K 60FPS Export & Cloud Assets',
     taglineAr: 'مونتاج فيديو VIP مع كتابة نصوص تلقائية وتصدير 4K بدون علامة مائية',
     filename: 'BLEUWI-CapCutPro.jpg',
@@ -118,7 +118,7 @@ export const productRegistry = [
     badge: 'BEST VALUE',
     badgeAr: 'أفضل توفير',
     image: imgSpotify3M,
-    publicUrl: 'https://files.catbox.moe/fz24vr.jpg',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/offer-spotify-3m.jpg',
     tagline: '3 Months Ad-Free Music with Offline Downloads & Highest Audio Quality',
     taglineAr: '3 أشهر بريميوم بدون إعلانات مع تحميل وتشغيل أوفلاين',
     filename: 'BLEUWI-Spotify3M.jpg',
@@ -132,7 +132,7 @@ export const productRegistry = [
     badge: 'SPECIAL PRICE',
     badgeAr: 'سعر خاص',
     image: imgSpotify1M,
-    publicUrl: 'https://files.catbox.moe/9pe1kc.jpg',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/offer-spotify-1m.jpg',
     tagline: '1 Month Individual / Family Ad-Free Audio Stream',
     taglineAr: 'اشتراك شهر سبوتيفاي بريميوم بدون إعلانات وبجودة استماع عالية',
     filename: 'BLEUWI-Spotify1M.jpg',
@@ -145,7 +145,7 @@ const categoryFallbacks = {
     badge: 'Instant Delivery',
     badgeAr: 'تسليم فوري',
     image: refCoins,
-    publicUrl: 'https://files.catbox.moe/1oxjsy.png',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/1.png',
     tagline: 'Safe & fast in-game currency packages (Robux, V-Bucks, GTA, VP)',
     taglineAr: 'باقات شحن ألعاب آمنة وسريعة بأفضل الأسعار الرسمية',
     filename: 'BLEUWI-Coins-Catalog.png',
@@ -155,7 +155,7 @@ const categoryFallbacks = {
     badge: 'Best Rates',
     badgeAr: 'أفضل الأسعار',
     image: refAbonnements,
-    publicUrl: 'https://files.catbox.moe/b8belo.png',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/2.png',
     tagline: 'Premium community, streaming, and gaming passes',
     taglineAr: 'اشتراكات بريميوم للألعاب، البث، والمجتمعات الرقمية',
     filename: 'BLEUWI-Abonnements-Catalog.png',
@@ -165,7 +165,7 @@ const categoryFallbacks = {
     badge: 'Global Keys',
     badgeAr: 'مفاتيح عالمية',
     image: refGames,
-    publicUrl: 'https://files.catbox.moe/tv824s.png',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/3.png',
     tagline: 'Official AAA game keys & activations for PC, Steam & Epic',
     taglineAr: 'مفاتيح ألعاب أصلية لمنصات الكمبيوتر وستيم وإبيك',
     filename: 'BLEUWI-GameKeys-Catalog.png',
@@ -175,7 +175,7 @@ const categoryFallbacks = {
     badge: '4K Retention',
     badgeAr: 'مونتاج 4K',
     image: cardVideo,
-    publicUrl: 'https://files.catbox.moe/ys3br2.jpg',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/5.jpeg',
     tagline: 'High retention pacing, sound design & cinematic color grading',
     taglineAr: 'مونتاج احترافي لزيادة المشاهدات مع تلوين ومؤثرات سينمائية',
     filename: 'BLEUWI-Video-Editing.jpg',
@@ -185,7 +185,7 @@ const categoryFallbacks = {
     badge: 'Kernel Protected',
     badgeAr: 'حماية كيرنل',
     image: cardPanels,
-    publicUrl: 'https://files.catbox.moe/xwxiq7.jpg',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/6.jpeg',
     tagline: 'Kernel-level private tools, stream-proof overlay & HWID spoofers',
     taglineAr: 'أدوات وأوفرلاي خاص مخفي عن البث مع حماية سيريال القطع',
     filename: 'BLEUWI-Cheat-Panels.jpg',
@@ -195,7 +195,7 @@ const categoryFallbacks = {
     badge: 'Visual Identity',
     badgeAr: 'هوية بصرية',
     image: cardDesign,
-    publicUrl: 'https://files.catbox.moe/6iljgm.jpg',
+    publicUrl: 'https://bleuwiworld.shop/image_reference/8.jpeg',
     tagline: 'Custom creator websites, logos, brand marks & high-CTR thumbnails',
     taglineAr: 'تصميم مواقع عصرية، لوغوهات خاصة وصور مصغرة عالية النقر',
     filename: 'BLEUWI-Design-Dev.jpg',
@@ -326,7 +326,7 @@ export default function OrderModal({ isOpen, onClose, initialData = {} }) {
         badge: 'EXCLUSIVE DEAL',
         badgeAr: 'عرض خاص',
         image: initialData.productImage,
-        publicUrl: initialData.publicUrl || 'https://files.catbox.moe/tv824s.png',
+        publicUrl: initialData.publicUrl || 'https://bleuwiworld.shop/image_reference/3.png',
         tagline: initialData.productTagline || '',
         taglineAr: '',
         filename: 'BLEUWI-Product.jpg',
@@ -500,7 +500,7 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/80 backdrop-blur-xl transition-opacity animate-fade-in"
@@ -510,7 +510,7 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
 
       {/* Modal Dialog */}
       <div
-        className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-white/10 bg-[#070b14]/95 p-5 shadow-2xl shadow-cyan-950/40 sm:p-7 z-10 my-auto text-white animate-fade-up backdrop-blur-2xl"
+        className="relative w-full max-w-4xl max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-[#070b14]/95 p-3.5 sm:p-7 shadow-2xl shadow-cyan-950/40 z-10 my-auto text-white animate-fade-up backdrop-blur-2xl"
         dir={isRTL ? 'rtl' : 'ltr'}
       >
         {/* Ambient Glows */}
@@ -518,14 +518,14 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
         <div className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-sky-500/10 blur-3xl" />
 
         {/* Modal Header */}
-        <div className="relative flex items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-inner">
-              <ActiveCategoryIcon size={20} />
+        <div className="relative flex items-center justify-between gap-4 border-b border-white/[0.08] pb-3 sm:pb-4 flex-none">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl sm:rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-inner flex-none">
+              <ActiveCategoryIcon size={18} className="sm:w-5 sm:h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white">
+                <h3 className="text-base sm:text-xl font-bold tracking-tight text-white">
                   {t('orderModalTitle')}
                 </h3>
                 <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">
@@ -533,7 +533,7 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
                   {t('quickOrderBtn')}
                 </span>
               </div>
-              <p className="mt-0.5 text-xs text-slate-400">
+              <p className="mt-0.5 text-[11px] sm:text-xs text-slate-400">
                 {t('orderModalSubtitle')}
               </p>
             </div>
@@ -542,7 +542,7 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-white/10 bg-white/5 p-2 text-slate-400 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white hover:scale-105 cursor-pointer"
+            className="rounded-full border border-white/10 bg-white/5 p-1.5 sm:p-2 text-slate-400 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white hover:scale-105 cursor-pointer flex-none"
             aria-label="Close modal"
           >
             <X size={18} />
@@ -550,9 +550,9 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
         </div>
 
         {/* Modal Main Grid */}
-        <div className="relative mt-5 grid grid-cols-1 lg:grid-cols-12 gap-5 text-left">
+        <div className="relative mt-3.5 sm:mt-5 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 text-left flex-1 overflow-y-auto pr-1">
           {/* Left Column: Selection Controls (7 cols) */}
-          <div className="lg:col-span-7 space-y-4 max-h-[68vh] overflow-y-auto pr-1">
+          <div className="lg:col-span-7 space-y-3.5 sm:space-y-4">
             {/* 1. Category Selection Pills */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
@@ -896,6 +896,19 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
                   {copiedText ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
                   <span>{copiedText ? t('copiedTextBtn') : t('copyTextBtn')}</span>
                 </button>
+              </div>
+
+              {/* Mobile & PC Safe Photo Link Guarantee */}
+              <div className="rounded-xl border border-sky-400/20 bg-sky-500/10 p-2 text-[11px] text-sky-200">
+                <div className="flex items-center gap-1.5 font-semibold">
+                  <span>📸</span>
+                  <span>{lang === 'ar' ? 'رابط الصورة الرسمي مدمج في الرسالة' : 'Official Photo Link Attached'}</span>
+                </div>
+                <p className="mt-0.5 text-[10px] text-sky-300/80 leading-snug">
+                  {lang === 'ar'
+                    ? 'رابط صورة المنتج من bleuwiworld.shop مدمج تلقائياً في رسالتك ليظهر فوراً في واتساب.'
+                    : 'The direct bleuwiworld.shop image link is attached so the product appears immediately in WhatsApp.'}
+                </p>
               </div>
             </div>
           </div>

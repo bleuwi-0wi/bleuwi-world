@@ -36,16 +36,16 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#05070d]/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-3.5 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <a
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer"
           href="#home"
           onClick={handleLogoClick}
           aria-label="BLEUWI WORLD home"
         >
           <BrandMark size="small" />
-          <span className="text-sm font-semibold tracking-[0.18em] text-white">
+          <span className="text-xs sm:text-sm font-semibold tracking-[0.14em] sm:tracking-[0.18em] text-white">
             BLEUWI <span className="text-sky-300">WORLD</span>
           </span>
         </a>
@@ -120,32 +120,32 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
         </div>
 
         {/* Mobile controls */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
           <VisitorCounter compact={true} />
           <button
             type="button"
             onClick={toggleLanguage}
-            className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold text-sky-200 cursor-pointer"
+            className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 sm:px-2.5 sm:py-1.5 text-[11px] sm:text-xs font-bold text-sky-200 cursor-pointer"
           >
             {lang === 'ar' ? 'EN' : 'عربي'}
           </button>
           <button
             type="button"
             onClick={onOpenSettings}
-            className="rounded-lg border border-white/10 bg-white/[0.04] p-2 text-slate-200 cursor-pointer"
+            className="rounded-lg border border-white/10 bg-white/[0.04] p-1.5 sm:p-2 text-slate-200 cursor-pointer"
             aria-label="Settings"
           >
-            <SettingsIcon size={18} />
+            <SettingsIcon size={17} />
           </button>
           <button
-            className="inline-flex rounded-lg p-2 text-slate-200 transition hover:bg-white/[0.08] cursor-pointer"
+            className="inline-flex rounded-lg p-1.5 sm:p-2 text-slate-200 transition hover:bg-white/[0.08] cursor-pointer"
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label="Toggle navigation menu"
           >
-            {menuOpen ? <X size={21} /> : <Menu size={21} />}
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
