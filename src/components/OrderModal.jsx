@@ -19,6 +19,7 @@ import {
   Zap,
   Tag,
   Monitor,
+  Crown,
 } from 'lucide-react'
 import { orderPresets, WHATSAPP_NUMBER } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
@@ -211,7 +212,7 @@ const categoryIcons = {
   'Design / Dev': Palette,
 }
 
-export default function OrderModal({ isOpen, onClose, initialData = {} }) {
+export default function OrderModal({ isOpen, onClose, initialData = {}, onOpenWarranty }) {
   const { t, lang, isRTL } = useLanguage()
 
   const [name, setName] = useState(() => {
@@ -868,6 +869,23 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
                   <Shield size={13} className="text-emerald-400 shrink-0" />
                   <span>{t('safePaymentsBadge')}</span>
                 </div>
+
+                {/* Golden Warranty Interactive Seal */}
+                {onOpenWarranty && (
+                  <button
+                    type="button"
+                    onClick={onOpenWarranty}
+                    className="group mt-1 flex w-full items-center justify-between gap-2 rounded-xl border border-amber-400/35 bg-gradient-to-r from-amber-500/15 via-yellow-500/5 to-amber-500/10 p-2 text-xs font-bold text-amber-300 transition hover:border-amber-400 hover:bg-amber-500/25 hover:scale-[1.01] cursor-pointer text-left"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Crown size={14} className="text-amber-400 group-hover:rotate-12 transition-transform shrink-0" />
+                      <span>{lang === 'ar' ? 'مشمول بالضمان الذهبي 100%' : '100% Golden Warranty'}</span>
+                    </span>
+                    <span className="text-[10px] text-amber-300/80 underline font-normal">
+                      {lang === 'ar' ? 'عرض الشروط' : 'View Terms'}
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
 

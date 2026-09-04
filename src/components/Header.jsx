@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Globe, Menu, Settings as SettingsIcon, X, Flame } from 'lucide-react'
+import { Globe, Menu, Settings as SettingsIcon, X, Flame, Crown } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VisitorCounter from './VisitorCounter'
 import { useLanguage } from '../context/LanguageContext'
 
-export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) {
+export default function Header({ onHomeClick, activeShowcase, onOpenSettings, onOpenWarranty }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { lang, setLang, t, isRTL } = useLanguage()
 
@@ -67,6 +67,14 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
             <Flame size={14} className="text-amber-400 animate-pulse" />
             <span>{lang === 'ar' ? 'الأكثر مبيعاً' : 'Hot Sellers'}</span>
           </a>
+          <button
+            type="button"
+            className="nav-link cursor-pointer flex items-center gap-1.5 text-amber-300 hover:text-amber-200 transition"
+            onClick={onOpenWarranty}
+          >
+            <Crown size={14} className="text-amber-400" />
+            <span>{lang === 'ar' ? 'الضمان الذهبي' : 'Golden Warranty'}</span>
+          </button>
           <a
             className="nav-link cursor-pointer"
             href="#payments"
@@ -169,6 +177,17 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
               <Flame size={15} className="text-amber-400 animate-pulse" />
               <span>{lang === 'ar' ? 'الأكثر مبيعاً (الألعاب)' : 'Hot Sellers (Games)'}</span>
             </a>
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-amber-300 transition hover:bg-white/[0.06] hover:text-amber-200 cursor-pointer text-left w-full"
+              onClick={() => {
+                closeMenu()
+                if (onOpenWarranty) onOpenWarranty()
+              }}
+            >
+              <Crown size={16} className="text-amber-400" />
+              <span>{lang === 'ar' ? 'الضمان الذهبي 100%' : '100% Golden Warranty'}</span>
+            </button>
             <a
               className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
               href="#payments"

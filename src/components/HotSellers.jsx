@@ -13,7 +13,8 @@ import {
   Headphones,
   Video,
   Music,
-  Disc3
+  Disc3,
+  Crown
 } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { WHATSAPP_NUMBER } from '../data/links'
@@ -253,7 +254,7 @@ export const hotSubscriptionOffers = [
   },
 ]
 
-export default function HotSellers({ onOpenOrder }) {
+export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
   const { lang, isRTL } = useLanguage()
   const [filter, setFilter] = useState('all') // 'all' | 'games' | 'subscriptions'
   const [hoveredItem, setHoveredItem] = useState(null)
@@ -296,7 +297,23 @@ export default function HotSellers({ onOpenOrder }) {
                 {lang === 'ar' ? 'تسليم فوري وضمان كامل' : 'Instant Delivery'}
               </span>
             </h2>
-            <p className="mt-1 text-xs sm:text-sm text-slate-400 max-w-2xl">
+
+            {/* Interactive Golden Warranty Guarantee Seal */}
+            <div className="mt-2 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onOpenWarranty}
+                className="group inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/15 px-3 py-1 text-xs font-bold text-amber-300 shadow-sm transition hover:scale-105 hover:border-amber-400 hover:bg-amber-500/25 cursor-pointer"
+              >
+                <Crown size={13} className="text-amber-400 group-hover:rotate-12 transition-transform" />
+                <span>{lang === 'ar' ? 'مشمول بالضمان الذهبي 100% (استبدال فوري ودعم 24/7)' : '100% Golden Warranty (Instant Swap & 24/7 Support)'}</span>
+                <span className="text-[10px] text-amber-300/80 underline ml-0.5">
+                  {lang === 'ar' ? 'عرض الشروط' : 'View Terms'}
+                </span>
+              </button>
+            </div>
+
+            <p className="mt-2 text-xs sm:text-sm text-slate-400 max-w-2xl">
               {lang === 'ar'
                 ? 'ألعاب كمبيوتر أصلية (PC) واشتراكات بريميوم رقمية (Discord, Spotify, CapCut) بأسعار خاصة مع تسليم فوري عبر واتساب.'
                 : 'Official PC Games & Premium Subscriptions (Discord, Spotify, CapCut) at special rates with instant WhatsApp delivery.'}
