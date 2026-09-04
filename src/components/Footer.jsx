@@ -1,7 +1,10 @@
-import { Camera, MessageCircle, Video, ShieldCheck, CreditCard } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VisitorCounter from './VisitorCounter'
 import { useLanguage } from '../context/LanguageContext'
+import iconWhatsApp from '../assets/icon-whatsapp.png'
+import iconInstagram from '../assets/icon-instagram.png'
+import iconYouTube from '../assets/icon-youtube.png'
 
 export default function Footer() {
   const { t, lang } = useLanguage()
@@ -37,40 +40,34 @@ export default function Footer() {
           {/* Social Links */}
           <div className="flex items-center gap-3">
             <a
-              className="social-button"
+              className="social-button transition-transform hover:scale-105"
               href="https://wa.me/212762635587"
               target="_blank"
               rel="noreferrer"
               aria-label="WhatsApp BLEUWI"
-              title="Chat with BLEUWI on WhatsApp (+212 762-635587)"
+              title="WhatsApp"
             >
-              <MessageCircle size={17} />
+              <img src={iconWhatsApp} alt="WhatsApp" className="h-[18px] w-[18px] object-contain" />
             </a>
             <a
-              className="social-button"
+              className="social-button transition-transform hover:scale-105"
               href="https://www.instagram.com/blue.bluewi/"
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"
+              title="Instagram"
             >
-              <Camera size={17} />
+              <img src={iconInstagram} alt="Instagram" className="h-[18px] w-[18px] object-contain" />
             </a>
             <a
-              className="social-button"
+              className="social-button transition-transform hover:scale-105"
               href="https://www.youtube.com/@blue_bleuwi"
               target="_blank"
               rel="noreferrer"
               aria-label="YouTube"
+              title="YouTube"
             >
-              <Video size={18} />
-            </a>
-            <a
-              className="text-sm text-slate-400 transition hover:text-sky-200"
-              href="https://wa.me/212762635587"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {t('footerWhatsApp')}
+              <img src={iconYouTube} alt="YouTube" className="h-[18px] w-[18px] object-contain" />
             </a>
           </div>
         </div>

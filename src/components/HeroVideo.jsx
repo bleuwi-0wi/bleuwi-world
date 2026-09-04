@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import retroLoop from '../assets/bleuwi-retro-loop.mp4'
+import bleuwiIntro from '../assets/bleuwi-intro.mp4'
 
 export default function HeroVideo() {
   const videoRef = useRef(null)
@@ -33,13 +33,13 @@ export default function HeroVideo() {
         muted
         playsInline
         preload="metadata"
-        aria-label="BLEUWI retro animation preview"
+        aria-label="BLEUWI official intro video"
       >
-        <source src={retroLoop} type="video/mp4" />
+        <source src={bleuwiIntro} type="video/mp4" />
         Your browser does not support this video.
       </video>
       <div className="hero-video-overlay" aria-hidden="true" />
-      <span className="hero-video-label">BLEUWI WORLD / PLAYING</span>
+      <span className="hero-video-label">BLEUWI WORLD / INTRO</span>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Globe, Menu, Settings as SettingsIcon, X } from 'lucide-react'
+import { Globe, Menu, Settings as SettingsIcon, X, Flame } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VisitorCounter from './VisitorCounter'
 import { useLanguage } from '../context/LanguageContext'
@@ -60,6 +60,14 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
             {t('navHome')}
           </a>
           <a
+            className="nav-link cursor-pointer flex items-center gap-1.5 text-amber-300 hover:text-amber-200"
+            href="#hot-sellers"
+            onClick={(e) => handleNavClick(e, 'hot-sellers')}
+          >
+            <Flame size={14} className="text-amber-400 animate-pulse" />
+            <span>{lang === 'ar' ? 'الأكثر مبيعاً' : 'Hot Sellers'}</span>
+          </a>
+          <a
             className="nav-link cursor-pointer"
             href="#payments"
             onClick={(e) => handleNavClick(e, 'payments')}
@@ -109,14 +117,6 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
             <span>{t('navSettings')}</span>
           </button>
 
-          {/* Explore Links button */}
-          <a
-            className="rounded-full border border-sky-300/25 bg-sky-300/[0.08] px-4 py-2 text-sm font-medium text-sky-200 transition hover:border-sky-300/50 hover:bg-sky-300/[0.14] cursor-pointer"
-            href="#links"
-            onClick={(e) => handleNavClick(e, 'links')}
-          >
-            {t('exploreLinks')}
-          </a>
         </div>
 
         {/* Mobile controls */}
@@ -160,6 +160,14 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
               onClick={(e) => handleNavClick(e, 'home')}
             >
               {t('navHome')}
+            </a>
+            <a
+              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-amber-300 transition hover:bg-white/[0.06] hover:text-amber-200 cursor-pointer"
+              href="#hot-sellers"
+              onClick={(e) => handleNavClick(e, 'hot-sellers')}
+            >
+              <Flame size={15} className="text-amber-400 animate-pulse" />
+              <span>{lang === 'ar' ? 'الأكثر مبيعاً (الألعاب)' : 'Hot Sellers (Games)'}</span>
             </a>
             <a
               className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"

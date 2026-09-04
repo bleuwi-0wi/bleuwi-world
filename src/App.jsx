@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { LanguageProvider } from './context/LanguageContext'
 import Header from './components/Header'
 import Hero from './components/Hero'
+import HotSellers from './components/HotSellers'
 import PreviewCard from './components/PreviewCard'
 import WorkShowcase from './components/WorkShowcase'
 import LinksSection from './components/LinksSection'
@@ -95,6 +96,7 @@ function MainApp() {
         ) : (
           <>
             <Hero />
+            <HotSellers onOpenOrder={handleOpenOrder} />
             <PreviewCard
               onSelectShowcase={navigateToShowcase}
               onOpenOrder={handleOpenOrder}

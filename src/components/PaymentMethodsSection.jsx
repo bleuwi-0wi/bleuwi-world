@@ -47,17 +47,6 @@ export default function PaymentMethodsSection({ onOpenOrder }) {
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <a
-            href={getWhatsAppPaymentLink()}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 cursor-pointer"
-          >
-            <MessageCircle size={15} />
-            <span>{lang === 'ar' ? 'تأكيد الدفع عبر واتساب' : 'Confirm via WhatsApp'}</span>
-          </a>
-        </div>
       </div>
 
       {/* Main Payment Banner Display */}

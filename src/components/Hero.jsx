@@ -1,4 +1,4 @@
-import { ArrowDownRight, ArrowRight, MessageCircle, Play, CreditCard } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, MessageCircle, Play, CreditCard, Flame } from 'lucide-react'
 import HeroVideo from './HeroVideo'
 import { useLanguage } from '../context/LanguageContext'
 
@@ -43,6 +43,19 @@ export default function Hero() {
             >
               <MessageCircle size={16} className="text-emerald-400" />
               <span>{t('heroCtaWhatsApp')}</span>
+            </a>
+          </div>
+
+          {/* Top Hot Sellers Quick Banner */}
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            <a
+              href="#hot-sellers"
+              className="group inline-flex flex-wrap items-center gap-2 rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 px-3.5 py-2 text-xs font-bold text-amber-300 shadow-[0_0_16px_rgba(251,191,36,0.15)] transition hover:scale-[1.02] hover:border-amber-400/80 hover:bg-amber-500/25 hover:text-white"
+            >
+              <Flame size={15} className="text-amber-400 animate-pulse flex-none" />
+              <span>{lang === 'ar' ? '🔥 عروض حصرية:' : '🔥 Hot Offers:'}</span>
+              <span className="text-white font-semibold">GTA (200DH) · RDR2 (250DH) · FIFA (200DH) · Discord (70DH) · CapCut (90DH) · Spotify (70DH)</span>
+              <ArrowRight size={13} className={`text-amber-400 transition-transform group-hover:translate-x-0.5 flex-none ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
             </a>
           </div>
 
