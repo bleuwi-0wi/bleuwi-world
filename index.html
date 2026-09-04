@@ -31,6 +31,34 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      /* Anti-Inspect, Anti-F12, Anti-RightClick Protection */
+      (function() {
+        document.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }, { capture: true });
+
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+          if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].indexOf(e.key) !== -1) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+          if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+        }, { capture: true });
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import {
   Check,
   Copy,
@@ -21,9 +21,11 @@ import {
   Monitor,
   Crown,
   Gem,
+  AlertCircle,
 } from 'lucide-react'
 import { orderPresets, WHATSAPP_NUMBER } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
+import { getOrderRateLimitStatus, recordOrderSubmission, MAX_ORDERS_PER_DAY } from '../utils/orderAntiSpam'
 
 import imgGta from '../assets/game-gta-v.jpeg'
 import imgRedDead from '../assets/game-red-dead-2.jpeg'
@@ -327,6 +329,13 @@ export default function OrderModal({ isOpen, onClose, initialData = {}, onOpenWa
   const [copiedText, setCopiedText] = useState(false)
   const [previewZoom, setPreviewZoom] = useState(false)
 
+  // Anti-Spam & Validation State
+  const [nameError, setNameError] = useState(false)
+  const [itemError, setItemError] = useState(false)
+  const [spamError, setSpamError] = useState('')
+  const [rateLimitInfo, setRateLimitInfo] = useState(() => getOrderRateLimitStatus())
+  const nameInputRef = useRef(null)
+
   // Sync initialData when modal opens
   useEffect(() => {
     if (!isOpen) return
@@ -359,12 +368,19 @@ export default function OrderModal({ isOpen, onClose, initialData = {}, onOpenWa
     setCustomGame('')
     setCopiedText(false)
     setPreviewZoom(false)
+    setNameError(false)
+    setItemError(false)
+    setSpamError('')
+    setRateLimitInfo(getOrderRateLimitStatus())
   }, [isOpen, initialData])
 
   // Save name when changed (sanitized & length capped)
   const handleNameChange = (val) => {
     const clean = String(val || '').replace(/<[^>]*>?/gm, '').slice(0, 60)
     setName(clean)
+    if (clean.trim().length >= 2) {
+      setNameError(false)
+    }
     try {
       localStorage.setItem('bleuwi_customer_name', clean)
     } catch {
@@ -380,6 +396,7 @@ export default function OrderModal({ isOpen, onClose, initialData = {}, onOpenWa
       setSelectedGame(preset.games[0])
     }
     setCustomGame('')
+    setItemError(false)
   }
 
   // Close on Escape key
@@ -535,7 +552,54 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
 
   // Send to WhatsApp: Native file sharing on mobile / PNG clipboard copy on desktop
   const handleSendWhatsApp = async () => {
-    // 1. Mobile Web Share API: attaches REAL photo file directly into WhatsApp
+    // 1. Strict Customer Name Validation (Mandatory)
+    const trimmedName = name.trim()
+    if (!trimmedName || trimmedName.length < 2) {
+      setNameError(true)
+      if (nameInputRef.current) {
+        nameInputRef.current.focus()
+        nameInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+      return
+    }
+
+    // 2. Strict Product / Item Selection Validation (Mandatory)
+    const effectiveItem = selectedGame === 'Other' && customGame.trim() ? customGame.trim() : (selectedGame || '')
+    if (!effectiveItem || effectiveItem.trim().length < 2) {
+      setItemError(true)
+      return
+    }
+
+    // 3. Anti-Spam Rate Limiter (Max 10 orders per day + 15s cooldown)
+    const rateStatus = getOrderRateLimitStatus()
+    setRateLimitInfo(rateStatus)
+
+    if (rateStatus.isDailyLimitReached) {
+      setSpamError(
+        lang === 'ar'
+          ? '⚠️ تم استنفاد الحد الأقصى المسموح به للطلبات اليوم (10 طلبات في اليوم) لمنع الرسائل المزعجة (Anti-Spam). يمكنك مراسلتنا مباشرة على واتساب أو المحاولة غداً!'
+          : '⚠️ Daily order limit reached (max 10 orders per day) to prevent spam. You can contact us directly on WhatsApp or try again tomorrow!'
+      )
+      return
+    }
+
+    if (rateStatus.cooldownRemaining > 0) {
+      setSpamError(
+        lang === 'ar'
+          ? `⚠️ يرجى الانتظار ${rateStatus.cooldownRemaining} ثانية قبل إرسال طلب جديد (حماية Anti-Spam).`
+          : `⚠️ Please wait ${rateStatus.cooldownRemaining}s before submitting another order (Anti-Spam protection).`
+      )
+      return
+    }
+
+    // Passed all checks: clear errors and record order
+    setNameError(false)
+    setItemError(false)
+    setSpamError('')
+    recordOrderSubmission()
+    setRateLimitInfo(getOrderRateLimitStatus())
+
+    // 4. Mobile Web Share API: attaches REAL photo file directly into WhatsApp
     if (activeProduct?.image && typeof navigator !== 'undefined' && navigator.canShare) {
       try {
         const res = await fetch(activeProduct.image)
@@ -758,33 +822,65 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
                   <input
                     type="text"
                     value={customGame}
-                    onChange={(e) => setCustomGame(e.target.value)}
+                    onChange={(e) => {
+                      setCustomGame(e.target.value)
+                      if (e.target.value.trim().length >= 2) setItemError(false)
+                    }}
                     placeholder={t('otherItemPlaceholder')}
-                    className="w-full rounded-xl border border-sky-400/40 bg-white/[0.05] py-2 px-3.5 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
+                    className={`w-full rounded-xl border py-2 px-3.5 text-xs text-white placeholder-slate-500 focus:outline-none transition-colors ${
+                      itemError
+                        ? 'border-rose-500 bg-rose-500/10 focus:border-rose-400 focus:ring-1 focus:ring-rose-500'
+                        : 'border-sky-400/40 bg-white/[0.05] focus:border-sky-400'
+                    }`}
                     autoFocus
                   />
                 </div>
+              )}
+
+              {itemError && (
+                <p className="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-rose-400 animate-fade-up rounded-lg bg-rose-500/10 border border-rose-500/20 p-2">
+                  <AlertCircle size={14} className="shrink-0 text-rose-400" />
+                  <span>{lang === 'ar' ? '⚠️ يرجى اختيار المنتج أو الخدمة التي ترغب بشرائها!' : '⚠️ Please select the product or service you want to buy!'}</span>
+                </p>
               )}
             </div>
 
             {/* 3. Customer Info Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                  {t('nameLabel')} <span className="text-sky-400">*</span>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between">
+                  <span>
+                    {t('nameLabel')} <span className="text-sky-400">*</span>
+                  </span>
+                  {nameError && (
+                    <span className="text-[10px] font-bold text-rose-400 animate-pulse">
+                      {lang === 'ar' ? 'مطلوب إجباري' : 'Required'}
+                    </span>
+                  )}
                 </label>
                 <div className="relative">
-                  <div className={`pointer-events-none absolute inset-y-0 ${isRTL ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center text-slate-400`}>
+                  <div className={`pointer-events-none absolute inset-y-0 ${isRTL ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center ${nameError ? 'text-rose-400' : 'text-slate-400'}`}>
                     <User size={15} />
                   </div>
                   <input
+                    ref={nameInputRef}
                     type="text"
                     value={name}
                     onChange={(e) => handleNameChange(e.target.value)}
                     placeholder={t('namePlaceholder')}
-                    className={`w-full rounded-xl border border-white/10 bg-white/[0.04] py-2.5 ${isRTL ? 'pr-9 pl-3.5' : 'pl-9 pr-3.5'} text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:bg-white/[0.07] focus:outline-none focus:ring-1 focus:ring-sky-400`}
+                    className={`w-full rounded-xl border py-2.5 ${isRTL ? 'pr-9 pl-3.5' : 'pl-9 pr-3.5'} text-xs text-white placeholder-slate-500 transition-all duration-200 ${
+                      nameError
+                        ? 'border-rose-500 bg-rose-500/10 focus:border-rose-400 focus:ring-2 focus:ring-rose-500/40 ring-1 ring-rose-500'
+                        : 'border-white/10 bg-white/[0.04] focus:border-sky-400 focus:bg-white/[0.07] focus:outline-none focus:ring-1 focus:ring-sky-400'
+                    }`}
                   />
                 </div>
+                {nameError && (
+                  <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-rose-400 animate-fade-up">
+                    <AlertCircle size={13} className="shrink-0 text-rose-400" />
+                    <span>{lang === 'ar' ? '⚠️ يرجى كتابة اسمك للمتابعة وإرسال الطلب!' : '⚠️ Please enter your name to proceed with the order!'}</span>
+                  </p>
+                )}
               </div>
 
               <div>
@@ -991,16 +1087,44 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
 
             {/* CTA Buttons & Note */}
             <div className="mt-4 pt-3.5 border-t border-white/[0.08] space-y-2.5">
+              {/* Anti-Spam Warning Alert */}
+              {spamError && (
+                <div className="rounded-xl border border-rose-500/40 bg-rose-500/15 p-3 text-xs text-rose-200 animate-fade-up flex items-start gap-2.5 shadow-lg shadow-rose-950/40">
+                  <AlertCircle size={17} className="text-rose-400 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <p className="font-bold text-rose-300">{lang === 'ar' ? 'تنبيه نظام الحماية (Anti-Spam)' : 'Anti-Spam Security Alert'}</p>
+                    <p className="text-[11px] text-rose-200 leading-relaxed">{spamError}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Anti-Spam Quota Status Indicator */}
+              <div className="flex items-center justify-between px-1 text-[10px] text-slate-400">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck size={12} className="text-sky-400" />
+                  <span>{lang === 'ar' ? 'نظام مكافحة السبام نشط' : 'Anti-Spam Active'}</span>
+                </span>
+                <span className={`font-semibold ${rateLimitInfo.remaining <= 2 ? 'text-amber-400' : 'text-slate-400'}`}>
+                  {lang === 'ar'
+                    ? `الطلبات المتاحة اليوم: ${rateLimitInfo.remaining}/${rateLimitInfo.max}`
+                    : `Orders remaining today: ${rateLimitInfo.remaining}/${rateLimitInfo.max}`}
+                </span>
+              </div>
+
               <button
                 type="button"
                 onClick={handleSendWhatsApp}
-                className="group relative flex w-full items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 bg-[length:200%_auto] py-3.5 px-5 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:bg-right hover:shadow-emerald-500/40 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                className={`group relative flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5 px-5 text-sm font-bold shadow-lg transition-all duration-300 cursor-pointer ${
+                  rateLimitInfo.isDailyLimitReached
+                    ? 'bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30'
+                    : 'bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 bg-[length:200%_auto] text-slate-950 shadow-emerald-500/25 hover:bg-right hover:shadow-emerald-500/40 hover:scale-[1.01] active:scale-[0.99]'
+                }`}
               >
                 {/* Official WhatsApp Logo SVG */}
-                <svg className="h-5 w-5 fill-slate-950" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
                   <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.071.376-.043.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.392-10.416c-5.523 0-10 4.477-10 10 0 1.769.459 3.432 1.261 4.884l-1.341 4.896 5.031-1.319c1.408.767 3.018 1.201 4.729 1.201 5.523 0 10-4.477 10-10 0-5.523-4.477-10-10-10z" />
                 </svg>
-                <span>{t('sendWhatsAppBtn')}</span>
+                <span>{rateLimitInfo.isDailyLimitReached ? (lang === 'ar' ? 'تم بلوغ حد الطلبات اليومي' : 'Daily Limit Reached') : t('sendWhatsAppBtn')}</span>
                 <ArrowUpRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
 

@@ -59,6 +59,43 @@ function MainApp() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
+  // Anti-Inspect, Anti-RightClick, and Anti-F12 Protection
+  useEffect(() => {
+    const handleContextMenu = (e) => {
+      e.preventDefault()
+      return false
+    }
+
+    const handleKeyDown = (e) => {
+      // Disable F12
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault()
+        e.stopPropagation()
+        return false
+      }
+      // Disable DevTools shortcuts: Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) {
+        e.preventDefault()
+        e.stopPropagation()
+        return false
+      }
+      // Disable View Source: Ctrl+U, Save Page: Ctrl+S
+      if ((e.ctrlKey || e.metaKey) && ['u', 'U', 's', 'S'].includes(e.key)) {
+        e.preventDefault()
+        e.stopPropagation()
+        return false
+      }
+    }
+
+    document.addEventListener('contextmenu', handleContextMenu, true)
+    document.addEventListener('keydown', handleKeyDown, true)
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu, true)
+      document.removeEventListener('keydown', handleKeyDown, true)
+    }
+  }, [])
+
   const navigateToShowcase = (type) => {
     if (type && type !== 'all') {
       window.history.pushState({}, '', `/?showcase=${type}`)
