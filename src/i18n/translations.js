@@ -47,6 +47,10 @@ export const translations = {
     sessionDigitalDesc: 'Online services: Sell games, coins & abonnements.',
     sessionFreeFire: 'FREE FIRE DIAMONDS',
     sessionFreeFireDesc: 'Instant Free Fire ID top-up at 1$ = 10 DH official exchange rate.',
+    sessionAi: 'AI SUBSCRIPTIONS',
+    sessionAiDesc: 'ChatGPT Plus, Gemini Advanced, Claude Pro & Canva Pro (1M / 1Y / 18M).',
+    sessionWindows: 'WINDOWS & OFFICE KEYS',
+    sessionWindowsDesc: 'Windows 10, Windows 11 & Office Suite Lifetime Genuine Retail Licenses.',
 
     // Links section
     linksHeadingEyebrow: 'Direct Links',
@@ -75,7 +79,7 @@ export const translations = {
     orderModalSubtitle: 'Choose your service, enter your name, and send directly to BLEUWI on WhatsApp.',
     nameLabel: 'Your Name or Gamer Tag',
     namePlaceholder: 'e.g. Alex or BlueGamer99',
-    categoryLabel: 'Select Category',
+    categoryLabel: 'Selected Session',
     itemLabel: 'Select Package or Game',
     otherItemOption: 'Other (Custom Request)',
     otherItemPlaceholder: 'Type the exact game name or item you need...',
@@ -116,7 +120,7 @@ export const translations = {
 
     // Footer
     footerCopyright: 'All rights reserved.',
-    footerWhatsApp: 'WhatsApp +212 762-635587',
+    footerWhatsApp: 'Official WhatsApp Direct',
   },
 
   ar: {
@@ -167,6 +171,10 @@ export const translations = {
     sessionDigitalDesc: 'خدمات أونلاين: بيع الألعاب، الكوينز، والاشتراكات الشهرية.',
     sessionFreeFire: 'قسم جواهر فري فاير (Free Fire)',
     sessionFreeFireDesc: 'شحن فوري لجواهر فري فاير عبر الآيدي (ID) بمعدل صرف رسمي 1$ = 10 دراهم.',
+    sessionAi: 'اشتراكات الذكاء الاصطناعي (AI)',
+    sessionAiDesc: 'شات جي بي تي بلس، جيميني، كلود وكانفا برو (شهر / سنة / 18 شهراً).',
+    sessionWindows: 'مفاتيح وسيريالات ويندوز وأوفيس',
+    sessionWindowsDesc: 'تراخيص رقمية أصلية ومدى الحياة لويندوز 10 و 11 ومايكروسوفت أوفيس 2024.',
 
     // Links section
     linksHeadingEyebrow: 'الروابط المباشرة',
@@ -195,7 +203,7 @@ export const translations = {
     orderModalSubtitle: 'اختر الخدمة، اكتب اسمك، وأرسل الطلب مباشرة إلى BLEUWI على واتساب.',
     nameLabel: 'اسمك أو معرفك (Gamer Tag)',
     namePlaceholder: 'مثال: أحمد أو BlueGamer99',
-    categoryLabel: 'اختر القسم أو الخدمة',
+    categoryLabel: 'القسم المحدد للطلب',
     itemLabel: 'اختر الباقة أو اللعبة',
     otherItemOption: 'أخرى (طلب مخصص)',
     otherItemPlaceholder: 'اكتب اسم اللعبة أو الخدمة التي تريدها بدقة...',
@@ -236,6 +244,6 @@ export const translations = {
 
     // Footer
     footerCopyright: 'جميع الحقوق محفوظة.',
-    footerWhatsApp: 'واتساب +212 762-635587',
+    footerWhatsApp: 'واتساب الرسمي المباشر',
   },
 }

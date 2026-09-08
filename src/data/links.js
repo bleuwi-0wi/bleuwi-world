@@ -5,6 +5,13 @@ import cardDigital from '../assets/card-digital-6.jpg'
 import cardPanels from '../assets/card-panels-7.jpg'
 import cardDesign from '../assets/card-design-8.jpg'
 import cardFf19 from '../assets/freefire-19.jpeg'
+import cardAi20 from '../assets/card-ai-20.png'
+import cardAi21 from '../assets/card-ai-21.png'
+import cardAi22 from '../assets/card-ai-22.png'
+import cardAi23 from '../assets/card-ai-23.png'
+import cardWin24 from '../assets/card-win-24.png'
+import cardWin25 from '../assets/card-win-25.png'
+import cardWin26 from '../assets/card-win-26.png'
 
 import iconWhatsApp from '../assets/icon-whatsapp.png'
 import iconYouTube from '../assets/icon-youtube.png'
@@ -13,20 +20,45 @@ import iconTikTok from '../assets/icon-tiktok.png'
 import iconDiscord from '../assets/icon-discord.png'
 import iconKick from '../assets/icon-kick.jpeg'
 
-// Default Official WhatsApp Number for BLEUWI (Immutable / Tamper-proof)
-export const WHATSAPP_NUMBER = Object.freeze('212762635587')
+// Official WhatsApp Phone Number and Direct Links for BLEUWI
+export const WHATSAPP_RAW_PHONE = '212762635587'
+export const WHATSAPP_FORMATTED_PHONE = '+212 762-635587'
+export const WHATSAPP_DIRECT_LINK = 'https://wa.me/212762635587'
+export const WHATSAPP_NUMBER = WHATSAPP_DIRECT_LINK
 
-// Security helper: Generates tamper-proof, sanitized WhatsApp URL with safe phone number
+// Security helper: Generates direct, pre-filled WhatsApp URL with message automatically inserted
 export const getSecureWhatsAppUrl = (message = '') => {
-  const safePhone = '212762635587'
   const sanitized = String(message || '')
-    .slice(0, 1500)
-    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
-  return `https://wa.me/${safePhone}?text=${encodeURIComponent(sanitized)}`
+    .slice(0, 3000)
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '')
+
+  if (!sanitized.trim()) {
+    return `https://wa.me/${WHATSAPP_RAW_PHONE}`
+  }
+
+  return `https://wa.me/${WHATSAPP_RAW_PHONE}?text=${encodeURIComponent(sanitized)}`
+}
+
+// Universal launcher: Automatically copies message to clipboard and routes directly to WhatsApp
+export const openWhatsAppChat = (message = '') => {
+  const url = getSecureWhatsAppUrl(message)
+
+  // Auto-copy message text to clipboard as guaranteed instant backup
+  if (message && typeof navigator !== 'undefined' && navigator?.clipboard?.writeText) {
+    navigator.clipboard.writeText(message).catch(() => {})
+  }
+
+  // Seamless routing based on client environment
+  const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent || '')
+  if (isMobile) {
+    window.location.href = url
+  } else {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
 }
 
 export const links = [
-  { name: 'WhatsApp', description: 'Direct message BLEUWI (+212 762-635587).', icon: MessageCircle, image: iconWhatsApp, href: getSecureWhatsAppUrl('Hello BLEUWI!') },
+  { name: 'WhatsApp', description: 'Direct message BLEUWI (+212 762-635587).', icon: MessageCircle, image: iconWhatsApp, href: WHATSAPP_DIRECT_LINK },
   { name: 'YouTube', description: 'Watch the latest videos and streams.', icon: Video, image: iconYouTube, href: 'https://www.youtube.com/@blue_bleuwi' },
   { name: 'Instagram', description: 'Behind the scenes, captured daily.', icon: Camera, image: iconInstagram, href: 'https://www.instagram.com/blue.bluewi/' },
   { name: 'TikTok', description: 'Short-form moments from the world.', icon: Music2, image: iconTikTok, href: 'https://www.tiktok.com/@bleuwi_wizi0' },
@@ -34,23 +66,230 @@ export const links = [
   { name: 'KICK LIVE STREAM', description: 'Watch BLEUWI live on Kick.', icon: Globe2, image: iconKick, href: 'https://kick.com/bleuwi-wizi' },
 ]
 
-export const featuredLinks = [
+export const aiSubscriptions = [
   {
-    name: 'FREE FIRE DIAMONDS',
-    detail: 'Official Free Fire Diamonds instant ID recharge at 1$ = 10 DH rate.',
-    icon: Coins,
-    href: '/?showcase=freefire',
-    showcaseType: 'freefire',
-    cardImage: cardFf19,
-    cardNum: 19,
-    cardRank: 'B',
-    suit: '♦',
-    badge: '1$ = 10 DH (Best Rate)',
-    badgeAr: '1 دولار = 10 دراهم (أفضل سعر)',
-    categoryKey: 'Free Fire Diamonds',
-    features: ['530 Diamonds - 60 DH (6$)', '1080 Diamonds - 120 DH (12$)', '2420 Diamonds - 250 DH (25$)', '6160 Diamonds - 600 DH (60$)'],
-    featuresAr: ['530 جوهرة - 60 درهم (6$)', '1080 جوهرة - 120 درهم (12$)', '2420 جوهرة - 250 درهم (25$)', '6160 جوهرة - 600 درهم (60$)'],
+    id: 'chatgpt-plus',
+    num: 20,
+    name: 'ChatGPT Plus',
+    nameAr: 'شات جي بي تي بلس (ChatGPT Plus)',
+    tagline: 'GPT-4o, o1 Reasoning, DALL-E 3, Voice Mode & Web Search',
+    taglineAr: 'أحدث نماذج GPT-4o وo1، توليد صور DALL-E 3، الصوت المتقدم، والبحث',
+    image: cardAi20,
+    badge: 'GPT-4o / o1 PRO',
+    badgeAr: 'الأكثر طلباً عالمياً',
+    categoryKey: 'AI Subscriptions',
+    plans: [
+      { duration: '1 Month', durationAr: '1 شهر (1M)', price: '110 DH', priceUsd: '$11', isPopular: false },
+      { duration: '1 Year', durationAr: '1 سنة (1Y)', price: '400 DH', priceUsd: '$40', isPopular: true },
+      { duration: '18 Months', durationAr: '18 شهراً (18M)', price: '550 DH', priceUsd: '$55', isPopular: false },
+    ],
+    features: [
+      'Full Access to GPT-4o & o1 Advanced Reasoning',
+      'Unlimited High-Res DALL-E 3 Image Creation',
+      'Advanced Data Analysis & Python Code Execution',
+      'Real-Time Web Search & Document Upload Analysis',
+      'Private Dedicated Profile / Instant Delivery',
+    ],
+    featuresAr: [
+      'وصول كامل لنماذج الذكاء الاصطناعي GPT-4o وo1',
+      'توليد وتصميم صور فائقة الدقة بـ DALL-E 3',
+      'تحليل البيانات المتقدمة وقراءة وتصحيح الأكواد',
+      'تصفح مباشر للإنترنت ورفع وتحليل المستندات والـ PDF',
+      'حساب موثق وخاص مع تسليم فوري وتفعيل سريع',
+    ],
   },
+  {
+    id: 'gemini-advanced',
+    num: 21,
+    name: 'Google Gemini Advanced',
+    nameAr: 'جيميني أدفانسد (Gemini Advanced)',
+    tagline: 'Gemini 1.5 Pro, 2TB Google One Cloud, 1M Context & Docs',
+    taglineAr: 'نموذج Gemini 1.5 Pro، مساحة 2 تيرابايت سحابية، وسياق ضخم مليون توكن',
+    image: cardAi21,
+    badge: 'Gemini 1.5 Pro + 2TB',
+    badgeAr: 'سعة 2TB سحابية',
+    categoryKey: 'AI Subscriptions',
+    plans: [
+      { duration: '1 Month', durationAr: '1 شهر (1M)', price: '100 DH', priceUsd: '$10', isPopular: false },
+      { duration: '1 Year', durationAr: '1 سنة (1Y)', price: '350 DH', priceUsd: '$35', isPopular: true },
+      { duration: '18 Months', durationAr: '18 شهراً (18M)', price: '480 DH', priceUsd: '$48', isPopular: false },
+    ],
+    features: [
+      'Gemini 1.5 Pro with 1 Million Token Window',
+      'Integrated with Docs, Gmail, Drive & YouTube',
+      'Includes 2TB Google One Cloud Storage',
+      'Analyze Massive Codebases, Long PDFs & Videos',
+      'Guaranteed Private Activation & Instant Setup',
+    ],
+    featuresAr: [
+      'نموذج Gemini 1.5 Pro مع نافذة سياق تتسع لمليون رمز',
+      'تكامل مباشر مع جوجل درايف وDocs وGmail ويوتيوب',
+      'يشمل مساحة تخزين سحابية 2 تيرابايت في Google One',
+      'تحليل ملفات وفيديوهات ضخمة وتلخيص كتب كاملة',
+      'تفعيل رسمي خاص وضمان مستمر طوال المدة',
+    ],
+  },
+  {
+    id: 'claude-ai',
+    num: 22,
+    name: 'Claude AI (Claude Pro)',
+    nameAr: 'كلود برو (Claude AI Pro)',
+    tagline: 'Claude 3.5 Sonnet, Artifacts Canvas, 5x More Usage & Coding',
+    taglineAr: 'أقوى نموذج برمجي Claude 3.5 Sonnet، بيئة Artifacts التفاعلية',
+    image: cardAi22,
+    badge: 'Claude 3.5 Sonnet',
+    badgeAr: 'الرقم 1 في البرمجة',
+    categoryKey: 'AI Subscriptions',
+    plans: [
+      { duration: '1 Month', durationAr: '1 شهر (1M)', price: '120 DH', priceUsd: '$12', isPopular: false },
+      { duration: '1 Year', durationAr: '1 سنة (1Y)', price: '400 DH', priceUsd: '$40', isPopular: true },
+      { duration: '18 Months', durationAr: '18 شهراً (18M)', price: '550 DH', priceUsd: '$55', isPopular: false },
+    ],
+    features: [
+      'Claude 3.5 Sonnet - Top-Ranked Coding AI',
+      'Interactive Artifacts for Live Code & UI Previews',
+      '5x Higher Usage Limits compared to free tier',
+      'Superior Nuanced Writing, Logic & Document Synthesis',
+      'Clean Private Account with Immediate Delivery',
+    ],
+    featuresAr: [
+      'نموذج Claude 3.5 Sonnet المتصدر عالمياً في كتابة الكود',
+      'خاصية Artifacts التفاعلية لتشغيل ومعاينة البرامج حياً',
+      'حدود استخدام مضاعفة 5 مرات مع أولوية في أوقات الذروة',
+      'أسلوب كتابة وصياغة بشرية متقدمة وقراءة ملفات دقيقة',
+      'تسليم فوري ومباشر مع دعم تقني مستمر',
+    ],
+  },
+  {
+    id: 'canva-pro',
+    num: 23,
+    name: 'Canva Pro (Magic AI)',
+    nameAr: 'كانفا برو (Canva Pro AI)',
+    tagline: 'Magic AI Tools, 100M+ Stock Assets, Brand Kit & 1TB Storage',
+    taglineAr: 'أدوات الذكاء الاصطناعي السحرية، 100 مليون ملحق وتصميم، ومساحة 1TB',
+    image: cardAi23,
+    badge: 'Canva Pro + Magic AI',
+    badgeAr: 'شامل كل الميزات VIP',
+    categoryKey: 'AI Subscriptions',
+    plans: [
+      { duration: '1 Month', durationAr: '1 شهر (1M)', price: '50 DH', priceUsd: '$5', isPopular: false },
+      { duration: '1 Year', durationAr: '1 سنة (1Y)', price: '150 DH', priceUsd: '$15', isPopular: true },
+      { duration: '18 Months', durationAr: '18 شهراً (18M)', price: '210 DH', priceUsd: '$21', isPopular: false },
+    ],
+    features: [
+      'Unlimited 100M+ Premium Stock Photos, Videos & Fonts',
+      'Magic Background Remover & AI Image Extender',
+      'Magic Switch to Resize Designs for Any Platform',
+      'Brand Kit with Custom Colors, Logos & Fonts',
+      'Full 1TB Cloud Storage with Personal Account Upgrade',
+    ],
+    featuresAr: [
+      'أكثر من 100 مليون قالب، صورة، فيديو وخط احترافي',
+      'إزالة الخلفيات بضغطة زر وتوسيع الصور بالذكاء الاصطناعي',
+      'تغيير مقاسات التصاميم تلقائياً لجميع منصات السوشيال',
+      'طقم العلامة التجارية (Brand Kit) وإدارة الهوية البصرية',
+      'ترقية مباشرة على إيميلك الشخصي مع مساحة 1 تيرابايت',
+    ],
+  },
+]
+
+export const windowsOfficeKeys = [
+  {
+    id: 'win-10',
+    num: 24,
+    name: 'Windows 10',
+    nameAr: 'ويندوز 10 (Windows 10)',
+    tagline: 'Genuine Lifetime License Key with Official Direct Microsoft Online Activation',
+    taglineAr: 'مفتاح ترخيص أصلي مدى الحياة مع تفعيل رسمي ومباشر عبر خوادم مايكروسوفت',
+    image: cardWin24,
+    badge: 'LIFETIME KEY',
+    badgeAr: 'تفعيل دائم مدى الحياة',
+    categoryKey: 'Windows & Office',
+    versions: [
+      { name: 'Home', nameAr: 'Home (هوم)', price: '95 DH', priceUsd: '$9.50', isPopular: false },
+      { name: 'Pro', nameAr: 'Pro (برو)', price: '110 DH', priceUsd: '$11', isPopular: true },
+      { name: 'Enterprise', nameAr: 'Enterprise (شركات)', price: '140 DH', priceUsd: '$14', isPopular: false },
+    ],
+    features: [
+      '100% Genuine 25-Digit Microsoft Activation Key',
+      'One-Time Purchase for Lifetime Use (No Expiration)',
+      'Direct Online Activation & Official Updates Support',
+      'Multi-Language Support (Arabic, French, English, etc.)',
+      'Supports 32-Bit and 64-Bit Systems',
+    ],
+    featuresAr: [
+      'مفتاح تنشيط رسمي مكون من 25 رمزاً من مايكروسوفت',
+      'ترخيص دائم مدى الحياة بدون أي اشتراك شهري أو سنوي',
+      'تفعيل مباشر أونلاين ودعم كامل لجميع التحديثات الرسمية',
+      'يدعم جميع اللغات بالكامل (العربية، الفرنسية، الإنجليزية)',
+      'متوافق مع جميع أنظمة النواة 32-بت و64-بت',
+    ],
+  },
+  {
+    id: 'win-11',
+    num: 25,
+    name: 'Windows 11',
+    nameAr: 'ويندوز 11 (Windows 11)',
+    tagline: 'Modern UI, TPM 2.0 Security, DirectX 12 Ultimate & Auto HDR Gaming',
+    taglineAr: 'واجهة عصرية، أمان TPM 2.0 فائق، ودعم كامل لأحدث تقنيات الألعاب والتصميم',
+    image: cardWin25,
+    badge: 'WINDOWS 11 GENUINE',
+    badgeAr: 'الأحدث والأكثر طلباً',
+    categoryKey: 'Windows & Office',
+    versions: [
+      { name: 'Home', nameAr: 'Home (هوم)', price: '120 DH', priceUsd: '$12', isPopular: false },
+      { name: 'Pro', nameAr: 'Pro (برو)', price: '140 DH', priceUsd: '$14', isPopular: true },
+      { name: 'Enterprise', nameAr: 'Enterprise (شركات)', price: '170 DH', priceUsd: '$17', isPopular: false },
+    ],
+    features: [
+      'Official Microsoft Retail Key with Lifetime Activation',
+      'Optimized Gaming Performance & DirectStorage Support',
+      'Full BitLocker Drive Encryption & Windows Hello Security',
+      'Seamless Multi-Tasking with Snap Layouts & Desktops',
+      'Instant Delivery with Step-by-Step Activation Guide',
+    ],
+    featuresAr: [
+      'مفتاح رسمي أصلي مدى الحياة مع تفعيل فوري',
+      'أداء ألعاب محسن مع دعم كامل لـ DirectStorage وAuto HDR',
+      'حماية كاملة مع تشفير BitLocker وميزة Windows Hello',
+      'إدارة مهام متطورة وسريعة مع نوافذ Snap الذكية',
+      'تسليم فوري عبر واتساب مع شرح خطوات التفعيل خطوة بخطوة',
+    ],
+  },
+  {
+    id: 'ms-office',
+    num: 26,
+    name: 'Microsoft Office',
+    nameAr: 'مايكروسوفت أوفيس (Office Suite)',
+    tagline: 'Word, Excel, PowerPoint, Outlook, OneNote, Access & Full Cloud Suite',
+    taglineAr: 'حزمة البرامج المكتبية الشاملة: وورد، إكسل، باوربوينت، وأوتلوك بالكامل',
+    image: cardWin26,
+    badge: 'OFFICE SUITE PRO',
+    badgeAr: 'شامل كل برامج الأوفيس',
+    categoryKey: 'Windows & Office',
+    versions: [
+      { name: 'Office 365', nameAr: 'Office 365 (سنة)', price: '150 DH', priceUsd: '$15', isPopular: false },
+      { name: '2021 Pro Plus', nameAr: '2021 Pro Plus (دائم)', price: '180 DH', priceUsd: '$18', isPopular: false },
+      { name: '2024 LTSC Pro', nameAr: '2024 LTSC Pro (دائم)', price: '250 DH', priceUsd: '$25', isPopular: true },
+    ],
+    features: [
+      'Full Suite: Word, Excel, PowerPoint, Outlook, Access & Publisher',
+      'Lifetime Permanent Activation / Personal Account Upgrade',
+      'Official Setup from setup.office.com with Clean Install',
+      'Multi-Device & Multi-Language Support Worldwide',
+      '100% Replacement Warranty & Fast Tech Support',
+    ],
+    featuresAr: [
+      'الحزمة الكاملة: Word, Excel, PowerPoint, Outlook, Access والمزيد',
+      'تفعيل دائم مدى الحياة / ترقية مباشرة على حسابك',
+      'تحميل رسمي ومباشر من موقع مايكروسوفت الرسمي setup.office.com',
+      'يدعم العمل على أجهزة متعددة وجميع لغات العالم',
+      'مشمول بضمان الاستبدال 100% ودعم فني متواصل عبر واتساب',
+    ],
+  },
+]
+
+export const featuredLinks = [
   {
     name: 'VIDEO EDITING SESSION',
     detail: 'Edits built for standout content.',
@@ -101,7 +340,7 @@ export const featuredLinks = [
   },
   {
     name: 'DIGITAL SERVICES',
-    detail: 'Online services: Sell games, coins & subscriptions.',
+    detail: 'Online services: AI subscriptions, games, coins & abonnements.',
     icon: Coins,
     href: '/?showcase=digital',
     showcaseType: 'digital',
@@ -112,8 +351,8 @@ export const featuredLinks = [
     badge: 'Instant Delivery & Best Rates',
     badgeAr: 'تسليم فوري وأفضل الأسعار',
     categoryKey: 'Game Coins',
-    features: ['Robux, FC Coins, V-Bucks, GTA', 'Discord Nitro & Spotify Premium', 'Xbox Game Pass & PS Plus Codes', 'Steam & Epic Global Game Keys'],
-    featuresAr: ['روبوكس، كوينز فيفا، في بوكس، قراند', 'دسكورد نيترو وسبوتيفاي بريميوم', 'بطاقات إكس بوكس وبلايستيشن بلس', 'مفاتيح ألعاب ستيم وإبيك أصلية'],
+    features: ['AI Subscriptions (1M / 1Y / 18M)', 'Free Fire Diamonds (1$ = 10 DH)', 'Robux, FC Coins, V-Bucks, GTA', 'Discord Nitro & PC Games'],
+    featuresAr: ['اشتراكات AI (شهر / سنة / 18 شهر)', 'جواهر فري فاير (1$ = 10 دراهم)', 'روبوكس، كوينز فيفا، في بوكس، قراند', 'دسكورد نيترو وألعاب PC الأصلية'],
   },
 ]
 
@@ -143,6 +382,7 @@ export const digitalServices = [
     tagline: 'Premium gaming, music, streaming & community memberships.',
     icon: Sparkles,
     items: [
+      { name: 'AI Subscriptions (GPT, Claude, Gemini, Canva)', desc: '1 Month, 1 Year & 18 Months VIP plans' },
       { name: 'Discord Nitro', desc: '1 Month & 1 Year (with 2 server boosts)' },
       { name: 'Spotify Premium', desc: 'Individual & family renewal plans' },
       { name: 'Xbox Game Pass Ultimate', desc: 'Multi-month PC & Console game library' },
@@ -210,9 +450,48 @@ export const cheatPanels = [
 ]
 
 export const orderPresets = {
+  'AI Subscriptions': {
+    category: 'AI Subscriptions (GPT, Gemini, Claude, Canva)',
+    sessionName: 'AI SUBSCRIPTIONS',
+    sessionNameAr: 'اشتراكات الذكاء الاصطناعي',
+    games: [
+      'ChatGPT Plus (#20) - 1 Month (110 DH / $11)',
+      'ChatGPT Plus (#20) - 1 Year (400 DH / $40)',
+      'ChatGPT Plus (#20) - 18 Months (550 DH / $55)',
+      'Google Gemini Advanced (#21) - 1 Month (100 DH / $10)',
+      'Google Gemini Advanced (#21) - 1 Year (350 DH / $35)',
+      'Google Gemini Advanced (#21) - 18 Months (480 DH / $48)',
+      'Claude AI Pro (#22) - 1 Month (120 DH / $12)',
+      'Claude AI Pro (#22) - 1 Year (400 DH / $40)',
+      'Claude AI Pro (#22) - 18 Months (550 DH / $55)',
+      'Canva Pro Magic AI (#23) - 1 Month (50 DH / $5)',
+      'Canva Pro Magic AI (#23) - 1 Year (150 DH / $15)',
+      'Canva Pro Magic AI (#23) - 18 Months (210 DH / $21)',
+    ],
+  },
+  'AI Subscription': {
+    category: 'AI Subscriptions (GPT, Gemini, Claude, Canva)',
+    sessionName: 'AI SUBSCRIPTIONS',
+    sessionNameAr: 'اشتراكات الذكاء الاصطناعي',
+    games: [
+      'ChatGPT Plus (#20) - 1 Month (110 DH / $11)',
+      'ChatGPT Plus (#20) - 1 Year (400 DH / $40)',
+      'ChatGPT Plus (#20) - 18 Months (550 DH / $55)',
+      'Google Gemini Advanced (#21) - 1 Month (100 DH / $10)',
+      'Google Gemini Advanced (#21) - 1 Year (350 DH / $35)',
+      'Google Gemini Advanced (#21) - 18 Months (480 DH / $48)',
+      'Claude AI Pro (#22) - 1 Month (120 DH / $12)',
+      'Claude AI Pro (#22) - 1 Year (400 DH / $40)',
+      'Claude AI Pro (#22) - 18 Months (550 DH / $55)',
+      'Canva Pro Magic AI (#23) - 1 Month (50 DH / $5)',
+      'Canva Pro Magic AI (#23) - 1 Year (150 DH / $15)',
+      'Canva Pro Magic AI (#23) - 18 Months (210 DH / $21)',
+    ],
+  },
   'Free Fire Diamond': {
     category: 'Free Fire Diamond (Game Coins)',
-    sessionName: 'DIGITAL SERVICES',
+    sessionName: 'FREE FIRE DIAMONDS',
+    sessionNameAr: 'شحن جواهر فري فاير',
     games: [
       'Free Fire 530 Diamonds - 60 DH (6$)',
       'Free Fire 1080 Diamonds - 120 DH (12$)',
@@ -222,7 +501,8 @@ export const orderPresets = {
   },
   'Free Fire Diamonds': {
     category: 'Free Fire Diamonds (Game Coins)',
-    sessionName: 'DIGITAL SERVICES',
+    sessionName: 'FREE FIRE DIAMONDS',
+    sessionNameAr: 'شحن جواهر فري فاير',
     games: [
       'Free Fire 530 Diamonds - 60 DH (6$)',
       'Free Fire 1080 Diamonds - 120 DH (12$)',
@@ -232,7 +512,8 @@ export const orderPresets = {
   },
   'Game Coins': {
     category: 'Game Coins & Currencies',
-    sessionName: 'DIGITAL SERVICES',
+    sessionName: 'GAME COINS & CURRENCIES',
+    sessionNameAr: 'شحن كوينز ورصيد الألعاب',
     games: [
       'Free Fire 530 Diamonds - 60 DH (6$)',
       'Free Fire 1080 Diamonds - 120 DH (12$)',
@@ -249,7 +530,8 @@ export const orderPresets = {
   },
   'Abonnements': {
     category: 'Subscriptions & Abonnements',
-    sessionName: 'DIGITAL SERVICES',
+    sessionName: 'SUBSCRIPTIONS & ABONNEMENTS',
+    sessionNameAr: 'اشتراكات الحسابات والخدمات',
     games: [
       'Discord Nitro (Full + 2 Boosts) - 70 DH',
       'CapCut Pro (1 Month VIP) - 90 DH',
@@ -263,7 +545,8 @@ export const orderPresets = {
   },
   'Sell Games': {
     category: 'Sell Games & Digital Keys',
-    sessionName: 'DIGITAL SERVICES',
+    sessionName: 'SELL GAMES & DIGITAL KEYS',
+    sessionNameAr: 'ألعاب ومفاتيح رقمية أصلية',
     games: [
       'GTA V (PC ONLY) - 200 DH',
       'RED DEAD 2 (PC ONLY) - 250 DH',
@@ -278,6 +561,7 @@ export const orderPresets = {
   'Cheat Panels': {
     category: 'Cheat Panels Session',
     sessionName: 'CHEAT PANELS SESSION',
+    sessionNameAr: 'جلسات برامج وبانل الألعاب',
     games: [
       'FiveM / GTA V Private Roleplay Panel',
       'Call of Duty: Warzone & MW3 Panel',
@@ -291,6 +575,7 @@ export const orderPresets = {
   'Video Editing': {
     category: 'Video Editing Session',
     sessionName: 'VIDEO EDITING SESSION',
+    sessionNameAr: 'جلسة مونتاج الفيديو الاحترافي',
     games: [
       'YouTube Long-Form Video Edit',
       'TikTok / Shorts / Reels Content Pack',
@@ -302,12 +587,47 @@ export const orderPresets = {
   'Design / Dev': {
     category: 'Design & Dev Session',
     sessionName: 'DESIGN / DEV SESSION',
+    sessionNameAr: 'جلسة التصميم وتطوير المواقع',
     games: [
       'Channel Logo & Brand Mark Identity',
       'High-CTR YouTube Thumbnails Pack',
       'Custom Creator Website / Web App',
       'Twitch / Kick Stream Overlays & Badges',
       'Retro Pixel Art / Animation Asset',
+    ],
+  },
+  'Windows & Office': {
+    category: 'Windows & Office Genuine Keys',
+    sessionName: 'WINDOWS & OFFICE KEYS',
+    sessionNameAr: 'مفاتيح ويندوز وأوفيس الأصلية',
+    games: [
+      'Windows 10 Home (#24) - 95 DH ($9.50)',
+      'Windows 10 Pro (#24) - 110 DH ($11)',
+      'Windows 10 Enterprise (#24) - 140 DH ($14)',
+      'Windows 11 Home (#25) - 120 DH ($12)',
+      'Windows 11 Pro (#25) - 140 DH ($14)',
+      'Windows 11 Enterprise (#25) - 170 DH ($17)',
+      'Office 365 Account License (#26) - 150 DH ($15)',
+      'Office 2021 Professional Plus (#26) - 180 DH ($18)',
+      'Office 2024 LTSC Professional Plus (#26) - 250 DH ($25)',
+      'Other Microsoft Key / Product',
+    ],
+  },
+  'Windows & Office Keys': {
+    category: 'Windows & Office Genuine Keys',
+    sessionName: 'WINDOWS & OFFICE KEYS',
+    sessionNameAr: 'مفاتيح ويندوز وأوفيس الأصلية',
+    games: [
+      'Windows 10 Home (#24) - 95 DH ($9.50)',
+      'Windows 10 Pro (#24) - 110 DH ($11)',
+      'Windows 10 Enterprise (#24) - 140 DH ($14)',
+      'Windows 11 Home (#25) - 120 DH ($12)',
+      'Windows 11 Pro (#25) - 140 DH ($14)',
+      'Windows 11 Enterprise (#25) - 170 DH ($17)',
+      'Office 365 Account License (#26) - 150 DH ($15)',
+      'Office 2021 Professional Plus (#26) - 180 DH ($18)',
+      'Office 2024 LTSC Professional Plus (#26) - 250 DH ($25)',
+      'Other Microsoft Key / Product',
     ],
   },
 }

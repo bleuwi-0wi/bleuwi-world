@@ -11,8 +11,6 @@ import ReviewsSection from './components/ReviewsSection'
 import Footer from './components/Footer'
 import OrderModal from './components/OrderModal'
 import SettingsModal from './components/SettingsModal'
-import WarrantyModal from './components/WarrantyModal'
-import WarrantyBanner from './components/WarrantyBanner'
 import ParticlesBackground from './components/ParticlesBackground'
 import CustomCursor from './components/CustomCursor'
 
@@ -24,7 +22,6 @@ function MainApp() {
   const [orderModalOpen, setOrderModalOpen] = useState(false)
   const [orderModalData, setOrderModalData] = useState({})
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
-  const [warrantyModalOpen, setWarrantyModalOpen] = useState(false)
 
   const handleOpenOrder = (data = {}) => {
     setOrderModalData(data)
@@ -41,14 +38,6 @@ function MainApp() {
 
   const handleCloseSettings = () => {
     setSettingsModalOpen(false)
-  }
-
-  const handleOpenWarranty = () => {
-    setWarrantyModalOpen(true)
-  }
-
-  const handleCloseWarranty = () => {
-    setWarrantyModalOpen(false)
   }
 
   useEffect(() => {
@@ -116,7 +105,7 @@ function MainApp() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const isShowcaseActive = showcase === 'video' || showcase === 'panels' || showcase === 'design' || showcase === 'digital' || showcase === 'services' || showcase === 'freefire' || showcase === 'all'
+  const isShowcaseActive = showcase === 'video' || showcase === 'panels' || showcase === 'design' || showcase === 'digital' || showcase === 'services' || showcase === 'freefire' || showcase === 'ai' || showcase === 'windows' || showcase === 'all'
 
   return (
     <div className={`relative min-h-screen ${isShowcaseActive ? '' : 'overflow-x-clip'} bg-[#05070d] text-white selection:bg-sky-400 selection:text-slate-950`}>
@@ -131,7 +120,6 @@ function MainApp() {
         onHomeClick={navigateHome}
         activeShowcase={showcase}
         onOpenSettings={handleOpenSettings}
-        onOpenWarranty={handleOpenWarranty}
       />
 
       <main className={`relative z-10 ${isShowcaseActive ? 'pt-10' : ''}`}>
@@ -144,11 +132,9 @@ function MainApp() {
           />
         ) : (
           <>
-            <Hero onOpenWarranty={handleOpenWarranty} onOpenOrder={handleOpenOrder} />
-            <WarrantyBanner onOpenWarranty={handleOpenWarranty} />
+            <Hero onOpenOrder={handleOpenOrder} />
             <HotSellers
               onOpenOrder={handleOpenOrder}
-              onOpenWarranty={handleOpenWarranty}
             />
             <PreviewCard
               onSelectShowcase={navigateToShowcase}
@@ -168,14 +154,6 @@ function MainApp() {
         isOpen={orderModalOpen}
         onClose={handleCloseOrder}
         initialData={orderModalData}
-        onOpenWarranty={handleOpenWarranty}
-      />
-
-      {/* Official Golden Warranty Modal */}
-      <WarrantyModal
-        isOpen={warrantyModalOpen}
-        onClose={handleCloseWarranty}
-        onOpenOrder={handleOpenOrder}
       />
 
       {/* Settings Modal (Language, Particles, Custom Cursor) */}

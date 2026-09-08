@@ -332,16 +332,6 @@ export default function ReviewsSection() {
             <Plus size={15} />
             <span>{lang === 'ar' ? 'أضف تقييمك' : 'Write a Review'}</span>
           </button>
-
-          <a
-            href={getWhatsAppReviewLink()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-200 transition hover:bg-emerald-500/20 hover:border-emerald-400 cursor-pointer"
-          >
-            <MessageCircle size={15} className="text-emerald-400" />
-            <span>{lang === 'ar' ? 'تقييم عبر واتساب' : 'Review on WhatsApp'}</span>
-          </a>
         </div>
       </div>
 

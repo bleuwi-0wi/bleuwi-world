@@ -2,7 +2,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 
 const arabicDescriptions = {
-  'WhatsApp': 'تواصل مباشرة مع BLEUWI عبر واتساب (+212 762-635587).',
+  'WhatsApp': 'تواصل مباشرة مع BLEUWI عبر واتساب الرسمي.',
   'YouTube': 'شاهد أحدث الفيديوهات، المقاطع الطويلة، والمونتاج.',
   'Instagram': 'كواليس صناعة المحتوى ولحظات يومية متجددة.',
   'TikTok': 'مقاطع قصيرة، هايلايتس، ولحظات سريعة من البث.',

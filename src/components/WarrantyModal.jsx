@@ -13,7 +13,7 @@ import {
   Check
 } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import { WHATSAPP_NUMBER } from '../data/links'
+import { getSecureWhatsAppUrl, openWhatsAppChat, WHATSAPP_DIRECT_LINK } from '../data/links'
 
 export default function WarrantyModal({ isOpen, onClose, onOpenOrder }) {
   const { lang, isRTL } = useLanguage()
@@ -78,12 +78,11 @@ export default function WarrantyModal({ isOpen, onClose, onOpenOrder }) {
   ]
 
   const handleContactSupport = () => {
-    const text = encodeURIComponent(
+    const text =
       lang === 'ar'
-        ? 'السلام عليكم BLEUWI! أريد الاستفسار عن الضمان الذهبي لطلبات الألعاب والاشتراكات.'
+        ? 'السلام عليكم BLEUWI! أريد الاستفسار عن الضمان لطلبات الألعاب والاشتراكات.'
         : 'Hello BLEUWI! I would like to inquire about the Golden Warranty Guarantee for my order.'
-    )
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer')
+    openWhatsAppChat(text)
   }
 
   const handleOrderWithWarranty = () => {

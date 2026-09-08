@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, ArrowRight, CheckCircle2, Coins, CreditCard, Eye, Gamepad2, MessageCircle, ShieldCheck, Sparkles, X, Zap, ZoomIn, Gem } from 'lucide-react'
-import { digitalServices, cheatPanels } from '../data/links'
+import { ArrowLeft, ArrowRight, CheckCircle2, Coins, CreditCard, Eye, Gamepad2, MessageCircle, ShieldCheck, Sparkles, X, Zap, ZoomIn, Gem, Key } from 'lucide-react'
+import { digitalServices, cheatPanels, aiSubscriptions, windowsOfficeKeys } from '../data/links'
 import { freeFirePacks } from './HotSellers'
 import { useLanguage } from '../context/LanguageContext'
 import designOne from '../assets/design-1.webp'
@@ -79,12 +79,25 @@ const serviceImages = {
 export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpenOrder }) {
   const [lightboxImage, setLightboxImage] = useState(null)
   const { t, lang, isRTL } = useLanguage()
+  const [aiPlanIndices, setAiPlanIndices] = useState({
+    'chatgpt-plus': 1,
+    'gemini-advanced': 1,
+    'claude-ai': 1,
+    'canva-pro': 1,
+  })
+  const [winVersionIndices, setWinVersionIndices] = useState({
+    'win-10': 1,
+    'win-11': 1,
+    'ms-office': 2,
+  })
 
   const showVideo = type === 'all' || type === 'video'
   const showPanels = type === 'all' || type === 'panels'
   const showDesign = type === 'all' || type === 'design'
   const showDigital = type === 'all' || type === 'digital' || type === 'services'
-  const showFreeFire = type === 'all' || type === 'freefire'
+  const showFreeFire = type === 'all' || type === 'freefire' || type === 'digital' || type === 'services'
+  const showAi = type === 'all' || type === 'ai' || type === 'digital' || type === 'services'
+  const showWindows = type === 'all' || type === 'windows' || type === 'digital' || type === 'services'
 
   const getDigitalCategoryKey = (id) => {
     if (id === 'game-coins') return 'Game Coins'
@@ -149,6 +162,10 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
             ? (lang === 'ar' ? 'التصميم والتطوير ' : 'Design / dev ')
             : type === 'freefire'
             ? (lang === 'ar' ? 'شحن جواهر فري فاير ' : 'Free Fire Diamonds ')
+            : type === 'ai'
+            ? (lang === 'ar' ? 'اشتراكات الذكاء الاصطناعي ' : 'AI Subscriptions ')
+            : type === 'windows'
+            ? (lang === 'ar' ? 'مفاتيح ويندوز وأوفيس ' : 'Windows & Office ')
             : type === 'digital' || type === 'services'
             ? (lang === 'ar' ? 'الخدمات ' : 'Degital ')
             : (lang === 'ar' ? 'استكشف ' : 'Explore all ')}
@@ -161,6 +178,10 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
               ? (lang === 'ar' ? 'الإبداعي.' : 'session.')
               : type === 'freefire'
               ? (lang === 'ar' ? '(1$ = 10 دراهم).' : '(1$ = 10 DH Rate).')
+              : type === 'ai'
+              ? (lang === 'ar' ? 'تراخيص رسمية (1M / 1Y / 18M).' : 'Official Licenses (1M / 1Y / 18M).')
+              : type === 'windows'
+              ? (lang === 'ar' ? 'سيريالات أصلية مدى الحياة.' : 'Genuine Lifetime Keys.')
               : type === 'digital' || type === 'services'
               ? (lang === 'ar' ? 'الرقمية.' : 'servises.')
               : (lang === 'ar' ? 'جميع الأقسام.' : 'sessions.')}
@@ -175,6 +196,10 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
             ? t('sessionDesignDesc')
             : type === 'freefire'
             ? (lang === 'ar' ? 'شحن فوري عبر الأيدي (Player ID) بمعدل صرف رسمي 1$ = 10 دراهم مع ضمان ذهبي كامل.' : 'Official Free Fire Diamonds instant ID recharge at 1$ = 10 DH rate with golden guarantee.')
+            : type === 'ai'
+            ? (lang === 'ar' ? 'اشتراكات الذكاء الاصطناعي الرسمية (ChatGPT Plus, Gemini Advanced, Claude Pro, Canva Pro) مع اختيار المدة التي تناسبك: شهر، سنة، أو 18 شهراً.' : 'Official AI subscriptions (ChatGPT Plus, Gemini Advanced, Claude Pro, Canva Pro) with interactive duration plans: 1 Month, 1 Year, or 18 Months.')
+            : type === 'windows'
+            ? (lang === 'ar' ? 'سيريالات ومفاتيح ويندوز 10 و 11 وأوفيس الأصلية (#24 إلى #26) مدى الحياة مع تفعيل رسمي ومباشر أونلاين وضمان 100%.' : 'Official Microsoft Windows 10, Windows 11 and Office Suite genuine lifetime retail keys (#24 to #26) with direct online activation & 100% warranty.')
             : type === 'digital' || type === 'services'
             ? t('digitalCoinsTagline') + ' ' + (lang === 'ar' ? 'انقر على الصور المرجعية لمعاينة التفاصيل، أو اطلب مباشرة عبر واتساب!' : 'Click the picture references to inspect details, or order directly via WhatsApp!')
             : t('sessionsHeadingDesc')}
@@ -184,6 +209,34 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
           <div className="mt-6 flex flex-wrap gap-2">
             <button
               type="button"
+              onClick={() => onSelectType('windows')}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
+                type === 'windows'
+                  ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                  : 'border border-blue-400/30 bg-blue-500/10 text-blue-300 hover:border-blue-300/50 hover:text-white'
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                <Key size={13} className="text-blue-300" />
+                <span>{lang === 'ar' ? 'ويندوز وأوفيس (Keys)' : 'Windows & Office (Keys)'}</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onSelectType('ai')}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
+                type === 'ai'
+                  ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg shadow-purple-500/25'
+                  : 'border border-purple-400/30 bg-purple-500/10 text-purple-300 hover:border-purple-300/50 hover:text-white'
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                <Sparkles size={13} className="text-purple-300" />
+                <span>{lang === 'ar' ? 'اشتراكات AI (الذكاء الاصطناعي)' : 'AI Subscriptions (1M/1Y/18M)'}</span>
+              </span>
+            </button>
+            <button
+              type="button"
               onClick={() => onSelectType('freefire')}
               className={`rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
                 type === 'freefire'
@@ -191,7 +244,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                   : 'border border-white/10 bg-white/5 text-slate-300 hover:border-amber-300/30 hover:text-white'
               }`}
             >
-              {lang === 'ar' ? 'جواهر فري فاير (1$=10DH)' : 'Free Fire Diamonds (1$=10DH)'}
+              {lang === 'ar' ? 'جواهر فري فاير' : 'Free Fire Diamonds'}
             </button>
             <button
               type="button"
@@ -622,12 +675,9 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                       <span>{pack.diamonds} 💎</span>
                     </div>
 
-                    <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between">
+                    <div className="absolute bottom-2 left-2.5">
                       <span className="text-[10px] font-bold text-amber-300 bg-black/80 px-2 py-0.5 rounded backdrop-blur-sm border border-amber-400/30">
                         {pack.priceUsd} = {pack.price}
-                      </span>
-                      <span className="text-[10px] text-emerald-300 font-bold bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-500/30">
-                        1$=10DH
                       </span>
                     </div>
                   </div>
@@ -678,6 +728,317 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* SESSION 06: AI SUBSCRIPTIONS (1M / 1Y / 18M) */}
+      {showAi && (
+        <div className="portfolio-group">
+          <div className="portfolio-label">
+            <span>06</span>
+            <h3>
+              {lang === 'ar' 
+                ? 'اشتراكات الذكاء الاصطناعي — اختر المدة (1 شهر / 1 سنة / 18 شهراً)' 
+                : 'AI Subscriptions — Choose Duration (1 Month / 1 Year / 18 Months)'}
+            </h3>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {aiSubscriptions.map((item) => {
+              const activePlanIndex = aiPlanIndices[item.id] ?? 1
+              const activePlan = item.plans[activePlanIndex] || item.plans[0]
+
+              return (
+                <div
+                  key={item.id}
+                  className="group relative flex flex-col justify-between rounded-2xl border border-purple-500/20 bg-gradient-to-b from-purple-500/[0.08] via-white/[0.02] to-transparent p-4 sm:p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-purple-400/50 hover:shadow-xl hover:shadow-purple-500/15"
+                >
+                  <div>
+                    {/* Zoomable Reference Image Card (#20, #21, #22, #23) */}
+                    <div
+                      className="group/img relative mb-3.5 aspect-[4/3] w-full overflow-hidden rounded-xl border border-purple-400/30 bg-black/80 cursor-pointer shadow-lg transition-transform duration-300 hover:border-purple-400"
+                      onClick={() => setLightboxImage({
+                        src: item.image,
+                        title: `${item.name} (#${item.num})`,
+                        categoryKey: 'AI Subscriptions',
+                        subtitle: `${lang === 'ar' ? item.nameAr : item.name} · ${activePlan.duration} (${activePlan.price} / ${activePlan.priceUsd})`,
+                        alt: item.name,
+                      })}
+                      title="Click to zoom reference picture"
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+                      {/* Card Number Badge */}
+                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
+                        <Sparkles size={10} className="text-purple-200" />
+                        <span>#{item.num}</span>
+                      </div>
+
+                      {/* Floating Active Plan Price */}
+                      <div className="absolute bottom-2 left-2.5">
+                        <span className="text-xs font-black text-purple-200 bg-black/85 px-2.5 py-1 rounded-lg backdrop-blur-sm border border-purple-400/40 shadow-sm">
+                          {activePlan.price} <span className="text-[10px] font-normal text-slate-300">({activePlan.priceUsd})</span>
+                        </span>
+                      </div>
+
+                      <div className="absolute bottom-2 right-2.5">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-purple-950/80 px-2 py-0.5 text-[10px] font-bold text-purple-300 border border-purple-400/30 backdrop-blur-sm">
+                          <Eye size={10} />
+                          <span>{lang === 'ar' ? 'معاينة' : 'Zoom'}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-400/10 px-2.5 py-0.5 text-[10px] font-bold text-purple-300">
+                        <Sparkles size={11} className="text-purple-400" />
+                        <span>{lang === 'ar' ? item.badgeAr : item.badge}</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">AI PRO</span>
+                    </div>
+
+                    <h4 className="mt-2 text-base font-bold text-white group-hover:text-purple-300 transition-colors">
+                      {lang === 'ar' ? item.nameAr : item.name}
+                    </h4>
+                    <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
+                      {lang === 'ar' ? item.taglineAr : item.tagline}
+                    </p>
+
+                    {/* DURATION PLAN SELECTOR: 1 MONTH / 1 YEAR / 18 MONTHS */}
+                    <div className="mt-3.5 rounded-xl border border-white/10 bg-slate-950/60 p-2 backdrop-blur-sm">
+                      <div className="mb-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <span>{lang === 'ar' ? 'اختر مدة الاشتراك:' : 'Select Plan Duration:'}</span>
+                        <span className="text-purple-300 font-semibold">{lang === 'ar' ? activePlan.durationAr : activePlan.duration}</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {item.plans.map((p, pIdx) => {
+                          const isSelected = activePlanIndex === pIdx
+                          return (
+                            <button
+                              key={p.duration}
+                              type="button"
+                              onClick={() => setAiPlanIndices(prev => ({ ...prev, [item.id]: pIdx }))}
+                              className={`relative flex flex-col items-center justify-center rounded-lg py-1.5 px-1 text-center transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'border border-purple-400 bg-gradient-to-b from-purple-500/30 to-indigo-600/30 text-white shadow-[0_0_12px_rgba(168,85,247,0.35)] ring-1 ring-purple-400/50'
+                                  : 'border border-white/5 bg-white/[0.02] text-slate-400 hover:border-purple-300/30 hover:bg-white/[0.06] hover:text-slate-200'
+                              }`}
+                            >
+                              {p.isPopular && (
+                                <span className="absolute -top-1.5 right-1 rounded-full bg-amber-400 px-1 py-[1px] text-[8px] font-black text-slate-950 shadow-sm leading-none">
+                                  ★
+                                </span>
+                              )}
+                              <span className="text-[11px] font-bold leading-tight">
+                                {p.duration === '1 Month' ? '1M' : p.duration === '1 Year' ? '1Y' : '18M'}
+                              </span>
+                              <span className={`text-[10px] font-extrabold leading-tight ${isSelected ? 'text-purple-300' : 'text-slate-400'}`}>
+                                {p.price}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <ul className="mt-3.5 space-y-1.5 border-t border-white/[0.08] pt-2.5 text-[11px] text-slate-300">
+                      {(lang === 'ar' ? item.featuresAr : item.features).slice(0, 4).map((feat, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <CheckCircle2 size={12} className="text-purple-400 flex-none mt-0.5" />
+                          <span className="line-clamp-1">{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="mt-4 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => onOpenOrder && onOpenOrder({
+                        categoryKey: 'AI Subscriptions',
+                        specificItem: `${item.name} - ${activePlan.duration} (${activePlan.price})`,
+                        productName: `${item.name} (${activePlan.duration})`,
+                        productPrice: activePlan.price,
+                        productImage: item.image,
+                        productPlatform: 'AI SUBSCRIPTION',
+                        defaultNotes: `Subscription: ${item.name} (#${item.num}), Plan: ${activePlan.duration} (${activePlan.price} / ${activePlan.priceUsd})`,
+                      })}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-600 py-2.5 text-xs font-black text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-400 hover:to-indigo-400 cursor-pointer"
+                    >
+                      <MessageCircle size={14} />
+                      <span>
+                        {lang === 'ar' 
+                          ? `طلب ${activePlan.durationAr} (${activePlan.price})` 
+                          : `Order ${activePlan.duration} (${activePlan.price})`}
+                      </span>
+                      <ArrowRight size={13} className={isRTL ? 'rotate-180' : ''} />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 07. WINDOWS & MICROSOFT OFFICE SUITE KEYS (#24, #25, #26) */}
+      {showWindows && (
+        <div className="portfolio-group">
+          <div className="portfolio-label">
+            <span>07</span>
+            <h3>
+              {lang === 'ar' 
+                ? 'مفاتيح ويندوز وأوفيس الأصلية — اختر الإصدار (Home / Pro / Enterprise أو 365 / 2021 / 2024)' 
+                : 'Windows & Office Genuine Keys — Choose Edition (Home / Pro / Enterprise or 365 / 2021 / 2024)'}
+            </h3>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {windowsOfficeKeys.map((item) => {
+              const activeVersionIndex = winVersionIndices[item.id] ?? 1
+              const activeVersion = item.versions[activeVersionIndex] || item.versions[0]
+
+              return (
+                <div
+                  key={item.id}
+                  className="group relative flex flex-col justify-between rounded-2xl border border-blue-500/20 bg-gradient-to-b from-blue-500/[0.08] via-white/[0.02] to-transparent p-4 sm:p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-400/50 hover:shadow-xl hover:shadow-blue-500/15"
+                >
+                  <div>
+                    {/* Zoomable Reference Image Card (#24, #25, #26) */}
+                    <div
+                      className="group/img relative mb-3.5 aspect-[4/3] w-full overflow-hidden rounded-xl border border-blue-400/30 bg-black/80 cursor-pointer shadow-lg transition-transform duration-300 hover:border-blue-400"
+                      onClick={() => setLightboxImage({
+                        src: item.image,
+                        title: `${item.name} (#${item.num})`,
+                        categoryKey: 'Windows & Office',
+                        subtitle: `${lang === 'ar' ? item.nameAr : item.name} · ${activeVersion.name} (${activeVersion.price} / ${activeVersion.priceUsd})`,
+                        alt: item.name,
+                      })}
+                      title="Click to zoom reference picture"
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+                      {/* Card Number Badge */}
+                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
+                        <Key size={10} className="text-blue-200" />
+                        <span>#{item.num}</span>
+                      </div>
+
+                      {/* Floating Active Plan Price */}
+                      <div className="absolute bottom-2 left-2.5">
+                        <span className="text-xs font-black text-blue-200 bg-black/85 px-2.5 py-1 rounded-lg backdrop-blur-sm border border-blue-400/40 shadow-sm">
+                          {activeVersion.price} <span className="text-[10px] font-normal text-slate-300">({activeVersion.priceUsd})</span>
+                        </span>
+                      </div>
+
+                      <div className="absolute bottom-2 right-2.5">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-blue-950/80 px-2 py-0.5 text-[10px] font-bold text-blue-300 border border-blue-400/30 backdrop-blur-sm">
+                          <Eye size={10} />
+                          <span>{lang === 'ar' ? 'معاينة' : 'Zoom'}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors">
+                          {lang === 'ar' ? item.nameAr : item.name}
+                        </h4>
+                        <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">
+                          {lang === 'ar' ? item.taglineAr : item.tagline}
+                        </p>
+                      </div>
+                      <span className="shrink-0 rounded-full border border-blue-400/40 bg-blue-500/20 px-2 py-0.5 text-[10px] font-mono font-bold text-blue-300">
+                        {lang === 'ar' ? item.badgeAr : item.badge}
+                      </span>
+                    </div>
+
+                    {/* INTERACTIVE VERSION SWITCHER (HOME / PRO / ENTERPRISE OR 365 / 2021 / 2024) */}
+                    <div className="mt-3.5 rounded-xl border border-white/10 bg-slate-950/70 p-2 backdrop-blur-md">
+                      <div className="mb-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <span>{lang === 'ar' ? 'النسخة:' : 'Edition:'}</span>
+                        <span className="text-blue-300 font-semibold">{lang === 'ar' ? activeVersion.nameAr : activeVersion.name}</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {item.versions.map((ver, vIdx) => {
+                          const isSelected = activeVersionIndex === vIdx
+                          return (
+                            <button
+                              key={ver.name}
+                              type="button"
+                              onClick={() => setWinVersionIndices(prev => ({ ...prev, [item.id]: vIdx }))}
+                              className={`relative flex flex-col items-center justify-center rounded-lg py-1.5 px-1 text-center transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'border border-blue-400 bg-gradient-to-b from-blue-500/30 to-indigo-600/30 text-white shadow-[0_0_12px_rgba(59,130,246,0.35)] ring-1 ring-blue-400/50'
+                                  : 'border border-white/5 bg-white/[0.02] text-slate-400 hover:border-blue-300/30 hover:bg-white/[0.06] hover:text-slate-200'
+                              }`}
+                            >
+                              {ver.isPopular && (
+                                <span className="absolute -top-1.5 right-1 rounded-full bg-amber-400 px-1 py-[1px] text-[8px] font-black text-slate-950 shadow-sm leading-none">
+                                  ★
+                                </span>
+                              )}
+                              <span className="text-[11px] font-bold leading-tight truncate w-full">
+                                {ver.name}
+                              </span>
+                              <span className={`text-[10px] font-extrabold leading-tight ${isSelected ? 'text-blue-300' : 'text-slate-400'}`}>
+                                {ver.price}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <ul className="mt-3.5 space-y-1.5 border-t border-white/[0.08] pt-2.5 text-[11px] text-slate-300">
+                      {(lang === 'ar' ? item.featuresAr : item.features).slice(0, 4).map((feat, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <CheckCircle2 size={12} className="text-blue-400 flex-none mt-0.5" />
+                          <span className="line-clamp-1">{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="mt-4 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => onOpenOrder && onOpenOrder({
+                        categoryKey: 'Windows & Office',
+                        specificItem: `${item.name} - ${activeVersion.name} (${activeVersion.price})`,
+                        productName: `${item.name} (${activeVersion.name})`,
+                        productPrice: activeVersion.price,
+                        productImage: item.image,
+                        productPlatform: 'MICROSOFT KEY',
+                        defaultNotes: `Microsoft Key: ${item.name} (#${item.num}), Edition: ${activeVersion.name} (${activeVersion.price} / ${activeVersion.priceUsd})`,
+                      })}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 via-sky-500 to-indigo-600 py-2.5 text-xs font-black text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-400 hover:to-sky-400 cursor-pointer"
+                    >
+                      <MessageCircle size={14} />
+                      <span>
+                        {lang === 'ar' 
+                          ? `طلب ${activeVersion.nameAr} (${activeVersion.price})` 
+                          : `Order ${activeVersion.name} (${activeVersion.price})`}
+                      </span>
+                      <ArrowRight size={13} className={isRTL ? 'rotate-180' : ''} />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

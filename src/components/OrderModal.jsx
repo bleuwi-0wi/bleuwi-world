@@ -23,7 +23,7 @@ import {
   Gem,
   AlertCircle,
 } from 'lucide-react'
-import { orderPresets, WHATSAPP_NUMBER } from '../data/links'
+import { orderPresets, getSecureWhatsAppUrl, openWhatsAppChat, WHATSAPP_DIRECT_LINK } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
 import { getOrderRateLimitStatus, recordOrderSubmission, MAX_ORDERS_PER_DAY } from '../utils/orderAntiSpam'
 
@@ -44,6 +44,13 @@ import cardDesign from '../assets/card-design-8.jpg'
 import refCoins from '../assets/1.webp'
 import refAbonnements from '../assets/2.webp'
 import refGames from '../assets/3.webp'
+import cardAi20 from '../assets/card-ai-20.png'
+import cardAi21 from '../assets/card-ai-21.png'
+import cardAi22 from '../assets/card-ai-22.png'
+import cardAi23 from '../assets/card-ai-23.png'
+import cardWin24 from '../assets/card-win-24.png'
+import cardWin25 from '../assets/card-win-25.png'
+import cardWin26 from '../assets/card-win-26.png'
 
 // Comprehensive Product Registry for exact product image & WhatsApp message matching
 export const productRegistry = [
@@ -215,9 +222,137 @@ export const productRegistry = [
     taglineAr: 'اشتراك شهر سبوتيفاي بريميوم بدون إعلانات وبجودة استماع عالية',
     filename: 'BLEUWI-Spotify1M.jpg',
   },
+  {
+    matches: (name) => /chatgpt|gpt.*4|o1.*pro/i.test(name),
+    title: 'ChatGPT Plus (GPT-4o / o1 PRO)',
+    shortName: 'ChatGPT Plus',
+    price: '110 DH - 550 DH',
+    platform: 'AI PRO',
+    badge: 'GPT-4o / o1 PRO',
+    badgeAr: 'الأكثر طلباً عالمياً',
+    image: cardAi20,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/20.png',
+    tagline: 'GPT-4o, o1 Reasoning, DALL-E 3, Voice Mode & Web Search',
+    taglineAr: 'أحدث نماذج GPT-4o وo1، توليد صور DALL-E 3، الصوت المتقدم، والبحث',
+    filename: 'BLEUWI-ChatGPT-Plus.png',
+  },
+  {
+    matches: (name) => /gemini/i.test(name),
+    title: 'Google Gemini Advanced (2TB Cloud)',
+    shortName: 'Gemini Advanced',
+    price: '100 DH - 480 DH',
+    platform: 'AI PRO',
+    badge: 'Gemini 1.5 Pro + 2TB',
+    badgeAr: 'سعة 2TB سحابية',
+    image: cardAi21,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/21.png',
+    tagline: 'Gemini 1.5 Pro, 2TB Google One Cloud, 1M Context & Docs',
+    taglineAr: 'نموذج Gemini 1.5 Pro، مساحة 2 تيرابايت سحابية، وسياق ضخم مليون توكن',
+    filename: 'BLEUWI-Gemini-Advanced.png',
+  },
+  {
+    matches: (name) => /claude/i.test(name),
+    title: 'Claude AI (Claude Pro)',
+    shortName: 'Claude AI Pro',
+    price: '120 DH - 550 DH',
+    platform: 'AI PRO',
+    badge: 'Claude 3.5 Sonnet',
+    badgeAr: 'الرقم 1 في البرمجة',
+    image: cardAi22,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/22.png',
+    tagline: 'Claude 3.5 Sonnet, Artifacts Canvas, 5x More Usage & Coding',
+    taglineAr: 'أقوى نموذج برمجي Claude 3.5 Sonnet، بيئة Artifacts التفاعلية',
+    filename: 'BLEUWI-Claude-Pro.png',
+  },
+  {
+    matches: (name) => /canva/i.test(name),
+    title: 'Canva Pro (Magic AI)',
+    shortName: 'Canva Pro AI',
+    price: '50 DH - 210 DH',
+    platform: 'AI PRO',
+    badge: 'Canva Pro + Magic AI',
+    badgeAr: 'شامل كل الميزات VIP',
+    image: cardAi23,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/23.png',
+    tagline: 'Magic AI Tools, 100M+ Stock Assets, Brand Kit & 1TB Storage',
+    taglineAr: 'أدوات الذكاء الاصطناعي السحرية، 100 مليون ملحق وتصميم، ومساحة 1TB',
+    filename: 'BLEUWI-Canva-Pro.png',
+  },
+  {
+    matches: (name) => /windows.*10|win.*10|ويندوز.*10/i.test(name),
+    title: 'Windows 10 Genuine Lifetime Retail Key',
+    shortName: 'Windows 10 Key',
+    price: '95 DH - 140 DH',
+    platform: 'MICROSOFT KEY',
+    badge: 'LIFETIME KEY',
+    badgeAr: 'تفعيل دائم مدى الحياة',
+    image: cardWin24,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/24.png',
+    tagline: '100% Genuine Retail Key for Windows 10 (Home, Pro, Enterprise) with Direct Online Activation',
+    taglineAr: 'مفتاح أصلي دائم مدى الحياة لويندوز 10 (هوم، برو، شركات) مع تفعيل فوري ومباشر',
+    filename: 'BLEUWI-Windows10-Key.png',
+  },
+  {
+    matches: (name) => /windows.*11|win.*11|ويندوز.*11/i.test(name),
+    title: 'Windows 11 Genuine Lifetime Retail Key',
+    shortName: 'Windows 11 Key',
+    price: '120 DH - 170 DH',
+    platform: 'MICROSOFT KEY',
+    badge: 'WINDOWS 11 GENUINE',
+    badgeAr: 'الأحدث والأكثر مبيعاً',
+    image: cardWin25,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/25.png',
+    tagline: 'Direct Retail Key for Windows 11 (Home, Pro, Enterprise) with TPM 2.0 & Auto HDR Support',
+    taglineAr: 'مفتاح أصلي دائم لويندوز 11 مع دعم كامل للتحديثات وأحدث تقنيات الأمان والألعاب',
+    filename: 'BLEUWI-Windows11-Key.png',
+  },
+  {
+    matches: (name) => /office|أوفيس|365|ltsc|word|excel/i.test(name),
+    title: 'Microsoft Office Genuine Suite (365 / 2021 / 2024 LTSC)',
+    shortName: 'Microsoft Office',
+    price: '150 DH - 250 DH',
+    platform: 'MICROSOFT KEY',
+    badge: 'OFFICE SUITE PRO',
+    badgeAr: 'شامل كل برامج الأوفيس',
+    image: cardWin26,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/26.png',
+    tagline: 'Word, Excel, PowerPoint, Outlook, OneNote, Access with Direct Download from setup.office.com',
+    taglineAr: 'الحزمة الكاملة وورد وإكسل وباوربوينت مع تفعيل رسمي مدى الحياة وضمان 100%',
+    filename: 'BLEUWI-Microsoft-Office.png',
+  },
 ]
 
 const categoryFallbacks = {
+  'Windows & Office': {
+    title: 'Windows & Office Genuine Keys (Win 10, Win 11, Office 2024)',
+    badge: '100% Genuine Retail',
+    badgeAr: 'تراخيص رسمية أصلية',
+    image: cardWin25,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/25.png',
+    tagline: 'Official Microsoft lifetime activation retail keys with direct online activation and 100% replacement warranty',
+    taglineAr: 'سيريالات ومفاتيح مايكروسوفت الأصلية مدى الحياة مع تفعيل فوري أونلاين وضمان كامل 100%',
+    filename: 'BLEUWI-Windows-Office-Keys.png',
+  },
+  'Windows & Office Keys': {
+    title: 'Windows & Office Genuine Keys (Win 10, Win 11, Office 2024)',
+    badge: '100% Genuine Retail',
+    badgeAr: 'تراخيص رسمية أصلية',
+    image: cardWin25,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/25.png',
+    tagline: 'Official Microsoft lifetime activation retail keys with direct online activation and 100% replacement warranty',
+    taglineAr: 'سيريالات ومفاتيح مايكروسوفت الأصلية مدى الحياة مع تفعيل فوري أونلاين وضمان كامل 100%',
+    filename: 'BLEUWI-Windows-Office-Keys.png',
+  },
+  'AI Subscriptions': {
+    title: 'AI Subscriptions (GPT, Gemini, Claude, Canva)',
+    badge: '1M / 1Y / 18M Plans',
+    badgeAr: 'خطط شهر · سنة · 18 شهر',
+    image: cardAi20,
+    publicUrl: 'https://bleuwiworld.shop/image_reference/20.png',
+    tagline: 'Official AI VIP subscriptions with flexible 1M, 1Y, and 18M durations',
+    taglineAr: 'تراخيص واشتراكات الذكاء الاصطناعي الرسمية بمدد مرنة (شهر / سنة / 18 شهراً)',
+    filename: 'BLEUWI-AI-Subscriptions.png',
+  },
   'Free Fire Diamond': {
     title: 'Free Fire Diamond (Game Coins)',
     badge: '1$ = 10 DH',
@@ -309,9 +444,13 @@ const categoryIcons = {
   'Cheat Panels': ShieldCheck,
   'Video Editing': Clapperboard,
   'Design / Dev': Palette,
+  'AI Subscriptions': Sparkles,
+  'AI Subscription': Sparkles,
+  'Windows & Office': Monitor,
+  'Windows & Office Keys': Monitor,
 }
 
-export default function OrderModal({ isOpen, onClose, initialData = {}, onOpenWarranty }) {
+export default function OrderModal({ isOpen, onClose, initialData = {} }) {
   const { t, lang, isRTL } = useLanguage()
 
   const [name, setName] = useState(() => {
@@ -350,6 +489,10 @@ export default function OrderModal({ isOpen, onClose, initialData = {}, onOpenWa
       )
       if (found) matchedCategoryKey = found
     }
+
+    if (matchedCategoryKey === 'AI Subscription') matchedCategoryKey = 'AI Subscriptions'
+    if (matchedCategoryKey === 'Windows & Office Keys') matchedCategoryKey = 'Windows & Office'
+    if (matchedCategoryKey === 'Free Fire Diamonds') matchedCategoryKey = 'Free Fire Diamond'
 
     setSelectedCategoryKey(matchedCategoryKey)
 
@@ -453,38 +596,7 @@ export default function OrderModal({ isOpen, onClose, initialData = {}, onOpenWa
     return categoryFallbacks[selectedCategoryKey] || categoryFallbacks['Sell Games']
   }, [chosenItem, selectedCategoryKey, initialData])
 
-  // Helper to convert any image blob (jpeg, webp) into PNG blob so Windows/Mac clipboard accepts it
-  const convertBlobToPng = (blob) => {
-    return new Promise((resolve) => {
-      try {
-        const img = new Image()
-        const url = URL.createObjectURL(blob)
-        img.onload = () => {
-          URL.revokeObjectURL(url)
-          const canvas = document.createElement('canvas')
-          canvas.width = img.naturalWidth || img.width || 800
-          canvas.height = img.naturalHeight || img.height || 600
-          const ctx = canvas.getContext('2d')
-          ctx.drawImage(img, 0, 0)
-          canvas.toBlob((pngBlob) => {
-            resolve(pngBlob || blob)
-          }, 'image/png')
-        }
-        img.onerror = () => {
-          URL.revokeObjectURL(url)
-          resolve(blob)
-        }
-        img.src = url
-      } catch {
-        resolve(blob)
-      }
-    })
-  }
-
-  const [copiedImageToast, setCopiedImageToast] = useState(false)
-  const [copiedImageBtn, setCopiedImageBtn] = useState(false)
-
-  // Build the clean WhatsApp message with exact product details (NO ugly raw link!)
+  // Build the clean WhatsApp message with exact product details and direct image link
   const chosenProductTitle = activeProduct.title || chosenItem
   const productPriceTag = activeProduct.price ? ` (${activeProduct.price})` : ''
   const platformTag = activeProduct.platform ? `\n*• المنصة / النوع:* ${activeProduct.platform}` : ''
@@ -496,62 +608,20 @@ export default function OrderModal({ isOpen, onClose, initialData = {}, onOpenWa
 *• المنتج المطلوب:* ${chosenProductTitle}${productPriceTag}
 *• المنصة:* ${activeProduct.platform || 'PC / Digital'}
 *• القسم:* ${currentPreset.sessionName} (${currentPreset.category})
-*• اسم العميل:* ${cleanName}${details.trim() ? `\n*• الملاحظات:* ${details.trim()}` : ''}
+*• اسم العميل:* ${cleanName}${details.trim() ? `\n*• الملاحظات:* ${details.trim()}` : ''}${activeProduct.publicUrl ? `\n\n*• رابط صورة المنتج:*\n${activeProduct.publicUrl}` : ''}
 
-يرجى تزويدي بمعلومات الدفع (CIH / التجاري وفا / كاش بلوس / بايبال / كريبتو) لتأكيد وتفعيل الطلب فوراً!
-
-${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
+يرجى تزويدي بمعلومات الدفع (CIH / التجاري وفا / كاش بلوس / بايبال / كريبتو) لتأكيد وتفعيل الطلب فوراً!`
     : `*Hello BLEUWI!*
 
 *• Product Ordered:* ${chosenProductTitle}${productPriceTag}
 *• Platform:* ${activeProduct.platform || 'PC / Digital'}
 *• Service Category:* ${currentPreset.sessionName} (${currentPreset.category})
-*• Customer Name:* ${cleanName}${details.trim() ? `\n*• Notes:* ${details.trim()}` : ''}
+*• Customer Name:* ${cleanName}${details.trim() ? `\n*• Notes:* ${details.trim()}` : ''}${activeProduct.publicUrl ? `\n\n*• Product Image Link:*\n${activeProduct.publicUrl}` : ''}
 
-Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPal / Crypto) to confirm and activate my order now!
+Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPal / Crypto) to confirm and activate my order now!`
 
-${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
-
-  // Download real product image file
-  const handleDownloadImage = async () => {
-    if (!activeProduct?.image) return
-    try {
-      const res = await fetch(activeProduct.image)
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = activeProduct.filename || 'BLEUWI-Product.jpg'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    } catch (e) {
-      if (activeProduct.publicUrl) {
-        window.open(activeProduct.publicUrl, '_blank')
-      }
-    }
-  }
-
-  // Copy real image to clipboard
-  const handleManualCopyImage = async () => {
-    if (!activeProduct?.image) return
-    try {
-      const response = await fetch(activeProduct.image)
-      const rawBlob = await response.blob()
-      const pngBlob = await convertBlobToPng(rawBlob)
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': pngBlob })
-      ])
-      setCopiedImageBtn(true)
-      setTimeout(() => setCopiedImageBtn(false), 2500)
-    } catch (e) {
-      console.warn('Clipboard write failed:', e)
-    }
-  }
-
-  // Send to WhatsApp: Native file sharing on mobile / PNG clipboard copy on desktop
-  const handleSendWhatsApp = async () => {
+  // Send to WhatsApp: Open direct chat with order text + image link (WITHOUT sending/attaching the image file)
+  const handleSendWhatsApp = () => {
     // 1. Strict Customer Name Validation (Mandatory)
     const trimmedName = name.trim()
     if (!trimmedName || trimmedName.length < 2) {
@@ -599,48 +669,10 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
     recordOrderSubmission()
     setRateLimitInfo(getOrderRateLimitStatus())
 
-    // 4. Mobile Web Share API: attaches REAL photo file directly into WhatsApp
-    if (activeProduct?.image && typeof navigator !== 'undefined' && navigator.canShare) {
-      try {
-        const res = await fetch(activeProduct.image)
-        const blob = await res.blob()
-        const ext = blob.type?.includes('jpeg') ? 'jpg' : (blob.type?.includes('webp') ? 'webp' : 'png')
-        const safeName = (activeProduct.shortName || activeProduct.title || 'BLEUWI-Order').replace(/[^a-zA-Z0-9]/g, '_')
-        const file = new File([blob], `${safeName}.${ext}`, { type: blob.type || 'image/png' })
-
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: `BLEUWI Order - ${activeProduct.title}`,
-            text: generatedMessage,
-            files: [file],
-          })
-          return
-        }
-      } catch (err) {
-        // Fallback to desktop workflow if cancelled
-      }
-    }
-
-    // 2. Desktop Workflow: Copy real image as PNG to OS clipboard
-    if (activeProduct?.image) {
-      try {
-        const response = await fetch(activeProduct.image)
-        const rawBlob = await response.blob()
-        const pngBlob = await convertBlobToPng(rawBlob)
-        await navigator.clipboard.write([
-          new ClipboardItem({ 'image/png': pngBlob })
-        ])
-        setCopiedImageToast(true)
-      } catch (e) {
-        console.warn('Clipboard write failed:', e)
-      }
-    }
-
-    // 3. Open WhatsApp chat with clean text
-    const cleanPhone = WHATSAPP_NUMBER.replace(/[^0-9]/g, '')
-    const encoded = encodeURIComponent(generatedMessage)
-    const waUrl = `https://wa.me/${cleanPhone}?text=${encoded}`
-    window.open(waUrl, '_blank', 'noopener,noreferrer')
+    // Direct WhatsApp send with order template and image link (auto-prefills message in chat)
+    setCopiedText(true)
+    setTimeout(() => setCopiedText(false), 2500)
+    openWhatsAppChat(generatedMessage)
   }
 
   const handleCopyTextMessage = () => {
@@ -716,31 +748,38 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
         <div className="relative mt-3.5 sm:mt-5 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 text-left flex-1 overflow-y-auto pr-1">
           {/* Left Column: Selection Controls (7 cols) */}
           <div className="lg:col-span-7 space-y-3.5 sm:space-y-4">
-            {/* 1. Category Selection Pills */}
+            {/* 1. Selected Session (Shows ONLY the session the customer is purchasing from) */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
                 {t('categoryLabel')}
               </label>
-              <div className="flex flex-wrap gap-1.5">
-                {Object.keys(orderPresets).filter((k) => k !== 'Free Fire Diamonds').map((key) => {
-                  const Icon = categoryIcons[key] || Sparkles
-                  const isSelected = selectedCategoryKey === key
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => handleCategorySelect(key)}
-                      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-200 cursor-pointer ${
-                        isSelected
-                          ? 'border border-sky-400/80 bg-sky-400/15 text-sky-200 shadow-md shadow-sky-500/20 font-semibold ring-1 ring-sky-400/30'
-                          : 'border border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/20 hover:bg-white/[0.07] hover:text-white'
-                      }`}
-                    >
-                      <Icon size={13} className={isSelected ? 'text-sky-300' : 'text-slate-400'} />
-                      <span>{key}</span>
-                    </button>
-                  )
-                })}
+              <div className="flex items-center justify-between rounded-xl border border-sky-400/40 bg-gradient-to-r from-sky-400/15 via-sky-500/10 to-emerald-400/10 p-2.5 sm:p-3 shadow-md shadow-sky-500/15 ring-1 ring-sky-400/20">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-sky-400/50 bg-sky-400/20 text-sky-300 shadow-sm shadow-sky-500/20">
+                    <ActiveCategoryIcon size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs sm:text-sm font-bold text-white tracking-wide">
+                        {lang === 'ar'
+                          ? (currentPreset.sessionNameAr || currentPreset.sessionName || selectedCategoryKey)
+                          : (currentPreset.sessionName || selectedCategoryKey)}
+                      </span>
+                      <span className="inline-flex items-center rounded-md border border-sky-400/30 bg-sky-400/20 px-2 py-0.5 text-[10px] font-bold text-sky-200">
+                        {selectedCategoryKey}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                      {lang === 'ar'
+                        ? 'طلب مخصص ومباشر من هذا القسم'
+                        : 'Active session for this order'}
+                    </p>
+                  </div>
+                </div>
+                <div className="shrink-0 flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold text-emerald-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>{lang === 'ar' ? 'مفعل' : 'Active'}</span>
+                </div>
               </div>
             </div>
 
@@ -973,68 +1012,25 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
                   </p>
                 </div>
 
-                {/* Real Picture Actions Bar */}
+                {/* Image Link Preview Bar */}
                 <div className="flex items-center justify-between px-3 py-2 bg-black/40 border-t border-white/[0.05] text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={handleManualCopyImage}
-                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-medium text-slate-300 hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-white transition cursor-pointer"
-                      title={lang === 'ar' ? 'نسخ الصورة إلى الحافظة للصقها في واتساب' : 'Copy real photo to clipboard for WhatsApp'}
-                    >
-                      {copiedImageBtn ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
-                      <span>{copiedImageBtn ? (lang === 'ar' ? 'تم نسخ الصورة!' : 'Photo Copied!') : (lang === 'ar' ? 'نسخ الصورة (Ctrl+V)' : 'Copy Photo')}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleDownloadImage}
-                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-medium text-slate-300 hover:border-emerald-400/40 hover:bg-emerald-400/10 hover:text-white transition cursor-pointer"
-                      title={lang === 'ar' ? 'تحميل الصورة كملف حقيقي' : 'Save picture as real file'}
-                    >
-                      <Download size={12} />
-                      <span>{lang === 'ar' ? 'تحميل الصورة' : 'Save Photo'}</span>
-                    </button>
+                  <div className="flex items-center gap-1.5 overflow-hidden">
+                    <span className="text-sky-400">🔗</span>
+                    <span className="text-[11px] text-sky-300 font-mono truncate max-w-[200px]" title={activeProduct.publicUrl}>
+                      {activeProduct.publicUrl || 'bleuwiworld.shop'}
+                    </span>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setPreviewZoom(true)}
-                    className="text-[11px] text-sky-400 hover:text-sky-300 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] text-sky-400 hover:text-sky-300 hover:underline inline-flex items-center gap-1 cursor-pointer flex-none ml-2"
                   >
                     <Eye size={12} />
-                    <span>{lang === 'ar' ? 'تكبير' : 'Zoom'}</span>
+                    <span>{lang === 'ar' ? 'معاينة' : 'Zoom'}</span>
                   </button>
                 </div>
               </div>
-
-              {/* Real Picture Clipboard Notice Toast */}
-              {copiedImageToast && (
-                <div className="rounded-xl border border-emerald-400/40 bg-gradient-to-r from-emerald-950/90 to-slate-900/95 p-3 text-emerald-100 shadow-xl animate-fade-in">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-start gap-2">
-                      <span className="text-lg">📸</span>
-                      <div>
-                        <h5 className="text-xs font-bold text-white">
-                          {lang === 'ar' ? 'تم نسخ صورة المنتج الحقيقية!' : 'Real Product Photo Copied!'}
-                        </h5>
-                        <p className="mt-0.5 text-[10px] text-emerald-200/90 leading-relaxed">
-                          {lang === 'ar'
-                            ? 'في محادثة واتساب، اضغط Ctrl + V (أو لصق) لإرسال الصورة الحقيقية مع طلبك!'
-                            : 'In your WhatsApp chat, press Ctrl + V (or Paste) to send the actual photo with your order!'}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setCopiedImageToast(false)}
-                      className="text-emerald-400 hover:text-white p-0.5 cursor-pointer"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* Order Details Mini-Table */}
               <div className="space-y-1.5 text-xs">
@@ -1065,23 +1061,6 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
                   <Shield size={13} className="text-emerald-400 shrink-0" />
                   <span>{t('safePaymentsBadge')}</span>
                 </div>
-
-                {/* Golden Warranty Interactive Seal */}
-                {onOpenWarranty && (
-                  <button
-                    type="button"
-                    onClick={onOpenWarranty}
-                    className="group mt-1 flex w-full items-center justify-between gap-2 rounded-xl border border-amber-400/35 bg-gradient-to-r from-amber-500/15 via-yellow-500/5 to-amber-500/10 p-2 text-xs font-bold text-amber-300 transition hover:border-amber-400 hover:bg-amber-500/25 hover:scale-[1.01] cursor-pointer text-left"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <Crown size={14} className="text-amber-400 group-hover:rotate-12 transition-transform shrink-0" />
-                      <span>{lang === 'ar' ? 'مشمول بالضمان الذهبي 100%' : '100% Golden Warranty'}</span>
-                    </span>
-                    <span className="text-[10px] text-amber-300/80 underline font-normal">
-                      {lang === 'ar' ? 'عرض الشروط' : 'View Terms'}
-                    </span>
-                  </button>
-                )}
               </div>
             </div>
 
@@ -1140,16 +1119,16 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
                 </button>
               </div>
 
-              {/* Mobile & PC Safe Photo Link Guarantee */}
+              {/* Image Link in WhatsApp Message Note */}
               <div className="rounded-xl border border-sky-400/20 bg-sky-500/10 p-2 text-[11px] text-sky-200">
                 <div className="flex items-center gap-1.5 font-semibold">
-                  <span>📸</span>
-                  <span>{lang === 'ar' ? 'رابط الصورة الرسمي مدمج في الرسالة' : 'Official Photo Link Attached'}</span>
+                  <span>🔗</span>
+                  <span>{lang === 'ar' ? 'رابط الصورة مدمج في الرسالة' : 'Image Link Included in Message'}</span>
                 </div>
                 <p className="mt-0.5 text-[10px] text-sky-300/80 leading-snug">
                   {lang === 'ar'
-                    ? 'رابط صورة المنتج من bleuwiworld.shop مدمج تلقائياً في رسالتك ليظهر فوراً في واتساب.'
-                    : 'The direct bleuwiworld.shop image link is attached so the product appears immediately in WhatsApp.'}
+                    ? 'يتم إرسال رابط الصورة الرسمي داخل نص الرسالة بدون إرسال أو إرفاق ملف الصورة.'
+                    : 'The direct product image link is sent inside the message text without sending the image file.'}
                 </p>
               </div>
             </div>
@@ -1192,16 +1171,19 @@ ${activeProduct.publicUrl ? activeProduct.publicUrl : ''}`
 
             <div className="flex items-center justify-between border-t border-white/10 pt-2 text-xs">
               <span className="text-slate-400">
-                {lang === 'ar' ? 'صورة المنتج الرسمية مرفقة تلقائياً مع رسالة واتساب' : 'Official product picture sent automatically with your WhatsApp message'}
+                {lang === 'ar' ? 'رابط صورة المنتج مدمج في رسالة واتساب' : 'Product image link is included in your WhatsApp message'}
               </span>
-              <button
-                type="button"
-                onClick={handleDownloadImage}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-sky-500/20 border border-sky-500/30 px-3 py-1 font-semibold text-sky-300 hover:bg-sky-500/30 transition cursor-pointer"
-              >
-                <Download size={12} />
-                <span>{t('savePictureBtn')}</span>
-              </button>
+              {activeProduct.publicUrl && (
+                <a
+                  href={activeProduct.publicUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-sky-500/20 border border-sky-500/30 px-3 py-1 font-semibold text-sky-300 hover:bg-sky-500/30 transition cursor-pointer"
+                >
+                  <span>🔗</span>
+                  <span>{lang === 'ar' ? 'فتح رابط الصورة' : 'Open Image Link'}</span>
+                </a>
+              )}
             </div>
           </div>
         </div>

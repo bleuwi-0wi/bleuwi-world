@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Globe, Menu, Settings as SettingsIcon, X, Flame, Crown, Gem } from 'lucide-react'
+import { Globe, Menu, Settings as SettingsIcon, X, Flame, ShieldCheck } from 'lucide-react'
 import BrandMark from './BrandMark'
-import VisitorCounter from './VisitorCounter'
 import { useLanguage } from '../context/LanguageContext'
+import { WHATSAPP_DIRECT_LINK } from '../data/links'
 
-export default function Header({ onHomeClick, activeShowcase, onOpenSettings, onOpenWarranty }) {
+export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { lang, setLang, t, isRTL } = useLanguage()
 
@@ -36,24 +36,28 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#05070d]/90 backdrop-blur-xl">
-      {/* Top Trending Offers Announcement Bar */}
-      <div className="border-b border-white/[0.06] bg-gradient-to-r from-amber-500/20 via-sky-500/15 to-purple-500/20 px-3 py-1 text-center">
+      {/* Top 24/7 Service & 100% Guarantee Announcement Bar */}
+      <div className="border-b border-emerald-500/20 bg-gradient-to-r from-emerald-500/15 via-amber-500/15 to-sky-500/15 px-3 py-1.5 text-center shadow-[0_1px_15px_rgba(16,185,129,0.1)]">
         <a
-          href="#hot-sellers"
-          onClick={(e) => handleNavClick(e, 'hot-sellers')}
+          href={WHATSAPP_DIRECT_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
           className="group inline-flex items-center justify-center gap-2 text-[11px] sm:text-xs font-bold text-amber-300 transition hover:text-white"
         >
-          <span className="flex items-center gap-1 rounded-full bg-amber-400/20 px-2 py-0.5 text-amber-300 text-[10px] font-black uppercase tracking-wider">
-            <Flame size={11} className="text-amber-400 animate-pulse" />
-            <span>{lang === 'ar' ? 'أقوى العروض' : 'TOP OFFERS'}</span>
+          <span className="flex items-center gap-1 rounded-full bg-emerald-400/20 border border-emerald-400/40 px-2 py-0.5 text-emerald-300 text-[10px] font-black uppercase tracking-wider">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+            </span>
+            <span>24/7 ONLINE</span>
           </span>
-          <span className="text-white/95 font-medium truncate max-w-[210px] min-[420px]:max-w-[340px] sm:max-w-none">
+          <span className="text-white/95 font-extrabold tracking-wide">
             {lang === 'ar'
-              ? '💎 فري فاير (60DH / 1$=10DH) · 🚗 قراند GTA V (200DH) · 🤠 ريد ديد (250DH) · ⚽ فيفا (200DH) · 🚀 دسكورد (70DH) · 🎬 كاب كات (90DH)'
-              : '💎 Free Fire (60DH / 1$=10DH) · 🚗 GTA V (200DH) · 🤠 RDR2 (250DH) · ⚽ FIFA (200DH) · 🚀 Discord (70DH) · 🎬 CapCut (90DH)'}
+              ? '⚡ نعمل 24/7 مع ضمان 100% (استبدال فوري ودعم فني متواصل)'
+              : '⚡ WE WORK 24/7 WITH 100% GUARANTEE (Instant Swap & 24/7 Support)'}
           </span>
-          <span className="hidden min-[500px]:inline-block rounded-md bg-amber-400/30 px-1.5 py-0.5 text-[10px] text-amber-200 font-bold group-hover:bg-white group-hover:text-slate-950 transition-colors">
-            {lang === 'ar' ? 'اطلب الآن ←' : 'Order Now →'}
+          <span className="hidden min-[620px]:inline-block rounded-md bg-emerald-400/25 border border-emerald-400/40 px-2 py-0.5 text-[10px] text-emerald-200 font-bold group-hover:bg-white group-hover:text-slate-950 transition-colors">
+            {lang === 'ar' ? 'تواصل عبر واتساب ←' : 'Chat on WhatsApp →'}
           </span>
         </a>
       </div>
@@ -90,24 +94,6 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
             <span>{lang === 'ar' ? 'الأكثر مبيعاً' : 'Hot Sellers'}</span>
           </a>
           <a
-            className="nav-link cursor-pointer flex items-center gap-1.5 text-amber-300 hover:text-amber-100"
-            href="#hot-sellers"
-            onClick={(e) => handleNavClick(e, 'hot-sellers')}
-            title="Free Fire 1$ = 10 DH"
-          >
-            <Gem size={13} className="text-amber-400 animate-bounce" />
-            <span>{lang === 'ar' ? 'فري فاير 💎' : 'Free Fire 💎'}</span>
-            <span className="rounded bg-amber-400/20 px-1 text-[9px] font-mono text-amber-300">1$=10DH</span>
-          </a>
-          <button
-            type="button"
-            className="nav-link cursor-pointer flex items-center gap-1.5 text-amber-300 hover:text-amber-200 transition"
-            onClick={onOpenWarranty}
-          >
-            <Crown size={14} className="text-amber-400" />
-            <span>{lang === 'ar' ? 'الضمان الذهبي' : 'Golden Warranty'}</span>
-          </button>
-          <a
             className="nav-link cursor-pointer"
             href="#payments"
             onClick={(e) => handleNavClick(e, 'payments')}
@@ -130,11 +116,8 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
           </a>
         </nav>
 
-        {/* Action Controls: Visitor Counter + Language toggle + Settings + Explore */}
+        {/* Action Controls: Language toggle + Settings + Explore */}
         <div className="hidden items-center gap-3 md:flex">
-          {/* Live Visitor Counter Badge */}
-          <VisitorCounter compact={true} />
-
           {/* Quick Language Switcher Button */}
           <button
             type="button"
@@ -156,12 +139,10 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
             <SettingsIcon size={14} className="text-sky-300" />
             <span>{t('navSettings')}</span>
           </button>
-
         </div>
 
         {/* Mobile controls */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
-          <VisitorCounter compact={true} />
           <button
             type="button"
             onClick={toggleLanguage}
@@ -209,25 +190,6 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
               <Flame size={15} className="text-amber-400 animate-pulse" />
               <span>{lang === 'ar' ? 'الأكثر مبيعاً (الألعاب)' : 'Hot Sellers (Games)'}</span>
             </a>
-            <a
-              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-amber-300 transition hover:bg-white/[0.06] hover:text-amber-200 cursor-pointer"
-              href="#hot-sellers"
-              onClick={(e) => handleNavClick(e, 'hot-sellers')}
-            >
-              <Gem size={15} className="text-amber-400 animate-bounce" />
-              <span>{lang === 'ar' ? 'جواهر فري فاير (1$ = 10 DH)' : 'Free Fire Diamonds (1$ = 10 DH)'}</span>
-            </a>
-            <button
-              type="button"
-              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-amber-300 transition hover:bg-white/[0.06] hover:text-amber-200 cursor-pointer text-left w-full"
-              onClick={() => {
-                closeMenu()
-                if (onOpenWarranty) onOpenWarranty()
-              }}
-            >
-              <Crown size={16} className="text-amber-400" />
-              <span>{lang === 'ar' ? 'الضمان الذهبي 100%' : '100% Golden Warranty'}</span>
-            </button>
             <a
               className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
               href="#payments"

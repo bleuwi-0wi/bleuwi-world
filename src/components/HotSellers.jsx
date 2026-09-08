@@ -21,10 +21,11 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  CheckCircle2
+  CheckCircle2,
+  Key
 } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import { WHATSAPP_NUMBER } from '../data/links'
+import { getSecureWhatsAppUrl, openWhatsAppChat, WHATSAPP_DIRECT_LINK, aiSubscriptions, windowsOfficeKeys } from '../data/links'
 
 import imgGta from '../assets/game-gta-v.jpeg'
 import imgRedDead from '../assets/game-red-dead-2.jpeg'
@@ -405,14 +406,45 @@ export const hotSubscriptionOffers = [
   },
 ]
 
-export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
+export default function HotSellers({ onOpenOrder }) {
   const { lang, isRTL } = useLanguage()
-  const [filter, setFilter] = useState('all') // 'all' | 'freefire' | 'games' | 'subscriptions'
+  const [filter, setFilter] = useState('all') // 'all' | 'freefire' | 'ai' | 'games' | 'subscriptions'
   const [hoveredItem, setHoveredItem] = useState(null)
   const [selectedBigOffer, setSelectedBigOffer] = useState(null)
+  const [aiPlanIndices, setAiPlanIndices] = useState({
+    'chatgpt-plus': 1,
+    'gemini-advanced': 1,
+    'claude-ai': 1,
+    'canva-pro': 1,
+  })
+  const [winVersionIndices, setWinVersionIndices] = useState({
+    'win-10': 1,
+    'win-11': 1,
+    'ms-office': 2,
+  })
 
   const allOffers = [
     ...freeFirePacks,
+    ...aiSubscriptions.map(item => {
+      const plan = item.plans[aiPlanIndices[item.id] ?? 1] || item.plans[0]
+      return {
+        ...item,
+        price: plan.price,
+        shortName: `${item.name} (${plan.duration})`,
+        platform: 'AI SUBSCRIPTION',
+        platformAr: 'اشتراك ذكاء اصطناعي (AI)',
+      }
+    }),
+    ...windowsOfficeKeys.map(item => {
+      const version = item.versions[winVersionIndices[item.id] ?? 1] || item.versions[0]
+      return {
+        ...item,
+        price: version.price,
+        shortName: `${item.name} (${version.name})`,
+        platform: 'MICROSOFT KEY',
+        platformAr: 'مفتاح مايكروسوفت أصلي',
+      }
+    }),
     ...hotSellerGames,
     ...hotSubscriptionOffers,
   ]
@@ -456,17 +488,19 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
         defaultNotes: `Hello BLEUWI, I want to order ${item.name} (${item.price}).`,
       })
     } else {
-      const text = encodeURIComponent(`Hello BLEUWI, I would like to order ${item.name} (${item.price}).`)
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer')
+      const text = `Hello BLEUWI, I would like to order ${item.name} (${item.price}).`
+      openWhatsAppChat(text)
     }
   }
 
   const showFreeFire = filter === 'all' || filter === 'freefire'
+  const showAi = filter === 'all' || filter === 'ai'
+  const showWindows = filter === 'all' || filter === 'windows'
   const showGames = filter === 'all' || filter === 'games'
   const showSubs = filter === 'all' || filter === 'subscriptions'
 
   return (
-    <section id="hot-sellers" className="relative z-10 scroll-mt-24 py-12 sm:py-16">
+    <section id="hot-sellers" className="relative z-10 scroll-mt-24 pt-2 sm:pt-4 pb-12 sm:pb-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col items-start justify-between gap-6 border-b border-white/[0.08] pb-6 lg:flex-row lg:items-center">
@@ -483,22 +517,6 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                 {lang === 'ar' ? 'تسليم فوري وضمان كامل' : 'Instant Delivery'}
               </span>
             </h2>
-
-            {/* Interactive Golden Warranty Guarantee Seal */}
-            <div className="mt-2 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={onOpenWarranty}
-                className="group inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/15 px-3 py-1 text-xs font-bold text-amber-300 shadow-sm transition hover:scale-105 hover:border-amber-400 hover:bg-amber-500/25 cursor-pointer"
-              >
-                <Crown size={13} className="text-amber-400 group-hover:rotate-12 transition-transform" />
-                <span>{lang === 'ar' ? 'مشمول بالضمان الذهبي 100% (استبدال فوري ودعم 24/7)' : '100% Golden Warranty (Instant Swap & 24/7 Support)'}</span>
-                <span className="text-[10px] text-amber-300/80 underline ml-0.5">
-                  {lang === 'ar' ? 'عرض الشروط' : 'View Terms'}
-                </span>
-              </button>
-            </div>
-
             <p className="mt-2 text-xs sm:text-sm text-slate-400 max-w-2xl">
               {lang === 'ar'
                 ? 'شحن جواهر فري فاير (1$ = 10 دراهم)، ألعاب كمبيوتر أصلية (PC)، واشتراكات بريميوم رقمية (Discord, Spotify, CapCut) مع تسليم فوري عبر واتساب.'
@@ -518,7 +536,33 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
               }`}
             >
               <Flame size={13} className={filter === 'all' ? 'text-amber-400' : 'text-slate-500'} />
-              <span>{lang === 'ar' ? 'جميع العروض (11)' : 'All Deals (11)'}</span>
+              <span>{lang === 'ar' ? 'جميع العروض (18)' : 'All Deals (18)'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFilter('windows')}
+              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                filter === 'windows'
+                  ? 'bg-blue-500/25 text-blue-300 border border-blue-400/50 shadow-[0_0_15px_rgba(59,130,246,0.35)]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+              }`}
+            >
+              <Key size={13} className={filter === 'windows' ? 'text-blue-300 animate-pulse' : 'text-blue-400/80'} />
+              <span>{lang === 'ar' ? 'ويندوز وأوفيس (3)' : 'Windows & Office (3)'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFilter('ai')}
+              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                filter === 'ai'
+                  ? 'bg-purple-500/25 text-purple-300 border border-purple-400/50 shadow-[0_0_15px_rgba(168,85,247,0.35)]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+              }`}
+            >
+              <Sparkles size={13} className={filter === 'ai' ? 'text-purple-300 animate-pulse' : 'text-purple-400/80'} />
+              <span>{lang === 'ar' ? 'اشتراكات AI (4)' : 'AI Subscriptions (4)'}</span>
             </button>
 
             <button
@@ -532,7 +576,6 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
             >
               <Gem size={13} className={filter === 'freefire' ? 'text-amber-400 animate-bounce' : 'text-amber-400/70'} />
               <span>{lang === 'ar' ? 'جواهر فري فاير (Free Fire Diamond)' : 'Free Fire Diamond'}</span>
-              <span className="rounded-md bg-amber-400/20 px-1.5 py-0.2 text-[10px] text-amber-300 font-mono font-bold">1$=10DH</span>
             </button>
 
             <button
@@ -557,7 +600,7 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
               }`}
             >
-              <Sparkles size={13} className={filter === 'subscriptions' ? 'text-purple-300' : 'text-slate-500'} />
+              <Disc3 size={13} className={filter === 'subscriptions' ? 'text-purple-300' : 'text-slate-500'} />
               <span>{lang === 'ar' ? 'اشتراكات وبرامج (4)' : 'Subscriptions (4)'}</span>
             </button>
           </div>
@@ -740,8 +783,6 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                     <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-lg border border-amber-400/40 bg-slate-950/90 px-2 py-0.5 text-[11px] font-mono font-bold text-amber-300 backdrop-blur-md shadow-md">
                       <span className="text-white/70">USD:</span>
                       <span>{pack.priceUsd}</span>
-                      <span className="text-white/40">·</span>
-                      <span className="text-emerald-400">1$=10DH</span>
                     </div>
 
                     {/* Hover Zoom Overlay */}
@@ -829,9 +870,520 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
           </div>
         )}
 
-        {/* 2. PC GAMES SECTION */}
-        {showGames && (
+        {/* AI SUBSCRIPTION SECTION (#20 TO #23 - 1M / 1Y / 18M) */}
+        {showAi && (
           <div className={showFreeFire ? 'mt-12 pt-10 border-t border-white/[0.08]' : 'mt-8'}>
+            {/* AI Announcement Banner */}
+            <div className="mb-6 overflow-hidden rounded-2xl sm:rounded-3xl border border-purple-500/40 bg-gradient-to-r from-purple-500/15 via-indigo-500/10 to-purple-500/15 p-4 sm:p-6 backdrop-blur-xl shadow-[0_10px_35px_rgba(168,85,247,0.15)]">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="relative grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl border border-purple-400/60 bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-lg shadow-purple-500/30">
+                    <Sparkles size={26} className="text-white animate-pulse" />
+                    <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-purple-400" />
+                    </span>
+                  </div>
+
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-purple-400/20 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-purple-300 border border-purple-400/30 uppercase tracking-wider">
+                        <Sparkles size={11} className="text-purple-400" />
+                        <span>{lang === 'ar' ? 'إعلان رسمي: اشتراكات AI (الذكاء الاصطناعي)' : 'OFFICIAL ANNONCE: AI SUBSCRIPTIONS'}</span>
+                      </span>
+                      <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
+                        {lang === 'ar' ? 'خطط مرنة: 1 شهر · 1 سنة · 18 شهراً' : 'Flexible Plans: 1 Month · 1 Year · 18 Months'}
+                      </span>
+                    </div>
+
+                    <h4 className="mt-1 text-base sm:text-lg font-black text-white">
+                      {lang === 'ar' 
+                        ? 'اشتراكات الذكاء الاصطناعي (#20 إلى #23) — شات جي بي تي بلس، جيميني، كلود وكانفا برو' 
+                        : 'AI Subscriptions (#20 to #23) — ChatGPT Plus, Gemini, Claude & Canva Pro'}
+                    </h4>
+                    <p className="mt-0.5 text-xs text-slate-300 max-w-2xl">
+                      {lang === 'ar'
+                        ? 'اختر المدة المناسبة لك لكل اشتراك (شهر، سنة، أو 18 شهراً) مع تفعيل فوري وضمان كامل ودعم مستمر.'
+                        : 'Choose your desired duration for each subscription (1 Month, 1 Year, or 18 Months) with instant setup & full warranty.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href={WHATSAPP_DIRECT_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-purple-400/60 bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-purple-500/25 transition hover:scale-105 cursor-pointer"
+                  >
+                    <MessageCircle size={14} />
+                    <span>{lang === 'ar' ? 'استفسار AI على واتساب' : 'Inquire on WhatsApp'}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Grid Cards (From 20 to 23 with 1M, 1Y, 18M duration selector) */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {aiSubscriptions.map((item) => {
+                const activePlanIndex = aiPlanIndices[item.id] ?? 1
+                const activePlan = item.plans[activePlanIndex] || item.plans[0]
+
+                return (
+                  <div
+                    key={item.id}
+                    onMouseEnter={() => setHoveredItem(item.id)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    className="group relative flex flex-col justify-between rounded-3xl border border-purple-500/20 bg-gradient-to-b from-purple-500/[0.08] via-slate-950/80 to-[#05070d] p-4 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-purple-400/50 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(168,85,247,0.25)]"
+                  >
+                    <div>
+                      {/* Image Reference with Zoom */}
+                      <div
+                        onClick={() => setSelectedBigOffer({
+                          ...item,
+                          price: activePlan.price,
+                          shortName: `${item.name} (${activePlan.duration})`,
+                          platform: 'AI SUBSCRIPTION',
+                          platformAr: 'اشتراك ذكاء اصطناعي (AI)',
+                        })}
+                        className="group/img relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-purple-400/30 bg-black/80 cursor-pointer shadow-lg transition-transform duration-300 hover:border-purple-400"
+                        title={lang === 'ar' ? 'انقر لتكبير صورة المرجع' : 'Click to zoom reference picture'}
+                      >
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+                        {/* Top Left Badge #20 - #23 */}
+                        <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
+                          <Sparkles size={10} className="text-purple-200" />
+                          <span>#{item.num}</span>
+                        </div>
+
+                        {/* Top Right Live Badge */}
+                        <div className="absolute top-2.5 right-2.5">
+                          <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-300 border border-purple-400/30 backdrop-blur-md">
+                            {lang === 'ar' ? item.badgeAr : item.badge}
+                          </span>
+                        </div>
+
+                        {/* Bottom Tag */}
+                        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-lg border border-purple-400/35 bg-slate-950/90 px-2 py-0.5 text-[10px] font-mono font-bold text-purple-300 backdrop-blur-md shadow-md">
+                          <Sparkles size={11} className="text-purple-400" />
+                          <span>{activePlan.duration}</span>
+                        </div>
+
+                        {/* Zoom Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 group-hover/img:opacity-100 transition-opacity backdrop-blur-[2px]">
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/85 border border-purple-400/60 px-3 py-1.5 text-xs font-black text-purple-300 shadow-xl backdrop-blur-md">
+                            <Maximize2 size={13} className="text-purple-400" />
+                            <span>{lang === 'ar' ? 'عرض مكبّر' : 'View Big'}</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Title & Price */}
+                      <div className="mt-3.5 flex items-start justify-between gap-2">
+                        <div>
+                          <h4
+                            onClick={() => setSelectedBigOffer({
+                              ...item,
+                              price: activePlan.price,
+                              shortName: `${item.name} (${activePlan.duration})`,
+                              platform: 'AI SUBSCRIPTION',
+                              platformAr: 'اشتراك ذكاء اصطناعي (AI)',
+                            })}
+                            className="text-base font-bold text-white group-hover:text-purple-300 transition-colors cursor-pointer"
+                          >
+                            {lang === 'ar' ? item.nameAr : item.name}
+                          </h4>
+                          <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
+                            {lang === 'ar' ? item.taglineAr : item.tagline}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end flex-none">
+                          <span className="rounded-xl border border-purple-400/40 bg-purple-500/15 px-2.5 py-1 text-sm sm:text-base font-black text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.25)]">
+                            {activePlan.price}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* PLAN SELECTOR (1 MONTH / 1 YEAR / 18 MONTHS) */}
+                      <div className="mt-3 rounded-xl border border-white/10 bg-slate-950/60 p-2 backdrop-blur-sm">
+                        <div className="mb-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          <span>{lang === 'ar' ? 'اختر المدة:' : 'Duration:'}</span>
+                          <span className="text-purple-300 font-semibold">{lang === 'ar' ? activePlan.durationAr : activePlan.duration}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1">
+                          {item.plans.map((p, pIdx) => {
+                            const isSelected = activePlanIndex === pIdx
+                            return (
+                              <button
+                                key={p.duration}
+                                type="button"
+                                onClick={() => setAiPlanIndices(prev => ({ ...prev, [item.id]: pIdx }))}
+                                className={`relative flex flex-col items-center justify-center rounded-lg py-1 px-1 text-center transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'border border-purple-400 bg-gradient-to-b from-purple-500/30 to-indigo-600/30 text-white shadow-[0_0_10px_rgba(168,85,247,0.35)] ring-1 ring-purple-400/50'
+                                    : 'border border-white/5 bg-white/[0.02] text-slate-400 hover:border-purple-300/30 hover:bg-white/[0.06] hover:text-slate-200'
+                                }`}
+                              >
+                                {p.isPopular && (
+                                  <span className="absolute -top-1.5 right-1 rounded-full bg-amber-400 px-1 py-[1px] text-[7px] font-black text-slate-950 shadow-sm leading-none">
+                                    ★
+                                  </span>
+                                )}
+                                <span className="text-[10px] font-bold leading-tight">
+                                  {p.duration === '1 Month' ? '1M' : p.duration === '1 Year' ? '1Y' : '18M'}
+                                </span>
+                                <span className={`text-[9px] font-extrabold leading-tight ${isSelected ? 'text-purple-300' : 'text-slate-400'}`}>
+                                  {p.price}
+                                </span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Features */}
+                      <ul className="mt-3 space-y-1 border-t border-white/[0.08] pt-2.5 text-[11px] text-slate-300">
+                        {(lang === 'ar' ? item.featuresAr : item.features).slice(0, 3).map((feat, idx) => (
+                          <li key={idx} className="flex items-center gap-1.5">
+                            <Check size={11} className="text-purple-400 flex-none" />
+                            <span className="line-clamp-1">{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-4 flex items-center gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBigOffer({
+                          ...item,
+                          price: activePlan.price,
+                          shortName: `${item.name} (${activePlan.duration})`,
+                          platform: 'AI SUBSCRIPTION',
+                          platformAr: 'اشتراك ذكاء اصطناعي (AI)',
+                        })}
+                        className="flex h-9 items-center justify-center gap-1 rounded-xl border border-purple-400/30 bg-purple-500/10 px-2.5 text-xs font-bold text-purple-300 transition hover:border-purple-400 hover:bg-purple-500/20 hover:scale-105 active:scale-95 cursor-pointer flex-none"
+                        title={lang === 'ar' ? 'تكبير العرض لقراءة أسهل' : 'View full offer big for easy reading'}
+                      >
+                        <Maximize2 size={13} />
+                        <span className="hidden sm:inline">{lang === 'ar' ? 'تكبير' : 'Big'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onOpenOrder ? onOpenOrder({
+                          categoryKey: 'AI Subscriptions',
+                          specificItem: `${item.name} - ${activePlan.duration} (${activePlan.price})`,
+                          productName: `${item.name} (${activePlan.duration})`,
+                          productPrice: activePlan.price,
+                          productImage: item.image,
+                          productPlatform: 'AI SUBSCRIPTION',
+                          defaultNotes: `AI Subscription: ${item.name} (#${item.num}), Plan: ${activePlan.duration} (${activePlan.price} / ${activePlan.priceUsd})`,
+                        }) : handleOrder({
+                          name: `${item.name} (${activePlan.duration})`,
+                          price: activePlan.price,
+                        })}
+                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-400 to-indigo-400 px-3 py-2 text-xs font-bold text-slate-950 shadow-[0_0_18px_rgba(168,85,247,0.3)] transition-all duration-200 hover:from-white hover:to-white hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-95 cursor-pointer"
+                      >
+                        <ShoppingCart size={13} />
+                        <span>{lang === 'ar' ? `اطلب (${activePlan.price})` : `Order (${activePlan.price})`}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onOpenOrder ? onOpenOrder({
+                          categoryKey: 'AI Subscriptions',
+                          specificItem: `${item.name} - ${activePlan.duration} (${activePlan.price})`,
+                          productName: `${item.name} (${activePlan.duration})`,
+                          productPrice: activePlan.price,
+                          productImage: item.image,
+                          productPlatform: 'AI SUBSCRIPTION',
+                          defaultNotes: `AI Subscription: ${item.name} (#${item.num}), Plan: ${activePlan.duration} (${activePlan.price} / ${activePlan.priceUsd})`,
+                        }) : handleOrder({
+                          name: `${item.name} (${activePlan.duration})`,
+                          price: activePlan.price,
+                        })}
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 transition hover:border-emerald-500/50 hover:bg-emerald-500/20 hover:scale-105 active:scale-95 cursor-pointer flex-none"
+                        title={lang === 'ar' ? 'طلب عبر واتساب' : 'Order via WhatsApp'}
+                        aria-label="Order on WhatsApp"
+                      >
+                        <MessageCircle size={15} className="text-emerald-400" />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 2. WINDOWS & MICROSOFT OFFICE SECTION (#24, #25, #26) */}
+        {showWindows && (
+          <div className={(showFreeFire || showAi) ? 'mt-12 pt-10 border-t border-white/[0.08]' : 'mt-8'}>
+            {/* Windows & Office Annonce Banner */}
+            <div className="mb-6 overflow-hidden rounded-2xl sm:rounded-3xl border border-blue-400/40 bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-sky-500/15 p-4 sm:p-6 backdrop-blur-xl shadow-[0_10px_35px_rgba(59,130,246,0.15)]">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="relative grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl border border-blue-400/60 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30">
+                    <Key size={26} className="text-white animate-pulse" />
+                    <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-blue-400" />
+                    </span>
+                  </div>
+
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-400/20 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-blue-300 border border-blue-400/30 uppercase tracking-wider">
+                        <Key size={11} className="text-blue-400" />
+                        <span>{lang === 'ar' ? 'إعلان فئة: ويندوز وأوفيس' : 'OFFICIAL ANNONCE: Windows & Office Keys'}</span>
+                      </span>
+                      <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
+                        {lang === 'ar' ? 'تفعيل أصلي دائم مدى الحياة' : '100% Genuine Lifetime Retail'}
+                      </span>
+                    </div>
+
+                    <h4 className="mt-1 text-base sm:text-lg font-black text-white">
+                      {lang === 'ar' 
+                        ? 'مفاتيح وسيريالات ويندوز 10 و 11 وأوفيس الأصلية (#24 إلى #26) مع تفعيل أونلاين مباشر' 
+                        : 'Windows 10, Windows 11 & Office Suite Genuine Keys (#24 to #26) with Direct Activation'}
+                    </h4>
+                    <p className="text-xs text-slate-300 leading-relaxed mt-0.5">
+                      {lang === 'ar'
+                        ? 'تراخيص رقمية رسمية لجميع النسخ (Home / Pro / Enterprise و Office 365 / 2021 / 2024 LTSC) مع تسليم فوري عبر واتساب وضمان الاستبدال 100%.'
+                        : 'Official retail digital keys for all editions (Home / Pro / Enterprise & Office 365 / 2021 / 2024 LTSC) with instant WhatsApp delivery & 100% guarantee.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Direct WhatsApp Quick Help */}
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <a
+                    href={getSecureWhatsAppUrl('Hello BLEUWI, I would like to inquire about Windows & Microsoft Office genuine keys (#24 - #26).')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl border border-blue-400/50 bg-blue-500/20 px-3.5 py-2 text-xs font-bold text-blue-200 transition hover:bg-blue-500/30 hover:text-white cursor-pointer"
+                  >
+                    <MessageCircle size={14} className="text-blue-400" />
+                    <span>{lang === 'ar' ? 'استفسار ويندوز/أوفيس على واتساب' : 'Inquire on WhatsApp'}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Windows & Office 3 Cards Grid (#24, #25, #26) */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {windowsOfficeKeys.map((item) => {
+                const activeVersionIndex = winVersionIndices[item.id] ?? 1
+                const activeVersion = item.versions[activeVersionIndex] || item.versions[0]
+
+                return (
+                  <div
+                    key={item.id}
+                    onMouseEnter={() => setHoveredItem(item.id)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    className="group relative flex flex-col justify-between rounded-3xl border border-blue-500/20 bg-gradient-to-b from-blue-500/[0.08] via-slate-950/80 to-[#05070d] p-4 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-blue-400/50 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(59,130,246,0.25)]"
+                  >
+                    <div>
+                      {/* Image Reference with Zoom */}
+                      <div
+                        onClick={() => setSelectedBigOffer({
+                          ...item,
+                          price: activeVersion.price,
+                          shortName: `${item.name} (${activeVersion.name})`,
+                          platform: 'MICROSOFT KEY',
+                          platformAr: 'مفتاح مايكروسوفت أصلي',
+                        })}
+                        className="group/img relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-blue-400/30 bg-black/80 cursor-pointer shadow-lg transition-transform duration-300 hover:border-blue-400"
+                        title={lang === 'ar' ? 'انقر لتكبير صورة المرجع' : 'Click to zoom reference picture'}
+                      >
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+                        {/* Top Left Badge #24 - #26 */}
+                        <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
+                          <Key size={10} className="text-blue-200" />
+                          <span>#{item.num}</span>
+                        </div>
+
+                        {/* Top Right Live Badge */}
+                        <div className="absolute top-2.5 right-2.5">
+                          <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold text-blue-300 border border-blue-400/30 backdrop-blur-md">
+                            {lang === 'ar' ? item.badgeAr : item.badge}
+                          </span>
+                        </div>
+
+                        {/* Bottom Tag */}
+                        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-lg border border-blue-400/35 bg-slate-950/90 px-2 py-0.5 text-[10px] font-mono font-bold text-blue-300 backdrop-blur-md shadow-md">
+                          <Key size={11} className="text-blue-400" />
+                          <span>{activeVersion.name}</span>
+                        </div>
+
+                        {/* Zoom Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 group-hover/img:opacity-100 transition-opacity backdrop-blur-[2px]">
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/85 border border-blue-400/60 px-3 py-1.5 text-xs font-black text-blue-300 shadow-xl backdrop-blur-md">
+                            <Maximize2 size={13} className="text-blue-400" />
+                            <span>{lang === 'ar' ? 'عرض مكبّر' : 'View Big'}</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Title & Price */}
+                      <div className="mt-3.5 flex items-start justify-between gap-2">
+                        <div>
+                          <h4
+                            onClick={() => setSelectedBigOffer({
+                              ...item,
+                              price: activeVersion.price,
+                              shortName: `${item.name} (${activeVersion.name})`,
+                              platform: 'MICROSOFT KEY',
+                              platformAr: 'مفتاح مايكروسوفت أصلي',
+                            })}
+                            className="text-base font-bold text-white group-hover:text-blue-300 transition-colors cursor-pointer"
+                          >
+                            {lang === 'ar' ? item.nameAr : item.name}
+                          </h4>
+                          <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
+                            {lang === 'ar' ? item.taglineAr : item.tagline}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end flex-none">
+                          <span className="rounded-xl border border-blue-400/40 bg-blue-500/15 px-2.5 py-1 text-sm sm:text-base font-black text-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.25)]">
+                            {activeVersion.price}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* VERSION SELECTOR (Home / Pro / Enterprise OR 365 / 2021 / 2024) */}
+                      <div className="mt-3 rounded-xl border border-white/10 bg-slate-950/60 p-2 backdrop-blur-sm">
+                        <div className="mb-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          <span>{lang === 'ar' ? 'اختر الإصدار:' : 'Edition / Version:'}</span>
+                          <span className="text-blue-300 font-semibold">{lang === 'ar' ? activeVersion.nameAr : activeVersion.name}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1">
+                          {item.versions.map((ver, vIdx) => {
+                            const isSelected = activeVersionIndex === vIdx
+                            return (
+                              <button
+                                key={ver.name}
+                                type="button"
+                                onClick={() => setWinVersionIndices(prev => ({ ...prev, [item.id]: vIdx }))}
+                                className={`relative flex flex-col items-center justify-center rounded-lg py-1 px-1 text-center transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'border border-blue-400 bg-gradient-to-b from-blue-500/30 to-indigo-600/30 text-white shadow-[0_0_10px_rgba(59,130,246,0.35)] ring-1 ring-blue-400/50'
+                                    : 'border border-white/5 bg-white/[0.02] text-slate-400 hover:border-blue-300/30 hover:bg-white/[0.06] hover:text-slate-200'
+                                }`}
+                              >
+                                {ver.isPopular && (
+                                  <span className="absolute -top-1.5 right-1 rounded-full bg-amber-400 px-1 py-[1px] text-[7px] font-black text-slate-950 shadow-sm leading-none">
+                                    ★
+                                  </span>
+                                )}
+                                <span className="text-[10px] font-bold leading-tight truncate w-full">
+                                  {ver.name}
+                                </span>
+                                <span className={`text-[9px] font-extrabold leading-tight ${isSelected ? 'text-blue-300' : 'text-slate-400'}`}>
+                                  {ver.price}
+                                </span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Features */}
+                      <ul className="mt-3 space-y-1 border-t border-white/[0.08] pt-2.5 text-[11px] text-slate-300">
+                        {(lang === 'ar' ? item.featuresAr : item.features).slice(0, 3).map((feat, idx) => (
+                          <li key={idx} className="flex items-center gap-1.5">
+                            <Check size={11} className="text-blue-400 flex-none" />
+                            <span className="line-clamp-1">{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-4 flex items-center gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBigOffer({
+                          ...item,
+                          price: activeVersion.price,
+                          shortName: `${item.name} (${activeVersion.name})`,
+                          platform: 'MICROSOFT KEY',
+                          platformAr: 'مفتاح مايكروسوفت أصلي',
+                        })}
+                        className="flex h-9 items-center justify-center gap-1 rounded-xl border border-blue-400/30 bg-blue-500/10 px-2.5 text-xs font-bold text-blue-300 transition hover:border-blue-400 hover:bg-blue-500/20 hover:scale-105 active:scale-95 cursor-pointer flex-none"
+                        title={lang === 'ar' ? 'تكبير العرض لقراءة أسهل' : 'View full offer big for easy reading'}
+                      >
+                        <Maximize2 size={13} />
+                        <span className="hidden sm:inline">{lang === 'ar' ? 'تكبير' : 'Big'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onOpenOrder ? onOpenOrder({
+                          categoryKey: 'Windows & Office',
+                          specificItem: `${item.name} - ${activeVersion.name} (${activeVersion.price})`,
+                          productName: `${item.name} (${activeVersion.name})`,
+                          productPrice: activeVersion.price,
+                          productImage: item.image,
+                          productPlatform: 'MICROSOFT KEY',
+                          defaultNotes: `Microsoft Key: ${item.name} (#${item.num}), Edition: ${activeVersion.name} (${activeVersion.price} / ${activeVersion.priceUsd})`,
+                        }) : handleOrder({
+                          name: `${item.name} (${activeVersion.name})`,
+                          price: activeVersion.price,
+                        })}
+                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-400 to-sky-400 px-3 py-2 text-xs font-bold text-slate-950 shadow-[0_0_18px_rgba(59,130,246,0.3)] transition-all duration-200 hover:from-white hover:to-white hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-95 cursor-pointer"
+                      >
+                        <ShoppingCart size={13} />
+                        <span>{lang === 'ar' ? `اطلب (${activeVersion.price})` : `Order (${activeVersion.price})`}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onOpenOrder ? onOpenOrder({
+                          categoryKey: 'Windows & Office',
+                          specificItem: `${item.name} - ${activeVersion.name} (${activeVersion.price})`,
+                          productName: `${item.name} (${activeVersion.name})`,
+                          productPrice: activeVersion.price,
+                          productImage: item.image,
+                          productPlatform: 'MICROSOFT KEY',
+                          defaultNotes: `Microsoft Key: ${item.name} (#${item.num}), Edition: ${activeVersion.name} (${activeVersion.price} / ${activeVersion.priceUsd})`,
+                        }) : handleOrder({
+                          name: `${item.name} (${activeVersion.name})`,
+                          price: activeVersion.price,
+                        })}
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 transition hover:border-emerald-500/50 hover:bg-emerald-500/20 hover:scale-105 active:scale-95 cursor-pointer flex-none"
+                        title={lang === 'ar' ? 'طلب عبر واتساب' : 'Order via WhatsApp'}
+                        aria-label="Order on WhatsApp"
+                      >
+                        <MessageCircle size={15} className="text-emerald-400" />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 3. PC GAMES SECTION */}
+        {showGames && (
+          <div className={(showFreeFire || showAi || showWindows) ? 'mt-12 pt-10 border-t border-white/[0.08]' : 'mt-8'}>
             <div className="flex items-center gap-2 mb-4">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-500/10 text-sky-400">
                 <Monitor size={15} />
@@ -1225,14 +1777,11 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                       </div>
                     </div>
 
-                    <div 
-                      onClick={onOpenWarranty}
-                      className="flex items-center gap-2 rounded-xl border border-amber-400/35 bg-amber-500/10 p-2.5 text-amber-300 cursor-pointer hover:bg-amber-500/20 transition"
-                    >
-                      <Crown size={16} className="text-amber-400 flex-none" />
+                    <div className="flex items-center gap-2 rounded-xl border border-amber-400/35 bg-amber-500/10 p-2.5 text-amber-300">
+                      <ShieldCheck size={16} className="text-amber-400 flex-none" />
                       <div>
-                        <div className="font-bold">{lang === 'ar' ? 'الضمان الذهبي 100%' : '100% Golden Warranty'}</div>
-                        <div className="text-[10px] text-amber-400/80">{lang === 'ar' ? 'استبدال ودعم مستمر' : 'Full Swap & Support'}</div>
+                        <div className="font-bold">{lang === 'ar' ? 'ضمان رسمي 100%' : '100% Official Guarantee'}</div>
+                        <div className="text-[10px] text-amber-400/80">{lang === 'ar' ? 'استبدال فوري ودعم متواصل' : 'Instant Swap & 24/7 Support'}</div>
                       </div>
                     </div>
                   </div>
@@ -1272,8 +1821,8 @@ export default function HotSellers({ onOpenOrder, onOpenWarranty }) {
                   <button
                     type="button"
                     onClick={() => {
-                      const text = encodeURIComponent(`Hello BLEUWI, I want to order ${selectedBigOffer.name} (${selectedBigOffer.price}).`)
-                      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer')
+                      const text = `Hello BLEUWI, I want to order ${selectedBigOffer.name} (${selectedBigOffer.price}).`
+                      openWhatsAppChat(text)
                     }}
                     className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl border border-emerald-500/40 bg-emerald-500/15 py-3.5 px-5 text-sm font-bold text-emerald-300 hover:bg-emerald-500/25 transition cursor-pointer"
                   >

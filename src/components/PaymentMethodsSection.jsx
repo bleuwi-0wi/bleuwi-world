@@ -1,8 +1,23 @@
 import { useState } from 'react'
 import { CheckCircle2, CreditCard, MessageCircle, ShieldCheck, ZoomIn, X, ExternalLink } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import { WHATSAPP_NUMBER } from '../data/links'
+import { getSecureWhatsAppUrl, WHATSAPP_DIRECT_LINK } from '../data/links'
 import refPayment from '../assets/4.webp'
+import iconCards27 from '../assets/payment-methods/27.png'
+import iconWafacash28 from '../assets/payment-methods/28-white.png'
+import iconCashPlus29 from '../assets/payment-methods/29.png'
+import iconPaypal30 from '../assets/payment-methods/30.png'
+import iconBinance31 from '../assets/payment-methods/31.png'
+import iconCih32 from '../assets/payment-methods/32-white.png'
+
+const officialPaymentIcons = [
+  { id: 'cih', name: 'CIH Bank (#32)', icon: iconCih32, alt: 'CIH Bank' },
+  { id: 'cards', name: 'Visa & Mastercard (#27)', icon: iconCards27, alt: 'Visa and Mastercard' },
+  { id: 'cashplus', name: 'Cash Plus (#29)', icon: iconCashPlus29, alt: 'Cash Plus' },
+  { id: 'wafacash', name: 'Wafacash (#28)', icon: iconWafacash28, alt: 'Wafacash' },
+  { id: 'paypal', name: 'PayPal (#30)', icon: iconPaypal30, alt: 'PayPal' },
+  { id: 'binance', name: 'Binance USDT (#31)', icon: iconBinance31, alt: 'Binance' },
+]
 
 export default function PaymentMethodsSection({ onOpenOrder }) {
   const { lang, isRTL } = useLanguage()
@@ -19,12 +34,11 @@ export default function PaymentMethodsSection({ onOpenOrder }) {
   ]
 
   const getWhatsAppPaymentLink = () => {
-    const msg = encodeURIComponent(
+    const msg =
       lang === 'ar'
         ? 'السلام عليكم BLEUWI! أود تأكيد الدفع لطلبي:\n- طريقة الدفع المختارة: \n- المبلغ: \n- الخدمة المطلوبة: \nيرجى تزويدي بمعلومات الحساب / RIB لإتمام الدفع.'
         : 'Hello BLEUWI! I would like to confirm payment for my order:\n- Chosen Payment Method: \n- Amount: \n- Service: \nPlease send me account details / RIB to complete payment.'
-    )
-    return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`
+    return getSecureWhatsAppUrl(msg)
   }
 
   return (
@@ -105,6 +119,35 @@ export default function PaymentMethodsSection({ onOpenOrder }) {
                   ? '⚡ تسليم فوري وتأكيد بعد إرسال الوصل أو لقطة الشاشة على واتساب.'
                   : '⚡ Instant activation & safe delivery upon sending payment receipt on WhatsApp.'}
               </p>
+            </div>
+
+            {/* Official Payment Method Icon Badges (#27 to #32) */}
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3.5 space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
+                  <CreditCard size={15} className="text-sky-400 shrink-0" />
+                  <span>{lang === 'ar' ? 'طرق الدفع المعتمدة والآمنة (#27 إلى #32):' : 'Official Payment Gateways (#27 - #32):'}</span>
+                </div>
+                <span className="rounded-md bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
+                  {lang === 'ar' ? 'تسليم فوري' : 'Instant 24/7'}
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-4 sm:gap-5 pt-1">
+                {officialPaymentIcons.map((pm) => (
+                  <div
+                    key={pm.id}
+                    className="flex items-center justify-center transition-transform duration-200 hover:scale-110 cursor-pointer"
+                    title={pm.name}
+                  >
+                    <img
+                      src={pm.icon}
+                      alt={pm.alt}
+                      className="h-6 sm:h-7 w-auto object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)] transition-all duration-200 hover:drop-shadow-[0_0_10px_rgba(56,189,248,0.4)]"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
