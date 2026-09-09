@@ -80,12 +80,6 @@ export default function PaymentMethodsSection({ onOpenOrder }) {
               loading="lazy"
               decoding="async"
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-slate-950/80 px-4 py-2 text-xs font-bold text-white backdrop-blur-md">
-                <ZoomIn size={15} className="text-sky-400" />
-                <span>{lang === 'ar' ? 'انقر لتكبير اللوحة' : 'Click to zoom Sheet #04'}</span>
-              </span>
-            </div>
             <div className="absolute bottom-3 left-3 rounded-md bg-black/70 px-2.5 py-1 text-[11px] font-semibold text-sky-300 backdrop-blur-md">
               Official Sheet #04
             </div>

@@ -295,19 +295,7 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
                     <span className="text-sky-400">♦</span>
                   </div>
 
-                  {/* Zoom Artwork Quick Button on Card */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setLightboxCard(item)
-                    }}
-                    className="absolute top-2.5 right-2.5 z-20 flex h-7 w-7 items-center justify-center rounded-lg bg-black/60 text-white/80 backdrop-blur-md border border-white/20 transition hover:scale-110 hover:bg-sky-500 hover:text-white cursor-pointer"
-                    title={t('zoomCard')}
-                    aria-label={t('zoomCard')}
-                  >
-                    <Maximize2 size={13} />
-                  </button>
+
 
                   {/* Active Selected Card Indicator Pill */}
                   {isActive && (
@@ -405,14 +393,7 @@ export default function SessionCardsFan({ onSelectShowcase, onOpenOrder }) {
               <span>{t('quickOrderBtn')}</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setLightboxCard(activeSession)}
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:border-white/20 hover:text-white cursor-pointer"
-            >
-              <Maximize2 size={13} />
-              <span>{t('zoomCard')}</span>
-            </button>
+
           </div>
         </div>
       </div>

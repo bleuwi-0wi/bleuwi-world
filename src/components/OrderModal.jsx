@@ -610,7 +610,7 @@ export default function OrderModal({ isOpen, onClose, initialData = {} }) {
 *• المنتج المطلوب:* ${chosenProductTitle}${productPriceTag}
 *• المنصة:* ${activeProduct.platform || 'PC / Digital'}
 *• القسم:* ${currentPreset.sessionName} (${currentPreset.category})
-*• اسم العميل:* ${cleanName}${details.trim() ? `\n*• الملاحظات:* ${details.trim()}` : ''}${activeProduct.publicUrl ? `\n\n*• رابط صورة المنتج:*\n${activeProduct.publicUrl}` : ''}
+*• اسم العميل:* ${cleanName}${details.trim() ? `\n*• الملاحظات:* ${details.trim()}` : ''}
 
 يرجى تزويدي بمعلومات الدفع (CIH / التجاري وفا / كاش بلوس / بايبال / كريبتو) لتأكيد وتفعيل الطلب فوراً!`
     : `*Hello BLEUWI!*
@@ -618,7 +618,7 @@ export default function OrderModal({ isOpen, onClose, initialData = {} }) {
 *• Product Ordered:* ${chosenProductTitle}${productPriceTag}
 *• Platform:* ${activeProduct.platform || 'PC / Digital'}
 *• Service Category:* ${currentPreset.sessionName} (${currentPreset.category})
-*• Customer Name:* ${cleanName}${details.trim() ? `\n*• Notes:* ${details.trim()}` : ''}${activeProduct.publicUrl ? `\n\n*• Product Image Link:*\n${activeProduct.publicUrl}` : ''}
+*• Customer Name:* ${cleanName}${details.trim() ? `\n*• Notes:* ${details.trim()}` : ''}
 
 Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPal / Crypto) to confirm and activate my order now!`
 
@@ -791,20 +791,10 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
 
             {/* 2. Choose Item / Package Grid */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="mb-2">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
                   {t('itemLabel')} <span className="text-sky-400">*</span>
                 </label>
-                {activeProduct?.image && (
-                  <button
-                    type="button"
-                    onClick={() => setPreviewZoom(true)}
-                    className="inline-flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300 hover:underline cursor-pointer"
-                  >
-                    <Eye size={12} />
-                    <span>{t('zoomBtn')} {lang === 'ar' ? 'صورة المنتج' : 'Picture'}</span>
-                  </button>
-                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -992,13 +982,6 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
                     </div>
                   )}
 
-                  {/* Hover Hint */}
-                  <div className="absolute inset-0 grid place-items-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-black/75 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md border border-white/20">
-                      <Eye size={13} />
-                      <span>{lang === 'ar' ? 'معاينة الصورة' : 'View Full Image'}</span>
-                    </span>
-                  </div>
                 </div>
 
                 {/* Product Meta Info Bar */}
@@ -1016,25 +999,6 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
                   <p className="mt-0.5 text-[11px] text-slate-400 truncate">
                     {lang === 'ar' ? (activeProduct.taglineAr || activeProduct.tagline) : activeProduct.tagline}
                   </p>
-                </div>
-
-                {/* Image Link Preview Bar */}
-                <div className="flex items-center justify-between px-3 py-2 bg-black/40 border-t border-white/[0.05] text-xs">
-                  <div className="flex items-center gap-1.5 overflow-hidden">
-                    <span className="text-sky-400">🔗</span>
-                    <span className="text-[11px] text-sky-300 font-mono truncate max-w-[200px]" title={activeProduct.publicUrl}>
-                      {activeProduct.publicUrl || 'bleuwiworld.shop'}
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setPreviewZoom(true)}
-                    className="text-[11px] text-sky-400 hover:text-sky-300 hover:underline inline-flex items-center gap-1 cursor-pointer flex-none ml-2"
-                  >
-                    <Eye size={12} />
-                    <span>{lang === 'ar' ? 'معاينة' : 'Zoom'}</span>
-                  </button>
                 </div>
               </div>
 
@@ -1185,22 +1149,11 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
               />
             </div>
 
-            <div className="flex items-center justify-between border-t border-white/10 pt-2 text-xs">
-              <span className="text-slate-400">
-                {lang === 'ar' ? 'رابط صورة المنتج مدمج في رسالة واتساب' : 'Product image link is included in your WhatsApp message'}
-              </span>
-              {activeProduct.publicUrl && (
-                <a
-                  href={activeProduct.publicUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-sky-500/20 border border-sky-500/30 px-3 py-1 font-semibold text-sky-300 hover:bg-sky-500/30 transition cursor-pointer"
-                >
-                  <span>🔗</span>
-                  <span>{lang === 'ar' ? 'فتح رابط الصورة' : 'Open Image Link'}</span>
-                </a>
-              )}
-            </div>
+            {activeProduct.tagline && (
+              <div className="border-t border-white/10 pt-2 text-xs text-center text-slate-400">
+                {lang === 'ar' ? (activeProduct.taglineAr || activeProduct.tagline) : activeProduct.tagline}
+              </div>
+            )}
           </div>
         </div>
       )}

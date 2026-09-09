@@ -145,13 +145,7 @@ export default function ProductCard({
           </div>
         )}
 
-        {/* Hover Inspect Indicator */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity backdrop-blur-[1.5px]">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/90 border border-sky-400/60 px-3 py-1.5 text-xs font-bold text-sky-200 shadow-xl backdrop-blur-md">
-            <Maximize2 size={13} className="text-sky-400" />
-            <span>{t('inspectDetails')}</span>
-          </span>
-        </div>
+
       </div>
 
       {/* 2. CARD CONTENT & TYPOGRAPHY HIERARCHY */}

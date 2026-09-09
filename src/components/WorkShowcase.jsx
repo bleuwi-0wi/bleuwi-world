@@ -481,13 +481,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#080d18] via-black/20 to-black/30 opacity-70 group-hover/img:opacity-40 transition-opacity" />
 
-                        {/* Top-right Zoom Badge */}
-                        <div className="absolute top-2.5 right-2.5">
-                          <span className="inline-flex items-center gap-1 rounded-full bg-black/80 px-2.5 py-1 text-[10px] font-semibold text-sky-200 backdrop-blur-md border border-sky-400/30 shadow-md">
-                            <ZoomIn size={12} className="text-sky-400" />
-                            <span>{t('clickToZoom')}</span>
-                          </span>
-                        </div>
+
 
                         {/* Bottom Info Bar */}
                         <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between">
@@ -600,9 +594,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                   title="Click to zoom Sheet #04"
                 >
                   <img src={refPayment} alt="Payment Methods Sheet #04" className="h-full w-full object-cover transition-transform duration-300 group-hover/pay:scale-105" />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover/pay:opacity-100">
-                    <ZoomIn size={16} className="text-sky-300" />
-                  </div>
+
                 </div>
                 <div>
                   <div className="flex items-center gap-2 text-xs font-bold text-sky-400 uppercase tracking-wider">
@@ -788,12 +780,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                         </span>
                       </div>
 
-                      <div className="absolute bottom-2 right-2.5">
-                        <span className="inline-flex items-center gap-1 rounded-md bg-purple-950/80 px-2 py-0.5 text-[10px] font-bold text-purple-300 border border-purple-400/30 backdrop-blur-sm">
-                          <Eye size={10} />
-                          <span>{lang === 'ar' ? 'معاينة' : 'Zoom'}</span>
-                        </span>
-                      </div>
+
                     </div>
 
                     <div className="flex items-center justify-between gap-2">
@@ -944,12 +931,7 @@ export default function WorkShowcase({ type = 'all', onBack, onSelectType, onOpe
                         </span>
                       </div>
 
-                      <div className="absolute bottom-2 right-2.5">
-                        <span className="inline-flex items-center gap-1 rounded-md bg-blue-950/80 px-2 py-0.5 text-[10px] font-bold text-blue-300 border border-blue-400/30 backdrop-blur-sm">
-                          <Eye size={10} />
-                          <span>{lang === 'ar' ? 'معاينة' : 'Zoom'}</span>
-                        </span>
-                      </div>
+
                     </div>
 
                     <div className="flex items-start justify-between gap-2">
