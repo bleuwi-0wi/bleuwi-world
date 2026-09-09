@@ -3,18 +3,30 @@ import { translations } from '../i18n/translations'
 
 const LanguageContext = createContext(null)
 
+const SUPPORTED_LANGS = ['ar', 'en', 'fr', 'es']
+
 const detectInitialLanguage = () => {
   try {
+    const params = new URLSearchParams(window.location.search)
+    const urlLang = params.get('lang')
+    if (urlLang && SUPPORTED_LANGS.includes(urlLang)) return urlLang
+
     const saved = localStorage.getItem('bleuwi_language')
-    if (saved === 'ar' || saved === 'en') return saved
+    if (saved && SUPPORTED_LANGS.includes(saved)) return saved
 
     const navLangs = navigator.languages || [navigator.language || '']
-    const hasArabic = navLangs.some((l) => l && l.toLowerCase().startsWith('ar'))
-    if (hasArabic) return 'ar'
+    for (const l of navLangs) {
+      if (!l) continue
+      const lower = l.toLowerCase()
+      if (lower.startsWith('ar')) return 'ar'
+      if (lower.startsWith('fr')) return 'fr'
+      if (lower.startsWith('es')) return 'es'
+      if (lower.startsWith('en')) return 'en'
+    }
   } catch {
     // fallback
   }
-  return 'en'
+  return 'ar' // Default to Arabic as primary Moroccan store language
 }
 
 export function LanguageProvider({ children }) {
@@ -39,7 +51,7 @@ export function LanguageProvider({ children }) {
   })
 
   const setLang = (newLang) => {
-    if (newLang !== 'ar' && newLang !== 'en') return
+    if (!SUPPORTED_LANGS.includes(newLang)) return
     setLangState(newLang)
     try {
       localStorage.setItem('bleuwi_language', newLang)

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Globe, Menu, Settings as SettingsIcon, X, Flame, ShieldCheck, ShoppingBag, Coins } from 'lucide-react'
+import { Globe, Menu, Settings as SettingsIcon, X, Flame, ShieldCheck, ShoppingBag, Coins, BookOpen, Gem, HelpCircle } from 'lucide-react'
 import BrandMark from './BrandMark'
 import { useLanguage } from '../context/LanguageContext'
 import { useShop, CURRENCY_RATES } from '../context/ShopContext'
@@ -32,8 +32,17 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
     }
   }
 
-  const toggleLanguage = () => {
-    setLang(lang === 'ar' ? 'en' : 'ar')
+  const LANG_CONFIG = {
+    ar: { label: 'العربية', code: 'عربي', flag: '🇲🇦' },
+    en: { label: 'English', code: 'EN', flag: '🇬🇧' },
+    fr: { label: 'Français', code: 'FR', flag: '🇫🇷' },
+    es: { label: 'Español', code: 'ES', flag: '🇪🇸' },
+  }
+
+  const cycleLanguage = () => {
+    const order = ['ar', 'en', 'fr', 'es']
+    const nextIdx = (order.indexOf(lang) + 1) % order.length
+    setLang(order[nextIdx])
   }
 
   const cycleCurrency = () => {
@@ -64,10 +73,14 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           <span className="text-white/95 font-extrabold tracking-wide">
             {lang === 'ar'
               ? '⚡ نعمل 24/7 مع ضمان 100% (استبدال فوري ودعم فني متواصل)'
+              : lang === 'fr'
+              ? '⚡ SERVICE 24/7 AVEC GARANTIE OR 100% (Remplacement immédiat & support)'
+              : lang === 'es'
+              ? '⚡ SERVICIO 24/7 CON GARANTÍA DORADA 100% (Reemplazo instantáneo & soporte)'
               : '⚡ WE WORK 24/7 WITH 100% GUARANTEE (Instant Swap & 24/7 Support)'}
           </span>
           <span className="hidden min-[620px]:inline-block rounded-md bg-emerald-400/25 border border-emerald-400/40 px-2 py-0.5 text-[10px] text-emerald-200 font-bold group-hover:bg-white group-hover:text-slate-950 transition-colors">
-            {lang === 'ar' ? 'تواصل عبر واتساب ←' : 'Chat on WhatsApp →'}
+            {lang === 'ar' ? 'تواصل عبر واتساب ←' : lang === 'fr' ? 'WhatsApp Direct ←' : lang === 'es' ? 'WhatsApp Directo ←' : 'Chat on WhatsApp →'}
           </span>
         </a>
       </div>
@@ -87,7 +100,7 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
+        <nav className="hidden items-center gap-6 lg:gap-7 md:flex" aria-label="Primary navigation">
           <a
             className="nav-link cursor-pointer"
             href="#home"
@@ -101,21 +114,45 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
             onClick={(e) => handleNavClick(e, 'hot-sellers')}
           >
             <Flame size={14} className="text-amber-400 animate-pulse" />
-            <span>{lang === 'ar' ? 'الأكثر مبيعاً' : 'Hot Sellers'}</span>
+            <span>{lang === 'ar' ? 'الأكثر مبيعاً' : lang === 'fr' ? 'Top Ventes' : lang === 'es' ? 'Más Vendidos' : 'Hot Sellers'}</span>
+          </a>
+          <a
+            className="nav-link cursor-pointer flex items-center gap-1.5 text-amber-400 hover:text-amber-300"
+            href="#diamond-calculator"
+            onClick={(e) => handleNavClick(e, 'diamond-calculator')}
+          >
+            <Gem size={14} className="text-amber-400" />
+            <span>{lang === 'ar' ? 'حاسبة فري فاير' : lang === 'fr' ? 'Calculateur FF' : lang === 'es' ? 'Calculadora FF' : 'FF Calculator'}</span>
+          </a>
+          <a
+            className="nav-link cursor-pointer flex items-center gap-1.5 text-sky-300 hover:text-sky-200"
+            href="#windows-advisor"
+            onClick={(e) => handleNavClick(e, 'windows-advisor')}
+          >
+            <ShieldCheck size={14} className="text-sky-400" />
+            <span>{lang === 'ar' ? 'مستشار ويندوز' : lang === 'fr' ? 'Conseiller Clés' : lang === 'es' ? 'Asesor Claves' : 'Key Advisor'}</span>
           </a>
           <a
             className="nav-link cursor-pointer"
             href="#payments"
             onClick={(e) => handleNavClick(e, 'payments')}
           >
-            {lang === 'ar' ? 'طرق الدفع' : 'Payments'}
+            {lang === 'ar' ? 'طرق الدفع' : lang === 'fr' ? 'Paiements' : lang === 'es' ? 'Pagos' : 'Payments'}
+          </a>
+          <a
+            className="nav-link cursor-pointer flex items-center gap-1.5 text-slate-300 hover:text-white"
+            href="#faq-section"
+            onClick={(e) => handleNavClick(e, 'faq-section')}
+          >
+            <HelpCircle size={14} className="text-sky-400" />
+            <span>{lang === 'ar' ? 'الأسئلة الشائعة' : lang === 'fr' ? 'FAQ' : lang === 'es' ? 'Preguntas' : 'FAQ'}</span>
           </a>
           <a
             className="nav-link cursor-pointer"
             href="#reviews"
             onClick={(e) => handleNavClick(e, 'reviews')}
           >
-            {lang === 'ar' ? 'التقييمات' : 'Reviews'}
+            {lang === 'ar' ? 'التقييمات' : lang === 'fr' ? 'Avis' : lang === 'es' ? 'Opiniones' : 'Reviews'}
           </a>
           <a
             className="nav-link cursor-pointer"
@@ -156,15 +193,15 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
             )}
           </button>
 
-          {/* Quick Language Switcher Button */}
+          {/* Quick Language Switcher Button (AR, EN, FR, ES) */}
           <button
             type="button"
-            onClick={toggleLanguage}
+            onClick={cycleLanguage}
             className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-white cursor-pointer"
-            title={lang === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'}
+            title={LANG_CONFIG[lang]?.label || 'Language'}
           >
-            <Globe size={13} className="text-sky-400" />
-            <span>{lang === 'ar' ? 'EN' : 'عربي'}</span>
+            <span className="text-sm">{LANG_CONFIG[lang]?.flag || '🌐'}</span>
+            <span className="font-bold">{LANG_CONFIG[lang]?.code || 'LANG'}</span>
           </button>
 
           {/* Settings Button */}
@@ -209,10 +246,12 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           {/* Mobile Language Button */}
           <button
             type="button"
-            onClick={toggleLanguage}
-            className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 sm:px-2.5 sm:py-1.5 text-[11px] sm:text-xs font-bold text-sky-200 cursor-pointer"
+            onClick={cycleLanguage}
+            className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 sm:px-2.5 sm:py-1.5 text-[11px] sm:text-xs font-bold text-sky-200 cursor-pointer flex items-center gap-1"
+            title={LANG_CONFIG[lang]?.label}
           >
-            {lang === 'ar' ? 'EN' : 'عربي'}
+            <span>{LANG_CONFIG[lang]?.flag}</span>
+            <span>{LANG_CONFIG[lang]?.code}</span>
           </button>
 
           <button
@@ -254,21 +293,45 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
               onClick={(e) => handleNavClick(e, 'hot-sellers')}
             >
               <Flame size={15} className="text-amber-400 animate-pulse" />
-              <span>{lang === 'ar' ? 'الأكثر مبيعاً (الألعاب)' : 'Hot Sellers (Games)'}</span>
+              <span>{lang === 'ar' ? 'الأكثر مبيعاً' : lang === 'fr' ? 'Top Ventes' : lang === 'es' ? 'Más Vendidos' : 'Hot Sellers'}</span>
+            </a>
+            <a
+              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-amber-400 transition hover:bg-white/[0.06] hover:text-amber-300 cursor-pointer"
+              href="#diamond-calculator"
+              onClick={(e) => handleNavClick(e, 'diamond-calculator')}
+            >
+              <Gem size={15} className="text-amber-400" />
+              <span>{lang === 'ar' ? 'حاسبة فري فاير' : lang === 'fr' ? 'Calculateur FF' : lang === 'es' ? 'Calculadora FF' : 'FF Calculator'}</span>
+            </a>
+            <a
+              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-sky-300 transition hover:bg-white/[0.06] hover:text-sky-200 cursor-pointer"
+              href="#windows-advisor"
+              onClick={(e) => handleNavClick(e, 'windows-advisor')}
+            >
+              <ShieldCheck size={15} className="text-sky-400" />
+              <span>{lang === 'ar' ? 'مستشار ويندوز' : lang === 'fr' ? 'Conseiller Clés' : lang === 'es' ? 'Asesor Claves' : 'Windows Key Advisor'}</span>
             </a>
             <a
               className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
               href="#payments"
               onClick={(e) => handleNavClick(e, 'payments')}
             >
-              {lang === 'ar' ? 'طرق الدفع' : 'Payments'}
+              {lang === 'ar' ? 'طرق الدفع' : lang === 'fr' ? 'Paiements' : lang === 'es' ? 'Pagos' : 'Payments'}
+            </a>
+            <a
+              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
+              href="#faq-section"
+              onClick={(e) => handleNavClick(e, 'faq-section')}
+            >
+              <HelpCircle size={15} className="text-sky-400" />
+              <span>{lang === 'ar' ? 'الأسئلة الشائعة' : lang === 'fr' ? 'FAQ' : lang === 'es' ? 'Preguntas Frecuentes' : 'FAQ'}</span>
             </a>
             <a
               className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
               href="#reviews"
               onClick={(e) => handleNavClick(e, 'reviews')}
             >
-              {lang === 'ar' ? 'التقييمات' : 'Reviews'}
+              {lang === 'ar' ? 'التقييمات' : lang === 'fr' ? 'Avis' : lang === 'es' ? 'Opiniones' : 'Reviews'}
             </a>
             <a
               className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"

@@ -91,6 +91,30 @@ export default function SettingsModal({ isOpen, onClose }) {
             </p>
 
             <div className="mt-3 grid grid-cols-2 gap-2.5">
+              {/* Arabic */}
+              <button
+                type="button"
+                onClick={() => setLang('ar')}
+                className={`flex items-center justify-between gap-2 rounded-xl border p-3 text-left transition cursor-pointer ${
+                  lang === 'ar'
+                    ? 'border-emerald-400 bg-emerald-400/15 text-white font-semibold shadow-md shadow-emerald-500/15'
+                    : 'border-white/10 bg-white/[0.02] text-slate-300 hover:border-white/20 hover:bg-white/[0.05]'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-lg">🇲🇦</span>
+                  <div>
+                    <p className="text-xs font-bold text-white">العربية</p>
+                    <p className="text-[10px] text-slate-400">Arabic (RTL)</p>
+                  </div>
+                </div>
+                {lang === 'ar' && (
+                  <span className="grid h-5 w-5 place-items-center rounded-full bg-emerald-400 text-slate-950">
+                    <Check size={12} />
+                  </span>
+                )}
+              </button>
+
               {/* English */}
               <button
                 type="button"
@@ -115,25 +139,49 @@ export default function SettingsModal({ isOpen, onClose }) {
                 )}
               </button>
 
-              {/* Arabic */}
+              {/* French */}
               <button
                 type="button"
-                onClick={() => setLang('ar')}
+                onClick={() => setLang('fr')}
                 className={`flex items-center justify-between gap-2 rounded-xl border p-3 text-left transition cursor-pointer ${
-                  lang === 'ar'
-                    ? 'border-emerald-400 bg-emerald-400/15 text-white font-semibold shadow-md shadow-emerald-500/15'
+                  lang === 'fr'
+                    ? 'border-sky-400 bg-sky-400/15 text-white font-semibold shadow-md shadow-sky-500/15'
                     : 'border-white/10 bg-white/[0.02] text-slate-300 hover:border-white/20 hover:bg-white/[0.05]'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="text-lg">🇲🇦</span>
+                  <span className="text-lg">🇫🇷</span>
                   <div>
-                    <p className="text-xs font-bold text-white">العربية</p>
-                    <p className="text-[10px] text-slate-400">Arabic (RTL)</p>
+                    <p className="text-xs font-bold text-white">Français</p>
+                    <p className="text-[10px] text-slate-400">French (LTR)</p>
                   </div>
                 </div>
-                {lang === 'ar' && (
-                  <span className="grid h-5 w-5 place-items-center rounded-full bg-emerald-400 text-slate-950">
+                {lang === 'fr' && (
+                  <span className="grid h-5 w-5 place-items-center rounded-full bg-sky-400 text-slate-950">
+                    <Check size={12} />
+                  </span>
+                )}
+              </button>
+
+              {/* Spanish */}
+              <button
+                type="button"
+                onClick={() => setLang('es')}
+                className={`flex items-center justify-between gap-2 rounded-xl border p-3 text-left transition cursor-pointer ${
+                  lang === 'es'
+                    ? 'border-amber-400 bg-amber-400/15 text-white font-semibold shadow-md shadow-amber-500/15'
+                    : 'border-white/10 bg-white/[0.02] text-slate-300 hover:border-white/20 hover:bg-white/[0.05]'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-lg">🇪🇸</span>
+                  <div>
+                    <p className="text-xs font-bold text-white">Español</p>
+                    <p className="text-[10px] text-slate-400">Spanish (LTR)</p>
+                  </div>
+                </div>
+                {lang === 'es' && (
+                  <span className="grid h-5 w-5 place-items-center rounded-full bg-amber-400 text-slate-950">
                     <Check size={12} />
                   </span>
                 )}

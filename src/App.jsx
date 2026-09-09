@@ -20,6 +20,10 @@ import PwaInstallBanner from './components/PwaInstallBanner'
 const WorkShowcase = lazy(() => import('./components/WorkShowcase'))
 const OrderModal = lazy(() => import('./components/OrderModal'))
 const SettingsModal = lazy(() => import('./components/SettingsModal'))
+const WindowsKeyAdvisor = lazy(() => import('./components/WindowsKeyAdvisor'))
+const FreeFireCalculator = lazy(() => import('./components/FreeFireCalculator'))
+const FaqSection = lazy(() => import('./components/FaqSection'))
+const LiveSalesTicker = lazy(() => import('./components/LiveSalesTicker'))
 
 function MainApp() {
   const [showcase, setShowcase] = useState(() => {
@@ -148,11 +152,20 @@ function MainApp() {
             <HotSellers
               onOpenOrder={handleOpenOrder}
             />
+            <Suspense fallback={null}>
+              <FreeFireCalculator />
+            </Suspense>
             <PreviewCard
               onSelectShowcase={navigateToShowcase}
               onOpenOrder={handleOpenOrder}
             />
+            <Suspense fallback={null}>
+              <WindowsKeyAdvisor onOpenOrder={handleOpenOrder} />
+            </Suspense>
             <PaymentMethodsSection onOpenOrder={handleOpenOrder} />
+            <Suspense fallback={null}>
+              <FaqSection />
+            </Suspense>
             <ReviewsSection />
             <LinksSection />
           </>
@@ -169,6 +182,11 @@ function MainApp() {
 
       {/* Floating Add to Cart Feedback Toast */}
       <CartToast />
+
+      {/* Real-Time Multilingual Social Proof Sales Ticker (1,000 Verified Names Pool) */}
+      <Suspense fallback={null}>
+        <LiveSalesTicker onOpenOrder={handleOpenOrder} />
+      </Suspense>
 
       {/* WhatsApp Order Modal (Dynamically loaded when triggered) */}
       {orderModalOpen && (

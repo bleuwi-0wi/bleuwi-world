@@ -73,8 +73,46 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Quick Product & Category Links */}
+        <div className="mt-8 pt-8 border-t border-white/[0.08]">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-sky-400">
+              {lang === 'ar' ? 'أقسام وخدمات المتجر السريعة' : 'Quick Store Services & Categories'}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-400">
+            <a href="#chapter-freefire-guide" className="hover:text-amber-300 transition-colors py-1">
+              {lang === 'ar' ? '• شحن فري فاير بالآيدي' : '• Free Fire ID Top-Up'}
+            </a>
+            <a href="#windows-advisor" className="hover:text-sky-400 transition-colors py-1 font-semibold text-sky-300">
+              {lang === 'ar' ? '• فاحص ومستشار ويندوز الذكي' : '• Windows Key Advisor'}
+            </a>
+            <a href="#chapter-windows-office" className="hover:text-sky-300 transition-colors py-1">
+              {lang === 'ar' ? '• سيريال ويندوز وأوفيس أصلي' : '• Genuine Windows & Office'}
+            </a>
+            <a href="#chapter-ai-subscriptions" className="hover:text-emerald-300 transition-colors py-1">
+              {lang === 'ar' ? '• اشتراكات الذكاء الاصطناعي' : '• AI VIP Subscriptions'}
+            </a>
+            <a href="#chapter-gaming-currencies" className="hover:text-purple-300 transition-colors py-1">
+              {lang === 'ar' ? '• كوينز وحسابات الألعاب' : '• Game Coins & Subs'}
+            </a>
+            <a href="#chapter-creative-studio" className="hover:text-pink-300 transition-colors py-1">
+              {lang === 'ar' ? '• خدمات المونتاج والتصميم' : '• Creative & Editing'}
+            </a>
+            <a href="#chapter-payment-methods" className="hover:text-cyan-300 transition-colors py-1">
+              {lang === 'ar' ? '• طرق الدفع (CIH، كاش بلوس)' : '• Moroccan Payment Guide'}
+            </a>
+            <a href="#chapter-master-faq" className="hover:text-yellow-300 transition-colors py-1">
+              {lang === 'ar' ? '• بنك الأسئلة الشائعة (50+ FAQ)' : '• Master FAQ (50+)'}
+            </a>
+            <a href="#chapter-golden-guarantee" className="hover:text-emerald-400 transition-colors py-1">
+              {lang === 'ar' ? '• ميثاق الضمان الذهبي 100%' : '• Golden Guarantee'}
+            </a>
+          </div>
+        </div>
+
         {/* Accepted Payment Methods Bar with Official Icons from 27 to 32 */}
-        <div className="mt-10 border-t border-white/[0.08] pt-8">
+        <div className="mt-8 border-t border-white/[0.08] pt-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/15 text-emerald-400 shrink-0">
