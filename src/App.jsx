@@ -1,18 +1,25 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { LanguageProvider } from './context/LanguageContext'
+import { ShopProvider } from './context/ShopContext'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import HotSellers from './components/HotSellers'
 import PreviewCard from './components/PreviewCard'
-import WorkShowcase from './components/WorkShowcase'
 import LinksSection from './components/LinksSection'
 import PaymentMethodsSection from './components/PaymentMethodsSection'
 import ReviewsSection from './components/ReviewsSection'
 import Footer from './components/Footer'
-import OrderModal from './components/OrderModal'
-import SettingsModal from './components/SettingsModal'
 import ParticlesBackground from './components/ParticlesBackground'
 import CustomCursor from './components/CustomCursor'
+import MobileQuickBar from './components/MobileQuickBar'
+import CartDrawer from './components/CartDrawer'
+import CartToast from './components/CartToast'
+import PwaInstallBanner from './components/PwaInstallBanner'
+
+// Code-split heavy non-critical components for ultra-fast initial load
+const WorkShowcase = lazy(() => import('./components/WorkShowcase'))
+const OrderModal = lazy(() => import('./components/OrderModal'))
+const SettingsModal = lazy(() => import('./components/SettingsModal'))
 
 function MainApp() {
   const [showcase, setShowcase] = useState(() => {
@@ -115,21 +122,26 @@ function MainApp() {
       {/* Smooth Dark Blue Mouse Cursor */}
       <CustomCursor />
 
-      {/* Main Header with Language & Settings controls */}
+      {/* Main Header with Language, Currency, Cart & Settings controls */}
       <Header
         onHomeClick={navigateHome}
         activeShowcase={showcase}
         onOpenSettings={handleOpenSettings}
       />
 
+      {/* Progressive Web App Install Banner */}
+      <PwaInstallBanner />
+
       <main className={`relative z-10 ${isShowcaseActive ? 'pt-10' : ''}`}>
         {isShowcaseActive ? (
-          <WorkShowcase
-            type={showcase}
-            onBack={navigateHome}
-            onSelectType={navigateToShowcase}
-            onOpenOrder={handleOpenOrder}
-          />
+          <Suspense fallback={<div className="min-h-[60vh] flex items-center justify-center text-sky-400">Loading showcase...</div>}>
+            <WorkShowcase
+              type={showcase}
+              onBack={navigateHome}
+              onSelectType={navigateToShowcase}
+              onOpenOrder={handleOpenOrder}
+            />
+          </Suspense>
         ) : (
           <>
             <Hero onOpenOrder={handleOpenOrder} />
@@ -149,18 +161,35 @@ function MainApp() {
 
       <Footer />
 
-      {/* WhatsApp Order Modal */}
-      <OrderModal
-        isOpen={orderModalOpen}
-        onClose={handleCloseOrder}
-        initialData={orderModalData}
-      />
+      {/* Mobile Sticky Quick Action Bar */}
+      <MobileQuickBar onOpenOrder={handleOpenOrder} />
 
-      {/* Settings Modal (Language, Particles, Custom Cursor) */}
-      <SettingsModal
-        isOpen={settingsModalOpen}
-        onClose={handleCloseSettings}
-      />
+      {/* Slide-over Multi-Item Cart Drawer */}
+      <CartDrawer />
+
+      {/* Floating Add to Cart Feedback Toast */}
+      <CartToast />
+
+      {/* WhatsApp Order Modal (Dynamically loaded when triggered) */}
+      {orderModalOpen && (
+        <Suspense fallback={null}>
+          <OrderModal
+            isOpen={orderModalOpen}
+            onClose={handleCloseOrder}
+            initialData={orderModalData}
+          />
+        </Suspense>
+      )}
+
+      {/* Settings Modal (Dynamically loaded when triggered) */}
+      {settingsModalOpen && (
+        <Suspense fallback={null}>
+          <SettingsModal
+            isOpen={settingsModalOpen}
+            onClose={handleCloseSettings}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -168,7 +197,9 @@ function MainApp() {
 export default function App() {
   return (
     <LanguageProvider>
-      <MainApp />
+      <ShopProvider>
+        <MainApp />
+      </ShopProvider>
     </LanguageProvider>
   )
 }

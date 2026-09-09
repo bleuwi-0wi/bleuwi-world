@@ -22,6 +22,7 @@ import {
   Crown,
   Gem,
   AlertCircle,
+  Loader2,
 } from 'lucide-react'
 import { orderPresets, getSecureWhatsAppUrl, openWhatsAppChat, WHATSAPP_DIRECT_LINK } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
@@ -473,6 +474,7 @@ export default function OrderModal({ isOpen, onClose, initialData = {} }) {
   const [itemError, setItemError] = useState(false)
   const [spamError, setSpamError] = useState('')
   const [rateLimitInfo, setRateLimitInfo] = useState(() => getOrderRateLimitStatus())
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const nameInputRef = useRef(null)
 
   // Sync initialData when modal opens
@@ -672,7 +674,11 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
     // Direct WhatsApp send with order template and image link (auto-prefills message in chat)
     setCopiedText(true)
     setTimeout(() => setCopiedText(false), 2500)
-    openWhatsAppChat(generatedMessage)
+    setIsSubmitting(true)
+    setTimeout(() => {
+      setIsSubmitting(false)
+      openWhatsAppChat(generatedMessage)
+    }, 350)
   }
 
   const handleCopyTextMessage = () => {
@@ -1093,18 +1099,28 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
               <button
                 type="button"
                 onClick={handleSendWhatsApp}
+                disabled={isSubmitting}
                 className={`group relative flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5 px-5 text-sm font-bold shadow-lg transition-all duration-300 cursor-pointer ${
                   rateLimitInfo.isDailyLimitReached
                     ? 'bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30'
                     : 'bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 bg-[length:200%_auto] text-slate-950 shadow-emerald-500/25 hover:bg-right hover:shadow-emerald-500/40 hover:scale-[1.01] active:scale-[0.99]'
                 }`}
               >
-                {/* Official WhatsApp Logo SVG */}
-                <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.071.376-.043.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.392-10.416c-5.523 0-10 4.477-10 10 0 1.769.459 3.432 1.261 4.884l-1.341 4.896 5.031-1.319c1.408.767 3.018 1.201 4.729 1.201 5.523 0 10-4.477 10-10 0-5.523-4.477-10-10-10z" />
-                </svg>
-                <span>{rateLimitInfo.isDailyLimitReached ? (lang === 'ar' ? 'تم بلوغ حد الطلبات اليومي' : 'Daily Limit Reached') : t('sendWhatsAppBtn')}</span>
-                <ArrowUpRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    <span>{lang === 'ar' ? 'جاري فتح محادثة واتساب...' : 'Opening WhatsApp Chat...'}</span>
+                  </>
+                ) : (
+                  <>
+                    {/* Official WhatsApp Logo SVG */}
+                    <svg className="h-5 w-5 fill-current shrink-0" viewBox="0 0 24 24">
+                      <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.071.376-.043.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.392-10.416c-5.523 0-10 4.477-10 10 0 1.769.459 3.432 1.261 4.884l-1.341 4.896 5.031-1.319c1.408.767 3.018 1.201 4.729 1.201 5.523 0 10-4.477 10-10 0-5.523-4.477-10-10-10z" />
+                    </svg>
+                    <span>{rateLimitInfo.isDailyLimitReached ? (lang === 'ar' ? 'تم بلوغ حد الطلبات اليومي' : 'Daily Limit Reached') : t('sendWhatsAppBtn')}</span>
+                    <ArrowUpRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </>
+                )}
               </button>
 
               <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">

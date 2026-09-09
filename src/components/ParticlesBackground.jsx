@@ -8,6 +8,11 @@ export default function ParticlesBackground() {
   useEffect(() => {
     if (!particlesEnabled) return
 
+    // Mobile & touch optimization: skip canvas particle loop on mobile to preserve battery & guarantee INP < 200ms
+    if (window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768) {
+      return
+    }
+
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d', { alpha: true })

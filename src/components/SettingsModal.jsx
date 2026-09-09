@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import { Check, Globe, MousePointer, Sparkles, X, Settings as SettingsIcon } from 'lucide-react'
+import { Check, Globe, MousePointer, Sparkles, X, Settings as SettingsIcon, Coins } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
+import { useShop, CURRENCY_RATES } from '../context/ShopContext'
 
 export default function SettingsModal({ isOpen, onClose }) {
   const {
@@ -13,6 +14,8 @@ export default function SettingsModal({ isOpen, onClose }) {
     customCursorEnabled,
     setCustomCursorEnabled,
   } = useLanguage()
+
+  const { currency, setCurrency } = useShop()
 
   // Close on Escape key
   useEffect(() => {
@@ -76,7 +79,7 @@ export default function SettingsModal({ isOpen, onClose }) {
         </div>
 
         {/* Settings Options */}
-        <div className="relative mt-5 space-y-5">
+        <div className="relative mt-5 space-y-4 max-h-[70vh] overflow-y-auto pr-1">
           {/* 1. Language Switcher */}
           <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sky-300">
@@ -138,7 +141,43 @@ export default function SettingsModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          {/* 2. Visual Effects: Particles */}
+          {/* 2. Currency Selector */}
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-300">
+              <Coins size={15} className="text-amber-400" />
+              <span>{lang === 'ar' ? 'العملة المفضلة' : 'Preferred Currency'}</span>
+            </div>
+            <p className="mt-1 text-[11px] text-slate-400 leading-relaxed">
+              {lang === 'ar' 
+                ? 'تحويل فوري لجميع أسعار المنتجات وباقات فري فاير وويندوز.'
+                : 'Instantly convert all product prices, Free Fire packs, and licenses.'}
+            </p>
+
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {Object.keys(CURRENCY_RATES).map((currKey) => {
+                const conf = CURRENCY_RATES[currKey]
+                const isSelected = currency === currKey
+                return (
+                  <button
+                    key={currKey}
+                    type="button"
+                    onClick={() => setCurrency(currKey)}
+                    className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition cursor-pointer text-center ${
+                      isSelected
+                        ? 'border-amber-400 bg-amber-400/15 text-white font-bold shadow-md shadow-amber-500/15'
+                        : 'border-white/10 bg-white/[0.02] text-slate-300 hover:border-white/20 hover:bg-white/[0.05]'
+                    }`}
+                  >
+                    <span className="text-xl mb-1">{conf.flag}</span>
+                    <span className="text-xs font-extrabold text-white">{currKey}</span>
+                    <span className="text-[10px] text-slate-400 mt-0.5">{conf.symbol}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* 3. Visual Effects: Particles */}
           <div className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 grid h-8 w-8 place-items-center rounded-lg border border-sky-400/20 bg-sky-400/10 text-sky-400">
@@ -173,7 +212,7 @@ export default function SettingsModal({ isOpen, onClose }) {
             </button>
           </div>
 
-          {/* 3. Visual Effects: Smooth Mouse Cursor */}
+          {/* 4. Visual Effects: Smooth Mouse Cursor */}
           <div className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 grid h-8 w-8 place-items-center rounded-lg border border-sky-400/20 bg-sky-400/10 text-sky-400">
@@ -210,7 +249,7 @@ export default function SettingsModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer Actions */}
-        <div className="relative mt-6 border-t border-white/10 pt-4">
+        <div className="relative mt-5 border-t border-white/10 pt-4">
           <button
             type="button"
             onClick={onClose}

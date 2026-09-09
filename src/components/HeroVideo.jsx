@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import bleuwiIntro from '../assets/bleuwi-intro.mp4'
+import heroPoster from '../assets/hero-video-poster.webp'
 
 export default function HeroVideo() {
   const videoRef = useRef(null)
@@ -24,15 +25,18 @@ export default function HeroVideo() {
   }, [])
 
   return (
-    <div className="hero-video-frame">
+    <div className="hero-video-frame aspect-video">
       <video
         ref={videoRef}
-        className="hero-video"
+        className="hero-video w-full h-full object-cover"
         autoPlay
         loop
         muted
         playsInline
         preload="metadata"
+        poster={heroPoster}
+        width="960"
+        height="540"
         aria-label="BLEUWI official intro video"
       >
         <source src={bleuwiIntro} type="video/mp4" />

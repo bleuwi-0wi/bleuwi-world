@@ -1,0 +1,64 @@
+{
+  "name": "BLEUWI WORLD | متجر الألعاب والخدمات الرقمية",
+  "short_name": "BLEUWI",
+  "description": "متجر رقمي لشحن فري فاير بالآيدي، تراخيص ويندوز وأوفيس الأصلية مدى الحياة، واشتراكات الذكاء الاصطناعي مع تسليم فوري وضمان 100%.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#05070d",
+  "theme_color": "#05070d",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["shopping", "games", "entertainment", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "شحن فري فاير (Free Fire)",
+      "short_name": "فري فاير",
+      "url": "/?showcase=freefire",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "مفاتيح ويندوز وأوفيس الأصلية",
+      "short_name": "ويندوز وأوفيس",
+      "url": "/?showcase=windows",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "اشتراكات الذكاء الاصطناعي (AI)",
+      "short_name": "اشتراكات AI",
+      "url": "/?showcase=ai",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

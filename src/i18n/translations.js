@@ -8,16 +8,42 @@ export const translations = {
     navBack: 'Back to Overview',
     exploreLinks: 'Explore Links',
 
-    // Hero
-    heroEyebrow: 'Official creator universe',
-    heroTitlePrefix: 'Everything BLEUWI, in ',
-    heroTitleGradient: 'one world.',
-    heroSubtitle: 'Video editing, custom game panels, digital services, and direct WhatsApp ordering.',
-    heroCtaExplore: 'Explore sessions',
-    heroCtaWhatsApp: 'Chat on WhatsApp',
-    heroStatusOnline: 'Online Now',
+    // Hero & Value Proposition
+    heroEyebrow: '🇲🇦 #1 Gaming & Digital Store in Morocco & Beyond',
+    heroTitlePrefix: 'Premium Gaming & Digital Goods, ',
+    heroTitleGradient: 'Delivered in 5 Minutes.',
+    heroSubtitle: 'Official Free Fire Diamonds (1$ = 10 DH), Genuine Lifetime Windows & Office Keys, AI Subscriptions (ChatGPT Plus, Claude, Canva), and PC Games with 100% Golden Guarantee.',
+    heroCtaExplore: 'Explore Store Deals',
+    heroCtaDeals: 'Explore Store Deals',
+    heroCtaWhatsApp: 'Direct WhatsApp Order',
+    heroCtaWhatsAppOrder: 'Direct WhatsApp Order',
+    heroStatusOnline: 'Online Now (24/7)',
     heroStatusStream: 'Kick Live Stream',
-    heroStatusVerified: 'Verified Creator',
+    heroStatusVerified: 'Verified Creator & Store',
+
+    // Trust Pillars (Above the Fold)
+    trustPillar1Title: '5-Min Instant Delivery',
+    trustPillar1Desc: 'Direct on WhatsApp 24/7',
+    trustPillar2Title: '100% Golden Guarantee',
+    trustPillar2Desc: 'Instant replacement & support',
+    trustPillar3Title: 'Moroccan & Global Pay',
+    trustPillar3Desc: 'CIH, Attijari, Cash Plus, PayPal',
+    trustPillar4Title: '4.9/5 Rating (500+ Buyers)',
+    trustPillar4Desc: 'Verified real customer reviews',
+
+    // Product Card UI & CTAs
+    buyNowCTA: 'Order Now',
+    buyNowWhatsAppCTA: 'Order on WhatsApp',
+    buyNowPriceCTA: 'Order Now',
+    inStockBadge: 'In Stock (5 min)',
+    inspectDetails: 'Inspect Specs',
+    selectVersion: 'Version:',
+    selectPlan: 'Plan:',
+    quickJumpLabel: 'Browse Category:',
+    mobileQuickOrder: 'Order on WhatsApp',
+    mobileBrowseDeals: 'Browse Deals',
+    loadingRedirect: 'Opening WhatsApp...',
+
 
     // Preview Card / Sessions Section
     sessionsHeadingEyebrow: 'Interactive Playing Cards',
@@ -132,16 +158,42 @@ export const translations = {
     navBack: 'العودة إلى النظرة العامة',
     exploreLinks: 'استكشف الروابط',
 
-    // Hero
-    heroEyebrow: 'العالم الرسمي لصانع المحتوى',
-    heroTitlePrefix: 'كل ما يخص BLEUWI، في ',
-    heroTitleGradient: 'عالم واحد.',
-    heroSubtitle: 'مونتاج الفيديو، بانيل الألعاب الخاصة، الخدمات الرقمية المتنوعة، والطلب المباشر عبر واتساب.',
-    heroCtaExplore: 'استكشف الأقسام',
-    heroCtaWhatsApp: 'تواصل عبر واتساب',
-    heroStatusOnline: 'متصل الآن',
+    // Hero & Value Proposition
+    heroEyebrow: '🇲🇦 متجر الألعاب والخدمات الرقمية الأول بالمغرب وعالمياً',
+    heroTitlePrefix: 'متجرك الرقمي للألعاب والتراخيص، ',
+    heroTitleGradient: 'تسليم فوري في 5 دقائق.',
+    heroSubtitle: 'شحن فوري لجواهر فري فاير (1$ = 10 دراهم)، مفاتيح ويندوز وأوفيس الأصلية مدى الحياة، اشتراكات الذكاء الاصطناعي (ChatGPT, Claude, Canva) وألعاب PC مع الضمان الذهبي 100%.',
+    heroCtaExplore: 'تصفح العروض والمنتجات',
+    heroCtaDeals: 'تصفح العروض والمنتجات',
+    heroCtaWhatsApp: 'طلب مباشر عبر واتساب',
+    heroCtaWhatsAppOrder: 'طلب مباشر عبر واتساب',
+    heroStatusOnline: 'متصل الآن (24/7)',
     heroStatusStream: 'بث مباشر على Kick',
-    heroStatusVerified: 'صانع محتوى موثوق',
+    heroStatusVerified: 'صانع محتوى ومتجر موثوق',
+
+    // Trust Pillars (Above the Fold)
+    trustPillar1Title: 'تسليم فوري (5 دقائق)',
+    trustPillar1Desc: 'مباشرة عبر واتساب 24/7',
+    trustPillar2Title: 'الضمان الذهبي 100%',
+    trustPillar2Desc: 'استبدال فوري ودعم متواصل',
+    trustPillar3Title: 'دفع مغربي وعالمي',
+    trustPillar3Desc: 'CIH، التجاري، كاش بلوس، بايبال',
+    trustPillar4Title: 'تقييم 4.9/5 (+500 عميل)',
+    trustPillar4Desc: 'آراء وتجارب عملاء موثقة',
+
+    // Product Card UI & CTAs
+    buyNowCTA: 'شراء الآن',
+    buyNowWhatsAppCTA: 'اطلب عبر واتساب',
+    buyNowPriceCTA: 'شراء الآن',
+    inStockBadge: 'متوفر فوراً (5 دقائق)',
+    inspectDetails: 'معاينة المواصفات',
+    selectVersion: 'النسخة:',
+    selectPlan: 'المدة / الخطة:',
+    quickJumpLabel: 'تصفح الفئات:',
+    mobileQuickOrder: 'اطلب عبر واتساب',
+    mobileBrowseDeals: 'تصفح العروض',
+    loadingRedirect: 'جاري التحويل لواتساب...',
+
 
     // Preview Card / Sessions Section
     sessionsHeadingEyebrow: 'أوراق اللعب التفاعلية',

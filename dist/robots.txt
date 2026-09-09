@@ -1,4 +1,50 @@
+# BLEUWI WORLD Official Robots.txt
+# https://bleuwiworld.shop
+
 User-agent: *
 Allow: /
+Allow: /image_reference/
+Allow: /assets/
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+Allow: /*.svg$
 
+# Search Engine Specific Directives
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /image_reference/
+Allow: /assets/
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Block Aggressive Scrapers & Spam Crawlers
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Sitemap & Host
 Sitemap: https://bleuwiworld.shop/sitemap.xml
+Host: bleuwiworld.shop

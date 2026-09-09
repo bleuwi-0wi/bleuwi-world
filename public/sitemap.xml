@@ -1,9 +1,149 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset 
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+>
+  <!-- 1. Primary Homepage -->
   <url>
     <loc>https://bleuwiworld.shop/</loc>
-    <lastmod>2026-09-08</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bleuwiworld.shop/" />
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/og-banner.png</image:loc>
+      <image:title>BLEUWI WORLD Official Digital Store &amp; Gaming Services</image:title>
+      <image:caption>المتجر الرسمي لخدمات BLEUWI: شحن جواهر فري فاير، مفاتيح ويندوز وأوفيس، واشتراكات الذكاء الاصطناعي</image:caption>
+    </image:image>
+  </url>
+
+  <!-- 2. Free Fire Diamonds Showcase -->
+  <url>
+    <loc>https://bleuwiworld.shop/?showcase=freefire</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?showcase=freefire&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?showcase=freefire&amp;lang=en" />
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/16.jpeg</image:loc>
+      <image:title>Free Fire 530 Diamonds (60 DH / 6$)</image:title>
+      <image:caption>شحن فوري 530 جوهرة فري فاير عبر الآيدي بمعدل صرف 1 دولار = 10 دراهم</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/17.jpeg</image:loc>
+      <image:title>Free Fire 1080 Diamonds (120 DH / 12$)</image:title>
+      <image:caption>شحن فوري 1080 جوهرة فري فاير بالأيدي</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/18.jpeg</image:loc>
+      <image:title>Free Fire 2420 Diamonds (250 DH / 25$)</image:title>
+      <image:caption>باقة 2420 جوهرة فري فاير مع الضمان الذهبي</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/19.jpeg</image:loc>
+      <image:title>Free Fire 6160 Diamonds VIP (600 DH / 60$)</image:title>
+      <image:caption>الباقة الملكية 6160 جوهرة فري فاير تسليم 5 دقائق</image:caption>
+    </image:image>
+  </url>
+
+  <!-- 3. Windows & Microsoft Office Genuine Keys -->
+  <url>
+    <loc>https://bleuwiworld.shop/?showcase=windows</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?showcase=windows&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?showcase=windows&amp;lang=en" />
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/24.png</image:loc>
+      <image:title>Windows 10 Genuine Lifetime Retail Key</image:title>
+      <image:caption>مفتاح أصلي دائم مدى الحياة لويندوز 10 مع تفعيل أونلاين رسمي</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/25.png</image:loc>
+      <image:title>Windows 11 Genuine Lifetime Retail Key</image:title>
+      <image:caption>مفتاح أصلي دائم مدى الحياة لويندوز 11 هوم وبرو</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/26.png</image:loc>
+      <image:title>Microsoft Office Genuine Suite (2024 / 2021 / 365)</image:title>
+      <image:caption>حزمة مايكروسوفت أوفيس الأصلية وورد وإكسل وباوربوينت تفعيل دائم</image:caption>
+    </image:image>
+  </url>
+
+  <!-- 4. AI Subscriptions (ChatGPT Plus, Claude, Gemini, Canva Pro) -->
+  <url>
+    <loc>https://bleuwiworld.shop/?showcase=ai</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?showcase=ai&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?showcase=ai&amp;lang=en" />
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/20.png</image:loc>
+      <image:title>ChatGPT Plus VIP Subscription</image:title>
+      <image:caption>اشتراك شات جي بي تي بلس الأصلي مع GPT-4o وDALL-E</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/21.png</image:loc>
+      <image:title>Gemini Advanced AI VIP Subscription</image:title>
+      <image:caption>اشتراك جوجل جيميني أدفانسد مع 2TB سعة تخزين سحابية</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/22.png</image:loc>
+      <image:title>Claude AI Pro Subscription</image:title>
+      <image:caption>اشتراك كلود برو لأقوى نماذج البرمجة والكتابة الذكية</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bleuwiworld.shop/image_reference/23.png</image:loc>
+      <image:title>Canva Pro Designer VIP Subscription</image:title>
+      <image:caption>اشتراك كانفا برو للمصممين مع فتح جميع القوالب والخطوط</image:caption>
+    </image:image>
+  </url>
+
+  <!-- 5. Digital Services (Coins, Games, Abonnements) -->
+  <url>
+    <loc>https://bleuwiworld.shop/?showcase=digital</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?showcase=digital&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?showcase=digital&amp;lang=en" />
+  </url>
+
+  <!-- 6. Video Editing Services -->
+  <url>
+    <loc>https://bleuwiworld.shop/?showcase=video</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- 7. Game Panels & Custom Tools -->
+  <url>
+    <loc>https://bleuwiworld.shop/?showcase=panels</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- 8. Design & Web Development -->
+  <url>
+    <loc>https://bleuwiworld.shop/?showcase=design</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- 9. All Showcases Catalog Overview -->
+  <url>
+    <loc>https://bleuwiworld.shop/?showcase=all</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
   </url>
 </urlset>

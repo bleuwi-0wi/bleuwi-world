@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Globe, Menu, Settings as SettingsIcon, X, Flame, ShieldCheck } from 'lucide-react'
+import { Globe, Menu, Settings as SettingsIcon, X, Flame, ShieldCheck, ShoppingBag, Coins } from 'lucide-react'
 import BrandMark from './BrandMark'
 import { useLanguage } from '../context/LanguageContext'
+import { useShop, CURRENCY_RATES } from '../context/ShopContext'
 import { WHATSAPP_DIRECT_LINK } from '../data/links'
 
 export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { lang, setLang, t, isRTL } = useLanguage()
+  const { currency, setCurrency, totalItemsCount, openCart } = useShop()
 
   const closeMenu = () => setMenuOpen(false)
 
@@ -33,6 +35,14 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
   const toggleLanguage = () => {
     setLang(lang === 'ar' ? 'en' : 'ar')
   }
+
+  const cycleCurrency = () => {
+    const order = ['MAD', 'USD', 'EUR']
+    const nextIdx = (order.indexOf(currency) + 1) % order.length
+    setCurrency(order[nextIdx])
+  }
+
+  const currentCurrConf = CURRENCY_RATES[currency] || CURRENCY_RATES.MAD
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#05070d]/90 backdrop-blur-xl">
@@ -116,8 +126,36 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           </a>
         </nav>
 
-        {/* Action Controls: Language toggle + Settings + Explore */}
-        <div className="hidden items-center gap-3 md:flex">
+        {/* Desktop Action Controls: Currency + Cart + Language + Settings */}
+        <div className="hidden items-center gap-2.5 md:flex">
+          {/* Currency Switcher Pill */}
+          <button
+            type="button"
+            onClick={cycleCurrency}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-white cursor-pointer"
+            title={lang === 'ar' ? `العملة الحالية: ${currency} (انقر للتبديل)` : `Currency: ${currency} (click to cycle)`}
+          >
+            <span className="text-sm">{currentCurrConf.flag}</span>
+            <span className="font-bold">{currency}</span>
+          </button>
+
+          {/* Cart Drawer Trigger Button */}
+          <button
+            type="button"
+            onClick={openCart}
+            className="relative inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-500/15 px-3.5 py-1.5 text-xs font-bold text-sky-200 transition hover:border-sky-400 hover:bg-sky-500/25 hover:text-white cursor-pointer shadow-sm shadow-sky-500/10"
+            title={lang === 'ar' ? 'سلة المشتريات' : 'Shopping Cart'}
+            aria-label="Shopping Cart"
+          >
+            <ShoppingBag size={14} className="text-sky-300" />
+            <span>{lang === 'ar' ? 'السلة' : 'Cart'}</span>
+            {totalItemsCount > 0 && (
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-black text-slate-950 shadow-md animate-scaleIn">
+                {totalItemsCount}
+              </span>
+            )}
+          </button>
+
           {/* Quick Language Switcher Button */}
           <button
             type="button"
@@ -126,23 +164,49 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
             title={lang === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'}
           >
             <Globe size={13} className="text-sky-400" />
-            <span>{lang === 'ar' ? 'English (EN)' : 'العربية (AR)'}</span>
+            <span>{lang === 'ar' ? 'EN' : 'عربي'}</span>
           </button>
 
           {/* Settings Button */}
           <button
             type="button"
             onClick={onOpenSettings}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-white cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-white cursor-pointer"
             title={t('navSettings')}
           >
             <SettingsIcon size={14} className="text-sky-300" />
-            <span>{t('navSettings')}</span>
           </button>
         </div>
 
-        {/* Mobile controls */}
+        {/* Mobile controls: Currency + Cart + Language + Settings + Hamburger */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
+          {/* Mobile Currency toggle */}
+          <button
+            type="button"
+            onClick={cycleCurrency}
+            className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-bold text-slate-200 cursor-pointer flex items-center gap-1"
+            title="Switch Currency"
+          >
+            <span>{currentCurrConf.flag}</span>
+            <span>{currency}</span>
+          </button>
+
+          {/* Mobile Cart Button */}
+          <button
+            type="button"
+            onClick={openCart}
+            className="relative rounded-lg border border-sky-400/30 bg-sky-500/15 p-1.5 text-sky-200 cursor-pointer"
+            aria-label="Shopping Cart"
+          >
+            <ShoppingBag size={17} />
+            {totalItemsCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-slate-950 shadow-md">
+                {totalItemsCount}
+              </span>
+            )}
+          </button>
+
+          {/* Mobile Language Button */}
           <button
             type="button"
             onClick={toggleLanguage}
@@ -150,6 +214,7 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           >
             {lang === 'ar' ? 'EN' : 'عربي'}
           </button>
+
           <button
             type="button"
             onClick={onOpenSettings}
@@ -158,6 +223,7 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           >
             <SettingsIcon size={17} />
           </button>
+
           <button
             className="inline-flex rounded-lg p-1.5 sm:p-2 text-slate-200 transition hover:bg-white/[0.08] cursor-pointer"
             type="button"
@@ -211,6 +277,22 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
             >
               {t('navLinks')}
             </a>
+            <button
+              type="button"
+              onClick={() => {
+                closeMenu()
+                openCart()
+              }}
+              className="flex items-center justify-between rounded-lg px-3 py-3 text-left text-sm font-semibold text-emerald-300 transition hover:bg-white/[0.06] cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={16} />
+                <span>{lang === 'ar' ? 'سلة المشتريات' : 'Shopping Cart'}</span>
+              </div>
+              <span className="rounded-full bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 text-xs text-emerald-200 font-bold">
+                {totalItemsCount}
+              </span>
+            </button>
             <button
               type="button"
               onClick={() => {
