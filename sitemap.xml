@@ -12,6 +12,8 @@
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?lang=ar" />
     <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bleuwiworld.shop/?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bleuwiworld.shop/?lang=es" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bleuwiworld.shop/" />
     <image:image>
       <image:loc>https://bleuwiworld.shop/og-banner.png</image:loc>
@@ -20,7 +22,43 @@
     </image:image>
   </url>
 
-  <!-- 2. Free Fire Diamonds Showcase -->
+  <!-- 2. Free Fire Diamonds & Moroccan Dirham Calculator Tool -->
+  <url>
+    <loc>https://bleuwiworld.shop/#diamond-calculator</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.98</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?lang=ar#diamond-calculator" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?lang=en#diamond-calculator" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bleuwiworld.shop/?lang=fr#diamond-calculator" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bleuwiworld.shop/?lang=es#diamond-calculator" />
+  </url>
+
+  <!-- 3. Windows & Office Key Advisor & Error Solver Tool -->
+  <url>
+    <loc>https://bleuwiworld.shop/#windows-advisor</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.96</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?lang=ar#windows-advisor" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?lang=en#windows-advisor" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bleuwiworld.shop/?lang=fr#windows-advisor" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bleuwiworld.shop/?lang=es#windows-advisor" />
+  </url>
+
+  <!-- 4. Verified FAQ & Buyer Trust Hub -->
+  <url>
+    <loc>https://bleuwiworld.shop/#faq-section</loc>
+    <lastmod>2026-09-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?lang=ar#faq-section" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?lang=en#faq-section" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bleuwiworld.shop/?lang=fr#faq-section" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bleuwiworld.shop/?lang=es#faq-section" />
+  </url>
+
+  <!-- 5. Free Fire Diamonds Showcase -->
   <url>
     <loc>https://bleuwiworld.shop/?showcase=freefire</loc>
     <lastmod>2026-09-09</lastmod>
@@ -28,6 +66,8 @@
     <priority>0.95</priority>
     <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?showcase=freefire&amp;lang=ar" />
     <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?showcase=freefire&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bleuwiworld.shop/?showcase=freefire&amp;lang=fr" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bleuwiworld.shop/?showcase=freefire&amp;lang=es" />
     <image:image>
       <image:loc>https://bleuwiworld.shop/image_reference/16.jpeg</image:loc>
       <image:title>Free Fire 530 Diamonds (60 DH / 6$)</image:title>
@@ -50,7 +90,7 @@
     </image:image>
   </url>
 
-  <!-- 3. Windows & Microsoft Office Genuine Keys -->
+  <!-- 6. Windows & Microsoft Office Genuine Keys -->
   <url>
     <loc>https://bleuwiworld.shop/?showcase=windows</loc>
     <lastmod>2026-09-09</lastmod>
@@ -58,6 +98,8 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?showcase=windows&amp;lang=ar" />
     <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?showcase=windows&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bleuwiworld.shop/?showcase=windows&amp;lang=fr" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bleuwiworld.shop/?showcase=windows&amp;lang=es" />
     <image:image>
       <image:loc>https://bleuwiworld.shop/image_reference/24.png</image:loc>
       <image:title>Windows 10 Genuine Lifetime Retail Key</image:title>
@@ -75,7 +117,7 @@
     </image:image>
   </url>
 
-  <!-- 4. AI Subscriptions (ChatGPT Plus, Claude, Gemini, Canva Pro) -->
+  <!-- 7. AI Subscriptions (ChatGPT Plus, Claude, Gemini, Canva Pro) -->
   <url>
     <loc>https://bleuwiworld.shop/?showcase=ai</loc>
     <lastmod>2026-09-09</lastmod>
@@ -83,6 +125,8 @@
     <priority>0.90</priority>
     <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?showcase=ai&amp;lang=ar" />
     <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?showcase=ai&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bleuwiworld.shop/?showcase=ai&amp;lang=fr" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bleuwiworld.shop/?showcase=ai&amp;lang=es" />
     <image:image>
       <image:loc>https://bleuwiworld.shop/image_reference/20.png</image:loc>
       <image:title>ChatGPT Plus VIP Subscription</image:title>
@@ -105,7 +149,7 @@
     </image:image>
   </url>
 
-  <!-- 5. Digital Services (Coins, Games, Abonnements) -->
+  <!-- 8. Digital Services (Coins, Games, Abonnements) -->
   <url>
     <loc>https://bleuwiworld.shop/?showcase=digital</loc>
     <lastmod>2026-09-09</lastmod>
@@ -113,9 +157,11 @@
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="ar" href="https://bleuwiworld.shop/?showcase=digital&amp;lang=ar" />
     <xhtml:link rel="alternate" hreflang="en" href="https://bleuwiworld.shop/?showcase=digital&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bleuwiworld.shop/?showcase=digital&amp;lang=fr" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bleuwiworld.shop/?showcase=digital&amp;lang=es" />
   </url>
 
-  <!-- 6. Video Editing Services -->
+  <!-- 9. Video Editing Services -->
   <url>
     <loc>https://bleuwiworld.shop/?showcase=video</loc>
     <lastmod>2026-09-09</lastmod>
@@ -123,7 +169,7 @@
     <priority>0.80</priority>
   </url>
 
-  <!-- 7. Game Panels & Custom Tools -->
+  <!-- 10. Game Panels & Custom Tools -->
   <url>
     <loc>https://bleuwiworld.shop/?showcase=panels</loc>
     <lastmod>2026-09-09</lastmod>
@@ -131,7 +177,7 @@
     <priority>0.80</priority>
   </url>
 
-  <!-- 8. Design & Web Development -->
+  <!-- 11. Design & Web Development -->
   <url>
     <loc>https://bleuwiworld.shop/?showcase=design</loc>
     <lastmod>2026-09-09</lastmod>
@@ -139,7 +185,7 @@
     <priority>0.80</priority>
   </url>
 
-  <!-- 9. All Showcases Catalog Overview -->
+  <!-- 12. All Showcases Catalog Overview -->
   <url>
     <loc>https://bleuwiworld.shop/?showcase=all</loc>
     <lastmod>2026-09-09</lastmod>
