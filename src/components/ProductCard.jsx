@@ -103,20 +103,30 @@ export default function ProductCard({
             <span className="text-[11px] font-medium">{product.name}</span>
           </div>
         ) : (
-          <img
-            src={product.image}
-            alt={product.name}
-            loading="lazy"
-            onLoad={() => setImageLoaded(true)}
-            onError={() => setImageError(true)}
-            className={`h-full w-full object-cover transition-all duration-500 group-hover/img:scale-105 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
+          <>
+            {/* Ambient blur backdrop */}
+            <img
+              src={product.image}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full object-cover blur-xl opacity-40 scale-125 pointer-events-none"
+            />
+            {/* Uncropped foreground artwork */}
+            <img
+              src={product.image}
+              alt={product.name}
+              loading="lazy"
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageError(true)}
+              className={`relative z-10 h-full w-full object-contain drop-shadow-md transition-all duration-500 group-hover/img:scale-105 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          </>
         )}
 
-        {/* Gradient dark overlay */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+        {/* Gradient dark overlay at bottom only to keep text readable without darkening top of artwork */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/20 to-transparent z-10" />
 
         {/* Top-Left: Badge */}
         {product.badge && (

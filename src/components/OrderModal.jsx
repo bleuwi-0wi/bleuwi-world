@@ -23,6 +23,7 @@ import {
   Gem,
   AlertCircle,
   Loader2,
+  Maximize2,
 } from 'lucide-react'
 import { orderPresets, getSecureWhatsAppUrl, openWhatsAppChat, WHATSAPP_DIRECT_LINK } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
@@ -951,19 +952,30 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
               {/* EXACT PRODUCT PICTURE SHOWCASE */}
               <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-slate-950/90 shadow-lg group">
                 <div
-                  className="relative aspect-[16/9] w-full overflow-hidden bg-black/60 cursor-pointer"
+                  className="relative aspect-[16/9] w-full overflow-hidden bg-black/80 cursor-pointer flex items-center justify-center group/orderimg"
                   onClick={() => setPreviewZoom(true)}
-                  title={lang === 'ar' ? 'انقر لتكبير صورة المنتج' : 'Click to zoom product image'}
+                  title={lang === 'ar' ? 'انقر لتكبير صورة المنتج بالحجم الكامل' : 'Click to zoom product image in full size'}
                 >
+                  {/* Ambient backdrop glow */}
+                  <img
+                    src={activeProduct.image}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-125 pointer-events-none"
+                  />
+
+                  {/* Complete uncropped foreground artwork */}
                   <img
                     src={activeProduct.image}
                     alt={activeProduct.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="relative z-10 max-h-full max-w-full object-contain drop-shadow-xl transition-transform duration-500 group-hover/orderimg:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+
+                  {/* Bottom fade only so top artwork is crystal clear */}
+                  <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-slate-950/90 to-transparent z-10 pointer-events-none" />
 
                   {/* Overlaid Badges */}
-                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                  <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5">
                     <span className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
                       {lang === 'ar' ? (activeProduct.badgeAr || activeProduct.badge) : activeProduct.badge}
                     </span>
@@ -975,13 +987,18 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
                   </div>
 
                   {activeProduct.price && (
-                    <div className="absolute top-2.5 right-2.5">
+                    <div className="absolute top-2.5 right-2.5 z-20">
                       <span className="rounded-xl border border-sky-400/50 bg-sky-500/25 px-2.5 py-0.5 text-xs font-black text-sky-200 backdrop-blur-md shadow-lg">
                         {activeProduct.price}
                       </span>
                     </div>
                   )}
 
+                  {/* Full Size zoom button indicator */}
+                  <div className="absolute bottom-2.5 right-2.5 z-20 flex items-center gap-1.5 rounded-full bg-black/80 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-md border border-white/20 shadow-md group-hover/orderimg:bg-sky-500 transition">
+                    <Maximize2 size={12} />
+                    <span>{lang === 'ar' ? 'تكبير كامل' : 'Full Size'}</span>
+                  </div>
                 </div>
 
                 {/* Product Meta Info Bar */}
@@ -1118,16 +1135,23 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
 
       {/* FULLSCREEN PRODUCT IMAGE ZOOM MODAL */}
       {previewZoom && activeProduct?.image && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-6 bg-black/95 backdrop-blur-lg animate-fade-in" dir={isRTL ? 'rtl' : 'ltr'}>
-          <div className="relative flex max-h-[92vh] max-w-5xl flex-col rounded-2xl border border-sky-400/30 bg-[#070b14] p-4 text-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+        <div 
+          className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-6 bg-black/95 backdrop-blur-xl animate-fade-in cursor-zoom-out" 
+          onClick={() => setPreviewZoom(false)}
+          dir={isRTL ? 'rtl' : 'ltr'}
+        >
+          <div 
+            className="relative flex max-h-[94vh] max-w-5xl w-full flex-col rounded-3xl border border-sky-400/30 bg-[#070b14] p-4 sm:p-6 text-white shadow-2xl cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-sky-200 flex items-center gap-1.5">
-                  <ImageIcon size={14} className="text-emerald-400" />
+                <span className="text-sm font-bold text-sky-200 flex items-center gap-1.5">
+                  <ImageIcon size={16} className="text-emerald-400" />
                   {activeProduct.title}
                 </span>
                 {activeProduct.price && (
-                  <span className="rounded-md border border-emerald-400/40 bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
+                  <span className="rounded-md border border-emerald-400/40 bg-emerald-500/20 px-2.5 py-0.5 text-xs font-bold text-emerald-300">
                     {activeProduct.price}
                   </span>
                 )}
@@ -1135,17 +1159,24 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
               <button
                 type="button"
                 onClick={() => setPreviewZoom(false)}
-                className="rounded-full bg-white/10 p-1.5 text-slate-300 hover:text-white cursor-pointer"
+                className="rounded-full bg-white/10 p-2 text-slate-300 hover:bg-white/20 hover:text-white transition cursor-pointer"
+                aria-label="Close full size view"
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="my-3 flex flex-1 items-center justify-center overflow-auto">
+            <div className="relative my-2 flex flex-1 items-center justify-center overflow-hidden min-h-[50vh] max-h-[78vh] rounded-2xl bg-black/90 border border-white/10 p-2">
+              <img
+                src={activeProduct.image}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full object-cover blur-3xl opacity-35 scale-125 pointer-events-none"
+              />
               <img
                 src={activeProduct.image}
                 alt={activeProduct.title}
-                className="max-h-[70vh] w-auto max-w-full rounded-lg object-contain shadow-2xl"
+                className="relative z-10 max-h-[74vh] w-auto max-w-full rounded-xl object-contain drop-shadow-[0_10px_40px_rgba(0,0,0,0.9)]"
               />
             </div>
 

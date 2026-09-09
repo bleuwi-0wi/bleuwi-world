@@ -412,6 +412,7 @@ export default function HotSellers({ onOpenOrder }) {
   const [filter, setFilter] = useState('all') // 'all' | 'freefire' | 'windows' | 'ai' | 'games' | 'subscriptions'
   const [isSwitching, setIsSwitching] = useState(false)
   const [selectedBigOffer, setSelectedBigOffer] = useState(null)
+  const [zoomImage, setZoomImage] = useState(null)
   
   const [aiPlanIndices, setAiPlanIndices] = useState({
     'chatgpt-plus': 1,
@@ -857,14 +858,35 @@ export default function HotSellers({ onOpenOrder }) {
             {/* Modal Body */}
             <div className="grid gap-6 md:grid-cols-12 items-center">
               <div className="md:col-span-5">
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
+                <div 
+                  className="relative min-h-[260px] sm:min-h-[320px] aspect-[4/3] sm:aspect-square md:aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/15 bg-black/90 flex items-center justify-center p-2 cursor-pointer group/img"
+                  onClick={() => setZoomImage(selectedBigOffer.image)}
+                  title={lang === 'ar' ? 'انقر لعرض الصورة بالحجم الكامل' : 'Click to view full size image'}
+                >
+                  {/* Ambient blurred background glow */}
+                  <img
+                    src={selectedBigOffer.image}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 h-full w-full object-cover blur-2xl opacity-40 scale-125 pointer-events-none"
+                  />
+
+                  {/* Complete uncropped foreground artwork */}
                   <img
                     src={selectedBigOffer.image}
                     alt={selectedBigOffer.name}
-                    className="h-full w-full object-cover"
+                    className="relative z-10 max-h-full max-w-full object-contain rounded-lg drop-shadow-[0_8px_30px_rgba(0,0,0,0.9)] transition-transform duration-300 group-hover/img:scale-105"
                   />
-                  <div className="absolute top-2.5 left-2.5 rounded-full bg-black/80 px-3 py-1 text-xs font-black text-sky-300 border border-white/15">
+
+                  {/* Price Badge */}
+                  <div className="absolute top-2.5 left-2.5 z-20 rounded-full bg-black/85 px-3 py-1 text-xs font-black text-sky-300 border border-white/20 backdrop-blur-md shadow-lg">
                     {selectedBigOffer.price}
+                  </div>
+
+                  {/* Full Size zoom button hint */}
+                  <div className="absolute bottom-2.5 right-2.5 z-20 flex items-center gap-1.5 rounded-full bg-black/80 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-md border border-white/20 shadow-md group-hover/img:bg-sky-500 transition">
+                    <Maximize2 size={13} />
+                    <span>{lang === 'ar' ? 'تكبير كامل' : 'Full Size'}</span>
                   </div>
                 </div>
               </div>
@@ -939,6 +961,34 @@ export default function HotSellers({ onOpenOrder }) {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* FULLSCREEN LIGHTBOX FOR 100% UNCLIPPED HIGH-RES IMAGE */}
+      {zoomImage && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-3 sm:p-6 animate-fade-in cursor-zoom-out"
+          onClick={() => setZoomImage(null)}
+          title={lang === 'ar' ? 'انقر في أي مكان للإغلاق' : 'Click anywhere to close'}
+        >
+          <button
+            type="button"
+            onClick={() => setZoomImage(null)}
+            className="absolute top-4 right-4 z-20 rounded-full bg-white/15 p-2.5 text-white hover:bg-white/25 transition cursor-pointer shadow-2xl border border-white/20"
+            aria-label="Close full size view"
+          >
+            <X size={24} />
+          </button>
+          <div 
+            className="relative flex max-h-[94vh] max-w-[96vw] items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={zoomImage}
+              alt="Full Size View"
+              className="max-h-[92vh] max-w-[95vw] object-contain rounded-2xl shadow-2xl transition-transform duration-200 select-none"
+            />
           </div>
         </div>
       )}
