@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bleuwi-world-v1'
+const CACHE_NAME = 'bleuwi-world-v2'
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -10,16 +10,17 @@ const STATIC_ASSETS = [
   '/apple-touch-icon.png',
 ]
 
-// Install event: Pre-cache static shell assets
+// Install event: Pre-cache static shell assets and immediately activate
 self.addEventListener('install', (event) => {
+  self.skipWaiting()
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS)
-    }).then(() => self.skipWaiting())
+    })
   )
 })
 
-// Activate event: Clean up old caches
+// Activate event: Immediately wipe all old caches and take control of all open tabs
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -34,17 +35,22 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-// Fetch event: Network-first for navigation/HTML, Cache-first for images/fonts/static
+// Fetch event: Network-first for navigation & scripts/styles to guarantee instant updates
 self.addEventListener('fetch', (event) => {
   const request = event.request
-
-  // Only handle GET requests
   if (request.method !== 'GET') return
 
   const url = new URL(request.url)
 
-  // 1. Navigation requests (HTML pages): Network-first with cache fallback
-  if (request.mode === 'navigate') {
+  // 1. Navigation requests & code bundles (HTML, JS, CSS): Network-first with cache fallback
+  const isCodeOrDoc = 
+    request.mode === 'navigate' ||
+    url.pathname.endsWith('.html') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.css') ||
+    url.pathname === '/'
+
+  if (isCodeOrDoc) {
     event.respondWith(
       fetch(request)
         .then((networkResponse) => {
@@ -54,28 +60,18 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse
         })
-        .catch(() => caches.match('/index.html') || caches.match(request))
+        .catch(() => caches.match(request) || caches.match('/index.html'))
     )
     return
   }
 
-  // 2. Static assets (images, fonts, stylesheets, scripts): Stale-while-revalidate or Cache-first
-  const isStaticAsset = 
-    url.pathname.startsWith('/assets/') ||
-    url.pathname.match(/\.(png|jpg|jpeg|webp|svg|gif|ico|woff2|woff|css|js)$/i)
+  // 2. Heavy Media & Images: Cache-first with network fallback
+  const isMediaAsset = url.pathname.match(/\.(png|jpg|jpeg|webp|svg|gif|ico|woff2|woff|mp4)$/i)
 
-  if (isStaticAsset) {
+  if (isMediaAsset) {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
-        if (cachedResponse) {
-          // Fetch background update
-          fetch(request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(request, networkResponse))
-            }
-          }).catch(() => {})
-          return cachedResponse
-        }
+        if (cachedResponse) return cachedResponse
 
         return fetch(request).then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {

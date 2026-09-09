@@ -61,12 +61,12 @@ export default function PwaInstallBanner() {
 
   return (
     <div 
-      className={`fixed top-[108px] sm:top-[126px] inset-x-3 sm:inset-x-auto ${
+      className={`fixed bottom-20 sm:bottom-6 inset-x-3 sm:inset-x-auto ${
         isRTL ? 'sm:left-6 sm:right-auto' : 'sm:right-6 sm:left-auto'
-      } z-40 max-w-md w-full transition-all duration-300 animate-slideDown`}
+      } z-40 max-w-md w-full transition-all duration-300 animate-slideUp`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-sky-400/40 bg-[#080d1a]/98 p-3.5 shadow-2xl backdrop-blur-2xl shadow-black/80 ring-1 ring-white/10">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-sky-400/40 bg-[#080d1a]/98 p-3.5 shadow-2xl backdrop-blur-2xl shadow-black/90 ring-1 ring-white/10">
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-indigo-600 text-slate-950 shadow-lg shadow-sky-500/20">
             <Smartphone size={22} className="stroke-[2.5]" />
