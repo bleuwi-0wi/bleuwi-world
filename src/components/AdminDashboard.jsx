@@ -36,6 +36,8 @@ import {
   Eye,
   Radio,
   X,
+  Star,
+  Trash2,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
@@ -45,11 +47,12 @@ export default function AdminDashboard({ onBackToStore }) {
   const { user, logout } = useAuth()
   const { lang, isRTL } = useLanguage()
 
-  const [activeTab, setActiveTab] = useState('overview') // 'overview' | 'visitors' | 'orders' | 'users' | 'settings' | 'cloudflare'
+  const [activeTab, setActiveTab] = useState('overview') // 'overview' | 'visitors' | 'orders' | 'users' | 'reviews' | 'settings' | 'cloudflare'
   const [stats, setStats] = useState(null)
   const [orders, setOrders] = useState([])
   const [users, setUsers] = useState([])
   const [settings, setSettings] = useState({})
+  const [adminReviews, setAdminReviews] = useState([])
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [toastMsg, setToastMsg] = useState('')
@@ -164,22 +167,40 @@ export default function AdminDashboard({ onBackToStore }) {
   const loadDashboardData = useCallback(async () => {
     setLoading(true)
     try {
-      const [statsRes, ordersRes, usersRes, settingsRes] = await Promise.all([
+      const [statsRes, ordersRes, usersRes, settingsRes, reviewsRes] = await Promise.all([
         api.getAdminStats(),
         api.getAdminOrders(),
         api.getAdminUsers(),
         api.getSettings(),
+        api.getAdminReviews(),
       ])
       setStats(statsRes?.stats || null)
       setOrders(ordersRes || [])
       setUsers(usersRes || [])
       setSettings(settingsRes || {})
+      setAdminReviews(reviewsRes || [])
     } catch (err) {
+      console.error('Error loading dashboard data:', err)
       notify('Failed to load some dashboard data.')
     } finally {
       setLoading(false)
     }
   }, [])
+
+  // Delete Customer Review
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm(lang === 'ar' ? 'هل أنت متأكد من رغبتك في حذف هذا التقييم نهائياً من قاعدة البيانات؟' : 'Are you sure you want to permanently delete this review?')) return
+    setActionLoading(true)
+    try {
+      await api.deleteAdminReview(reviewId)
+      notify(lang === 'ar' ? 'تم حذف التقييم بنجاح' : 'Review deleted successfully')
+      loadDashboardData()
+    } catch (err) {
+      notify(err.message || 'Failed to delete review')
+    } finally {
+      setActionLoading(false)
+    }
+  }
 
   useEffect(() => {
     loadDashboardData()
@@ -385,6 +406,7 @@ export default function AdminDashboard({ onBackToStore }) {
               },
               { id: 'orders', label: `${lang === 'ar' ? 'الطلبات' : 'Orders'} (${orders.length})`, icon: ShoppingBag },
               { id: 'users', label: `${lang === 'ar' ? 'المستخدمين' : 'Users'} (${users.length})`, icon: Users },
+              { id: 'reviews', label: `${lang === 'ar' ? 'التقييمات والآراء' : 'Reviews'} (${adminReviews.length})`, icon: Star },
               { id: 'settings', label: lang === 'ar' ? 'إعلانات المتجر' : 'Store Settings', icon: Sliders },
               { id: 'cloudflare', label: 'Cloudflare & D1', icon: Cloud },
             ].map((tab) => {
@@ -1497,6 +1519,152 @@ export default function AdminDashboard({ onBackToStore }) {
                 </ol>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* TAB 6: REVIEWS MANAGEMENT */}
+        {/* ======================================================== */}
+        {activeTab === 'reviews' && (
+          <div className="space-y-6">
+            {/* Reviews Header & Quick Stats */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#0a0f1d] p-5 shadow-xl">
+              <div>
+                <h3 className="text-base font-black text-white flex items-center gap-2">
+                  <Star size={18} className="text-amber-400 fill-amber-400" />
+                  <span>{lang === 'ar' ? 'إدارة تقييمات وآراء العملاء (Cloudflare D1)' : 'Customer Reviews Management'}</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  {lang === 'ar'
+                    ? 'كافة التقييمات الحقيقية المسجلة من العملاء في قاعدة البيانات مع بيانات الـ IP والدولة'
+                    : 'All real verified customer reviews stored in Cloudflare D1 with IP & country telemetry'}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl border border-white/10 bg-slate-900/80 px-4 py-2 text-center">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                    {lang === 'ar' ? 'إجمالي التقييمات' : 'Total Reviews'}
+                  </span>
+                  <span className="text-lg font-black text-amber-400">{adminReviews.length}</span>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-slate-900/80 px-4 py-2 text-center">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                    {lang === 'ar' ? 'متوسط التقييم' : 'Average'}
+                  </span>
+                  <span className="text-lg font-black text-emerald-400">
+                    {adminReviews.length > 0
+                      ? (adminReviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0) / adminReviews.length).toFixed(1)
+                      : '5.0'} ★
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Reviews Cards / Table */}
+            {adminReviews.length === 0 ? (
+              <div className="rounded-2xl border border-white/10 bg-[#0a0f1d] p-12 text-center shadow-xl">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-400">
+                  <Star size={24} />
+                </div>
+                <h4 className="text-sm font-bold text-white">
+                  {lang === 'ar' ? 'لا توجد تقييمات مسجلة بعد' : 'No customer reviews found'}
+                </h4>
+                <p className="text-xs text-slate-400 mt-1">
+                  {lang === 'ar'
+                    ? 'سيظهر هنا أي تقييم يضيفه الزوار أو العملاء فوراً وبشكل تلقائي.'
+                    : 'Any review submitted by website visitors will appear here in real-time.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {adminReviews.map((rev) => (
+                  <div
+                    key={rev.id}
+                    className="rounded-2xl border border-white/10 bg-[#0a0f1d] p-5 shadow-lg flex flex-col justify-between transition hover:border-amber-400/30"
+                  >
+                    <div>
+                      {/* Top bar: name, rating, service, and delete */}
+                      <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-3 mb-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-white text-sm">{rev.name}</span>
+                            {rev.verified && (
+                              <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
+                                <CheckCircle2 size={10} />
+                                <span>Verified</span>
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[11px] font-semibold text-sky-400 bg-sky-500/10 rounded-md px-2 py-0.5">
+                              {rev.service}
+                            </span>
+                            <span className="text-[10px] text-slate-400">{rev.date}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {/* Star Rating */}
+                          <div className="flex items-center text-amber-400">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={13}
+                                className={i < (Number(rev.rating) || 5) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}
+                              />
+                            ))}
+                          </div>
+
+                          {/* Delete Review Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteReview(rev.id)}
+                            disabled={actionLoading}
+                            className="p-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition cursor-pointer"
+                            title={lang === 'ar' ? 'حذف هذا التقييم' : 'Delete Review'}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Comment text */}
+                      <p className="text-xs text-slate-200 leading-relaxed font-sans bg-white/[0.02] p-3 rounded-xl border border-white/5">
+                        "{rev.comment}"
+                      </p>
+                    </div>
+
+                    {/* Bottom bar: IP, Country, Likes */}
+                    <div className="flex items-center justify-between pt-3 mt-3 border-t border-white/5 text-[11px] text-slate-400">
+                      <div className="flex items-center gap-2 font-mono">
+                        <span>{getCountryFlag(rev.country || 'MA')}</span>
+                        {rev.ip ? (
+                          <button
+                            type="button"
+                            onClick={() => handleCopyIp(rev.ip)}
+                            className="flex items-center gap-1 hover:text-sky-300 transition cursor-pointer"
+                            title="Click to copy IP"
+                          >
+                            <span>{rev.ip}</span>
+                            <Copy size={11} />
+                          </button>
+                        ) : (
+                          <span>Unknown IP</span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <span className="text-rose-400">❤️ {rev.likes || 0}</span>
+                        {rev.replies && rev.replies.length > 0 && (
+                          <span className="text-sky-400">💬 {rev.replies.length} replies</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

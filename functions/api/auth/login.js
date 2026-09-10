@@ -70,10 +70,11 @@ export async function onRequestPost({ request, env }) {
       return errorResponse('Invalid email/username or password.', 401)
     }
 
-    // Master Admin Whitelist: only damimehdi / admin@bleuwi.world can have admin role
+    // Master Admin Whitelist: only damimehdi / admin@bleuwi.world / damimehdi20@gmail.com can have admin role
     const isMasterAdminAccount =
       (user.username && user.username.toLowerCase() === 'damimehdi') ||
-      (user.email && user.email.toLowerCase() === 'admin@bleuwi.world')
+      (user.email && user.email.toLowerCase() === 'admin@bleuwi.world') ||
+      (user.email && user.email.toLowerCase() === 'damimehdi20@gmail.com')
 
     const effectiveRole = (user.role === 'admin' && isMasterAdminAccount) ? 'admin' : 'user'
 

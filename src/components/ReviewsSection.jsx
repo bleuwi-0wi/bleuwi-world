@@ -20,9 +20,9 @@ import { useLanguage } from '../context/LanguageContext'
 import { verifiedReviews } from '../data/reviews'
 import { checkProfanity } from '../utils/profanityFilter'
 import { WHATSAPP_NUMBER, getSecureWhatsAppUrl } from '../data/links'
+import { api } from '../services/api'
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
-const CLOUD_BIN_URL = 'https://extendsclass.com/api/json-storage/bin/adcaaea'
 
 export default function ReviewsSection() {
   const { t, lang, isRTL } = useLanguage()
@@ -55,18 +55,15 @@ export default function ReviewsSection() {
   const [submittedSuccess, setSubmittedSuccess] = useState(false)
   const [profanityError, setProfanityError] = useState('')
 
-  // 1. Synchronize reviews from live Cloud Database
+  // 1. Synchronize reviews from live Cloudflare D1 Database
   const fetchLiveReviews = async () => {
     setIsSyncing(true)
     try {
-      const res = await fetch(CLOUD_BIN_URL)
-      if (res.ok) {
-        const data = await res.json()
-        if (data && Array.isArray(data.reviews)) {
-          setReviews(data.reviews)
-          localStorage.setItem('bleuwi_community_reviews', JSON.stringify(data.reviews))
-          return
-        }
+      const liveList = await api.getReviews()
+      if (liveList && Array.isArray(liveList) && liveList.length > 0) {
+        setReviews(liveList)
+        localStorage.setItem('bleuwi_community_reviews', JSON.stringify(liveList))
+        return
       }
     } catch {
       // Fallback silently if offline
@@ -86,23 +83,12 @@ export default function ReviewsSection() {
     setReviews([...verifiedReviews])
   }
 
-  // Helper to persist reviews both locally AND to Cloud Database
+  // Helper to persist reviews both locally AND to Cloudflare D1
   const saveReviewsToCloud = async (newReviewsList) => {
     setReviews(newReviewsList)
     try {
       localStorage.setItem('bleuwi_community_reviews', JSON.stringify(newReviewsList))
     } catch {}
-
-    // Cloud sync PUT request
-    try {
-      await fetch(CLOUD_BIN_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reviews: newReviewsList }),
-      })
-    } catch {
-      // Offline fallback
-    }
   }
 
   // Load reviews, check 1-week limit, and fetch IP on mount
@@ -192,14 +178,32 @@ export default function ReviewsSection() {
     localStorage.setItem('bleuwi_last_review_time', Date.now().toString())
     if (userIp) localStorage.setItem('bleuwi_last_review_ip', userIp)
 
-    // Save to Cloud Database so ALL visitors worldwide see it instantly!
-    const updated = [newReview, ...reviews.filter((r) => r.id !== newReview.id)]
-    await saveReviewsToCloud(updated)
+    // Save to Cloudflare D1 Database so ALL visitors worldwide see it instantly!
+    try {
+      const res = await api.createReview({
+        name: name.trim(),
+        service,
+        rating,
+        comment: comment.trim(),
+      })
+      if (res && res.review) {
+        const created = res.review
+        created.isMine = true
+        setMyReview(created)
+        setReviews((prev) => [created, ...prev.filter((r) => r.id !== created.id)])
+      } else {
+        const updated = [newReview, ...reviews.filter((r) => r.id !== newReview.id)]
+        saveReviewsToCloud(updated)
+      }
+    } catch {
+      const updated = [newReview, ...reviews.filter((r) => r.id !== newReview.id)]
+      saveReviewsToCloud(updated)
+    }
 
     setSubmittedSuccess(true)
   }
 
-  // Handle Heart / Like Toggle (Updates Cloud Database live!)
+  // Handle Heart / Like Toggle (Updates Cloudflare D1 live!)
   const handleToggleLike = async (reviewId) => {
     const isCurrentlyLiked = !!likedReviews[reviewId]
     const nextLikedState = !isCurrentlyLiked
@@ -213,7 +217,7 @@ export default function ReviewsSection() {
       localStorage.setItem('bleuwi_liked_reviews', JSON.stringify(updatedLikesMap))
     } catch {}
 
-    // Update review like count and sync to cloud
+    // Update review like count and sync to D1
     const updatedReviews = reviews.map((r) => {
       if (r.id === reviewId) {
         const currentLikes = r.likes || 0
@@ -224,10 +228,11 @@ export default function ReviewsSection() {
       }
       return r
     })
-    await saveReviewsToCloud(updatedReviews)
+    saveReviewsToCloud(updatedReviews)
+    api.likeReview(reviewId, nextLikedState ? 1 : -1).catch(() => {})
   }
 
-  // Handle Submit Reply (Updates Cloud Database live!)
+  // Handle Submit Reply (Updates Cloudflare D1 live!)
   const handleAddReply = async (reviewId) => {
     setReplyProfanityError('')
     if (!replyName.trim() || !replyComment.trim()) return
@@ -272,10 +277,12 @@ export default function ReviewsSection() {
       }
       return r
     })
+    saveReviewsToCloud(updatedReviews)
+    api.replyReview(reviewId, newReply).catch(() => {})
 
-    await saveReviewsToCloud(updatedReviews)
+    setReplyName('')
     setReplyComment('')
-    setReplyProfanityError('')
+    setOpenReplyReviewId(null)
   }
 
   const filteredReviews = filter === 'all'

@@ -35,9 +35,13 @@ export async function onRequestPost({ request, env }) {
     const cleanFullName = String(fullName).trim()
     const cleanPhone = phone ? String(phone).trim() : ''
 
-    // 2. Maximum Security Protection: Whitelist & Master Account Protection
-    // Under NO circumstances can anyone register the master admin username or email!
-    if (cleanUsername === 'damimehdi' || cleanEmail === 'admin@bleuwi.world' || cleanUsername.includes('admin') || cleanUsername.includes('bleuwi')) {
+    if (
+      cleanUsername === 'damimehdi' ||
+      cleanEmail === 'admin@bleuwi.world' ||
+      cleanEmail === 'damimehdi20@gmail.com' ||
+      cleanUsername.includes('admin') ||
+      cleanUsername.includes('bleuwi')
+    ) {
       return errorResponse('This username or email is reserved for system administration. Public registration is forbidden.', 403)
     }
 

@@ -552,5 +552,75 @@ export const api = {
       })
     } catch {}
   },
+
+  // ----------------------------------------------------
+  // REVIEWS (Cloudflare D1 Real-Time System)
+  // ----------------------------------------------------
+  async getReviews() {
+    try {
+      const res = await request('/api/reviews')
+      return res.reviews || []
+    } catch (err) {
+      try {
+        const stored = localStorage.getItem('bleuwi_community_reviews')
+        if (stored) return JSON.parse(stored)
+      } catch {}
+      return []
+    }
+  },
+
+  async createReview(reviewData) {
+    try {
+      const res = await request('/api/reviews', {
+        method: 'POST',
+        body: JSON.stringify(reviewData),
+      })
+      return res
+    } catch (err) {
+      throw err
+    }
+  },
+
+  async likeReview(reviewId, delta = 1) {
+    try {
+      return await request('/api/reviews', {
+        method: 'PATCH',
+        body: JSON.stringify({ reviewId, action: 'like', delta }),
+      })
+    } catch (err) {
+      return { success: true }
+    }
+  },
+
+  async replyReview(reviewId, replyData) {
+    try {
+      return await request('/api/reviews', {
+        method: 'PATCH',
+        body: JSON.stringify({ reviewId, action: 'reply', reply: replyData }),
+      })
+    } catch (err) {
+      throw err
+    }
+  },
+
+  async getAdminReviews() {
+    try {
+      const res = await request('/api/admin/reviews')
+      return res.reviews || []
+    } catch (err) {
+      console.warn('getAdminReviews fallback:', err.message)
+      return []
+    }
+  },
+
+  async deleteAdminReview(reviewId) {
+    try {
+      return await request(`/api/admin/reviews?id=${encodeURIComponent(reviewId)}`, {
+        method: 'DELETE',
+      })
+    } catch (err) {
+      throw err
+    }
+  },
 }
 

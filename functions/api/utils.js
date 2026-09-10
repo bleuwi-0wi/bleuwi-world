@@ -134,7 +134,8 @@ function base64UrlDecode(str) {
 /**
  * Create HMAC-SHA256 signed JWT
  */
-export async function createJWT(payload, secret = DEFAULT_SECRET, expiresInSeconds = 7 * 24 * 60 * 60) {
+export async function createJWT(payload, secret, expiresInSeconds = 7 * 24 * 60 * 60) {
+  const effectiveSecret = (secret && typeof secret === 'string' && secret.trim().length > 0) ? secret.trim() : DEFAULT_SECRET
   const enc = new TextEncoder()
   const header = { alg: 'HS256', typ: 'JWT' }
   const now = Math.floor(Date.now() / 1000)
@@ -151,7 +152,7 @@ export async function createJWT(payload, secret = DEFAULT_SECRET, expiresInSecon
 
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
-    enc.encode(secret),
+    enc.encode(effectiveSecret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign']
@@ -166,8 +167,9 @@ export async function createJWT(payload, secret = DEFAULT_SECRET, expiresInSecon
 /**
  * Verify and decode HMAC-SHA256 JWT
  */
-export async function verifyJWT(token, secret = DEFAULT_SECRET) {
+export async function verifyJWT(token, secret) {
   if (!token || typeof token !== 'string') return null
+  const effectiveSecret = (secret && typeof secret === 'string' && secret.trim().length > 0) ? secret.trim() : DEFAULT_SECRET
   const parts = token.split('.')
   if (parts.length !== 3) return null
 
@@ -178,7 +180,7 @@ export async function verifyJWT(token, secret = DEFAULT_SECRET) {
   try {
     const cryptoKey = await crypto.subtle.importKey(
       'raw',
-      enc.encode(secret),
+      enc.encode(effectiveSecret),
       { name: 'HMAC', hash: 'SHA-256' },
       false,
       ['verify']
@@ -214,7 +216,9 @@ export async function getAuthUser(request, env) {
   if (!authHeader.startsWith('Bearer ')) return null
 
   const token = authHeader.substring(7).trim()
-  const secret = env.JWT_SECRET || DEFAULT_SECRET
+  const secret = (env && env.JWT_SECRET && typeof env.JWT_SECRET === 'string' && env.JWT_SECRET.trim().length > 0)
+    ? env.JWT_SECRET.trim()
+    : DEFAULT_SECRET
   const payload = await verifyJWT(token, secret)
   if (!payload || !payload.id) return null
 
@@ -239,13 +243,16 @@ export async function getAuthUser(request, env) {
 }
 
 /**
- * Master Admin Whitelist Check: strictly locks down admin privileges to damimehdi / admin@bleuwi.world
+ * Master Admin Whitelist Check: strictly locks down admin privileges to damimehdi / admin@bleuwi.world / damimehdi20@gmail.com
  */
 export function isMasterAdmin(user) {
   if (!user) return false
   const cleanUsername = String(user.username || '').trim().toLowerCase()
   const cleanEmail = String(user.email || '').trim().toLowerCase()
-  const isMasterIdentity = cleanUsername === 'damimehdi' || cleanEmail === 'admin@bleuwi.world'
+  const isMasterIdentity =
+    cleanUsername === 'damimehdi' ||
+    cleanEmail === 'admin@bleuwi.world' ||
+    cleanEmail === 'damimehdi20@gmail.com'
   return user.role === 'admin' && isMasterIdentity
 }
 
