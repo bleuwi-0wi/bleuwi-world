@@ -66,6 +66,20 @@ export async function onRequestPost({ request, env }) {
     // Regular users log in directly without any 2FA flow!
     // ========================================================
     if (user.role !== 'admin') {
+      const clientIp =
+        request.headers.get('cf-connecting-ip') ||
+        request.headers.get('x-forwarded-for') ||
+        request.headers.get('cf-pseudo-ipv4') ||
+        '127.0.0.1'
+
+      try {
+        await env.DB.prepare(
+          "UPDATE users SET last_login_ip = ?, last_login_at = datetime('now') WHERE id = ?"
+        )
+          .bind(clientIp, user.id)
+          .run()
+      } catch (e) {}
+
       const token = await createJWT(
         {
           id: user.id,

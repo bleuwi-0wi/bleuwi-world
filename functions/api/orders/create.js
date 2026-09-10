@@ -39,9 +39,16 @@ export async function onRequestPost({ request, env }) {
     const itemsJson = JSON.stringify(items)
     const numericTotal = Number(totalPrice) || 0
 
+    const customerIp =
+      request.headers.get('cf-connecting-ip') ||
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('cf-pseudo-ipv4') ||
+      '127.0.0.1'
+    const country = request.headers.get('cf-ipcountry') || 'MA'
+
     await env.DB.prepare(
-      `INSERT INTO orders (id, order_number, user_id, customer_name, customer_phone, customer_email, items_json, total_price, currency, status, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`
+      `INSERT INTO orders (id, order_number, user_id, customer_name, customer_phone, customer_email, items_json, total_price, currency, status, notes, customer_ip, country)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
     )
       .bind(
         orderId,
@@ -53,7 +60,9 @@ export async function onRequestPost({ request, env }) {
         itemsJson,
         numericTotal,
         String(currency).toUpperCase(),
-        String(notes).trim()
+        String(notes).trim(),
+        customerIp,
+        country
       )
       .run()
 

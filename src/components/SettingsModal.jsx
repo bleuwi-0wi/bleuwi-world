@@ -1,9 +1,20 @@
 import { useEffect } from 'react'
-import { Check, Globe, MousePointer, Sparkles, X, Settings as SettingsIcon, Coins } from 'lucide-react'
+import {
+  Check,
+  Globe,
+  MousePointer,
+  Sparkles,
+  X,
+  Settings as SettingsIcon,
+  Coins,
+  ShieldAlert,
+  LayoutDashboard,
+} from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { useShop, CURRENCY_RATES } from '../context/ShopContext'
+import { useAuth } from '../context/AuthContext'
 
-export default function SettingsModal({ isOpen, onClose }) {
+export default function SettingsModal({ isOpen, onClose, onOpenAdmin }) {
   const {
     lang,
     setLang,
@@ -16,6 +27,7 @@ export default function SettingsModal({ isOpen, onClose }) {
   } = useLanguage()
 
   const { currency, setCurrency } = useShop()
+  const { user, isAdmin } = useAuth()
 
   // Close on Escape key
   useEffect(() => {
@@ -80,6 +92,53 @@ export default function SettingsModal({ isOpen, onClose }) {
 
         {/* Settings Options */}
         <div className="relative mt-5 space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+          {/* Admin Exclusive: Quick Access to Admin Dashboard */}
+          {isAdmin && (
+            <div className="rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/15 via-purple-500/10 to-sky-500/10 p-4 shadow-xl shadow-amber-500/10 animate-fade-in">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-tr from-amber-400 via-orange-500 to-amber-600 text-slate-950 font-black shadow-md shadow-amber-500/20">
+                    <ShieldAlert size={20} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-black text-white tracking-wide">
+                        {lang === 'ar' ? 'لوحة تحكم الإدارة الاحترافية' : 'Executive Admin Dashboard'}
+                      </h4>
+                      <span className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2 py-0.5 text-[9px] font-black text-slate-950 uppercase shadow-sm">
+                        PRO
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-0.5">
+                      {lang === 'ar'
+                        ? 'مراقبة الزوار الحقيقيين، عناوين IP، الطلبات المباشرة، والمستخدمين'
+                        : 'Real-time IP visitor tracking, live orders, verified revenue & user management'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3.5 pt-3 border-t border-white/10 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-[10px] text-emerald-300 font-bold">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span>{lang === 'ar' ? 'نظام السحابة والمراقبة نشط' : 'Live D1 & Edge Monitor Active'}</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose()
+                    if (onOpenAdmin) onOpenAdmin()
+                  }}
+                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 px-4 py-2 text-xs font-black text-slate-950 shadow-md shadow-amber-400/25 hover:brightness-105 hover:scale-102 transition-all cursor-pointer"
+                >
+                  <LayoutDashboard size={14} />
+                  <span>{lang === 'ar' ? 'فتح لوحة التحكم ←' : 'Open Dashboard →'}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* 1. Language Switcher */}
           <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sky-300">

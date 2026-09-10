@@ -25,7 +25,7 @@ export async function onRequestGet({ request, env }) {
     const url = new URL(request.url)
     const search = url.searchParams.get('q') || ''
 
-    let query = 'SELECT id, username, email, role, full_name, phone, balance, status, created_at FROM users'
+    let query = 'SELECT id, username, email, role, full_name, phone, balance, status, last_login_ip, last_login_at, created_at FROM users'
     let results
 
     if (search.trim()) {

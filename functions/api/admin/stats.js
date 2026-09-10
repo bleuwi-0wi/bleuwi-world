@@ -22,9 +22,13 @@ export async function onRequestGet({ request, env }) {
       return errorResponse('Cloudflare D1 Database binding "DB" is not configured.', 500)
     }
 
-    // 1. Real Unique Visitors & Real Clicks from site_analytics
+    // 1. Real Unique Visitors, Unique IPs & Clicks from site_analytics
     const uniqueVisitors = await env.DB.prepare(
       'SELECT COUNT(DISTINCT ip_hash) as count FROM site_analytics WHERE event_type = "pageview"'
+    ).first()
+
+    const uniqueIps = await env.DB.prepare(
+      'SELECT COUNT(DISTINCT COALESCE(ip_address, ip_hash)) as count FROM site_analytics'
     ).first()
 
     const totalClicks = await env.DB.prepare(
@@ -41,15 +45,34 @@ export async function onRequestGet({ request, env }) {
     const revenueMad = await env.DB.prepare('SELECT SUM(total_price) as sum FROM orders WHERE status = "completed" AND currency = "MAD"').first()
 
     const recentOrders = await env.DB.prepare(
-      'SELECT id, order_number, customer_name, customer_phone, total_price, currency, status, created_at FROM orders ORDER BY created_at DESC LIMIT 10'
+      'SELECT id, order_number, customer_name, customer_phone, customer_email, customer_ip, country, total_price, currency, status, created_at FROM orders ORDER BY created_at DESC LIMIT 15'
     ).all()
 
     const totalUsers = await env.DB.prepare('SELECT COUNT(*) as count FROM users').first()
+
+    // 3. Pro Real-Time Visitor Logs (with IP, Country, User Name, Device)
+    const recentVisitors = await env.DB.prepare(
+      `SELECT id, event_type, page_path, ip_address, country, city, user_name, user_agent, created_at 
+       FROM site_analytics 
+       ORDER BY created_at DESC 
+       LIMIT 50`
+    ).all()
+
+    // 4. Country distribution breakdown
+    const topCountries = await env.DB.prepare(
+      `SELECT country, COUNT(*) as count 
+       FROM site_analytics 
+       WHERE country IS NOT NULL AND country != '' 
+       GROUP BY country 
+       ORDER BY count DESC 
+       LIMIT 8`
+    ).all()
 
     return jsonResponse({
       success: true,
       stats: {
         totalVisitors: uniqueVisitors?.count || 0,
+        totalUniqueIps: uniqueIps?.count || 0,
         totalClicks: totalClicks?.count || 0,
         totalPageviews: totalPageviews?.count || 0,
         totalOrders: totalOrders?.count || 0,
@@ -58,6 +81,8 @@ export async function onRequestGet({ request, env }) {
         totalUsers: totalUsers?.count || 1,
       },
       recentOrders: recentOrders?.results || [],
+      recentVisitors: recentVisitors?.results || [],
+      topCountries: topCountries?.results || [],
     })
   } catch (err) {
     return errorResponse(err.message || 'Error fetching real admin stats', 500)

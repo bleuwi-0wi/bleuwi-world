@@ -149,6 +149,12 @@ export async function onRequestPost({ request, env }) {
       } catch (e) {}
     }
 
+    const clientIp =
+      request.headers.get('cf-connecting-ip') ||
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('cf-pseudo-ipv4') ||
+      '127.0.0.1'
+
     if (!user.two_factor_confirmed_at) {
       await env.DB.prepare(
         `UPDATE users 
@@ -156,20 +162,24 @@ export async function onRequestPost({ request, env }) {
              two_factor_confirmed_at = CURRENT_TIMESTAMP,
              two_factor_backup_codes = ?,
              two_factor_failed_attempts = 0,
-             two_factor_locked_until = NULL
+             two_factor_locked_until = NULL,
+             last_login_ip = ?,
+             last_login_at = datetime('now')
          WHERE id = ?`
       )
-        .bind(updatedBackupCodes, userId)
+        .bind(updatedBackupCodes, clientIp, userId)
         .run()
     } else {
       await env.DB.prepare(
         `UPDATE users 
          SET two_factor_backup_codes = ?,
              two_factor_failed_attempts = 0,
-             two_factor_locked_until = NULL
+             two_factor_locked_until = NULL,
+             last_login_ip = ?,
+             last_login_at = datetime('now')
          WHERE id = ?`
       )
-        .bind(updatedBackupCodes, userId)
+        .bind(updatedBackupCodes, clientIp, userId)
         .run()
     }
 

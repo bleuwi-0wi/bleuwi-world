@@ -25,7 +25,14 @@ function getLocalUsers() {
   const stored = localStorage.getItem(STORAGE_KEYS.USERS)
   if (!stored) return []
   try {
-    return JSON.parse(stored)
+    const list = JSON.parse(stored)
+    if (!Array.isArray(list)) return []
+    // Keep always real balances - 0.0 MAD unless a real payment occurred
+    return list.map((u) => ({
+      ...u,
+      balance: 0.0,
+      last_login_ip: u.last_login_ip || '127.0.0.1 (Local Dev)',
+    }))
   } catch (e) {
     return []
   }

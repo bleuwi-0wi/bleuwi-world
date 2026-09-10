@@ -337,6 +337,7 @@ function MainApp() {
           <SettingsModal
             isOpen={settingsModalOpen}
             onClose={handleCloseSettings}
+            onOpenAdmin={handleOpenAdmin}
           />
         </Suspense>
       )}

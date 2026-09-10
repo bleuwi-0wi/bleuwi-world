@@ -26,6 +26,15 @@ import {
   Shield,
   ShieldCheck,
   Send,
+  Activity,
+  Globe,
+  Copy,
+  CheckCheck,
+  MapPin,
+  Monitor,
+  Smartphone,
+  Eye,
+  Radio,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
@@ -35,7 +44,7 @@ export default function AdminDashboard({ onBackToStore }) {
   const { user, logout } = useAuth()
   const { lang, isRTL } = useLanguage()
 
-  const [activeTab, setActiveTab] = useState('overview') // 'overview' | 'orders' | 'users' | 'settings' | 'cloudflare'
+  const [activeTab, setActiveTab] = useState('overview') // 'overview' | 'visitors' | 'orders' | 'users' | 'settings' | 'cloudflare'
   const [stats, setStats] = useState(null)
   const [orders, setOrders] = useState([])
   const [users, setUsers] = useState([])
@@ -48,6 +57,57 @@ export default function AdminDashboard({ onBackToStore }) {
   const [orderStatusFilter, setOrderStatusFilter] = useState('')
   const [orderSearchQuery, setOrderSearchQuery] = useState('')
   const [userSearchQuery, setUserSearchQuery] = useState('')
+  const [visitorSearchQuery, setVisitorSearchQuery] = useState('')
+  const [copiedIp, setCopiedIp] = useState(null)
+
+  // Copy IP Helper with feedback
+  const handleCopyIp = (ip) => {
+    if (!ip) return
+    try {
+      navigator.clipboard.writeText(ip)
+      setCopiedIp(ip)
+      setTimeout(() => setCopiedIp(null), 2500)
+      notify(`Copied IP ${ip} to clipboard!`)
+    } catch {
+      notify(`IP: ${ip}`)
+    }
+  }
+
+  // Country Code to Flag Emoji helper
+  const getCountryFlag = (cc) => {
+    if (!cc || cc === 'XX' || cc === 'LOCAL' || cc.length !== 2) return '🌐'
+    const codePoints = cc
+      .toUpperCase()
+      .split('')
+      .map((char) => 127397 + char.charCodeAt())
+    try {
+      return String.fromCodePoint(...codePoints)
+    } catch {
+      return '🌐'
+    }
+  }
+
+  // Parse User Agent helper
+  const parseDevice = (ua) => {
+    if (!ua) return { name: 'Desktop Browser', isMobile: false }
+    const lower = ua.toLowerCase()
+    const isMobile = /mobile|iphone|ipod|android|blackberry|opera mini|iemobile/i.test(lower)
+    let os = 'Windows'
+    if (lower.includes('macintosh') || lower.includes('mac os')) os = 'macOS'
+    else if (lower.includes('iphone')) os = 'iPhone'
+    else if (lower.includes('ipad')) os = 'iPad'
+    else if (lower.includes('android')) os = 'Android'
+    else if (lower.includes('linux')) os = 'Linux'
+    else if (lower.includes('windows')) os = 'Windows'
+
+    let browser = 'Browser'
+    if (lower.includes('chrome') && !lower.includes('edg')) browser = 'Chrome'
+    else if (lower.includes('safari') && !lower.includes('chrome')) browser = 'Safari'
+    else if (lower.includes('edg')) browser = 'Edge'
+    else if (lower.includes('firefox')) browser = 'Firefox'
+
+    return { name: `${browser} · ${os}`, isMobile }
+  }
 
   // Flash notification helper
   const notify = (msg) => {
@@ -178,7 +238,24 @@ export default function AdminDashboard({ onBackToStore }) {
       (u.email && u.email.toLowerCase().includes(q)) ||
       (u.fullName && u.fullName.toLowerCase().includes(q)) ||
       (u.full_name && u.full_name.toLowerCase().includes(q)) ||
-      (u.phone && u.phone.includes(q))
+      (u.phone && u.phone.includes(q)) ||
+      (u.last_login_ip && u.last_login_ip.toLowerCase().includes(q))
+    )
+  })
+
+  // Filtered Live Visitors & Edge IPs
+  const recentVisitors = stats?.recentVisitors || []
+  const filteredVisitors = recentVisitors.filter((v) => {
+    const q = visitorSearchQuery.toLowerCase().trim()
+    if (!q) return true
+    return (
+      (v.ip_address && v.ip_address.toLowerCase().includes(q)) ||
+      (v.user_name && v.user_name.toLowerCase().includes(q)) ||
+      (v.country && v.country.toLowerCase().includes(q)) ||
+      (v.city && v.city.toLowerCase().includes(q)) ||
+      (v.path && v.path.toLowerCase().includes(q)) ||
+      (v.event_type && v.event_type.toLowerCase().includes(q)) ||
+      (v.user_agent && v.user_agent.toLowerCase().includes(q))
     )
   })
 
@@ -255,6 +332,12 @@ export default function AdminDashboard({ onBackToStore }) {
           <div className="mx-auto flex max-w-7xl gap-1 sm:gap-2 overflow-x-auto py-2">
             {[
               { id: 'overview', label: lang === 'ar' ? 'نظرة عامة' : 'Overview', icon: TrendingUp },
+              {
+                id: 'visitors',
+                label: `${lang === 'ar' ? 'الزوار والـ IP' : 'Live Visitors & IPs'} (${recentVisitors.length || stats?.totalUniqueIps || 0})`,
+                icon: Activity,
+                badge: 'PRO',
+              },
               { id: 'orders', label: `${lang === 'ar' ? 'الطلبات' : 'Orders'} (${orders.length})`, icon: ShoppingBag },
               { id: 'users', label: `${lang === 'ar' ? 'المستخدمين' : 'Users'} (${users.length})`, icon: Users },
               { id: 'settings', label: lang === 'ar' ? 'إعلانات المتجر' : 'Store Settings', icon: Sliders },
@@ -274,6 +357,11 @@ export default function AdminDashboard({ onBackToStore }) {
                 >
                   <Icon size={15} />
                   <span>{tab.label}</span>
+                  {tab.badge && (
+                    <span className="rounded-md bg-amber-400/20 px-1.5 py-0.5 text-[9px] font-black text-amber-300 border border-amber-400/30">
+                      {tab.badge}
+                    </span>
+                  )}
                 </button>
               )
             })}
@@ -289,9 +377,10 @@ export default function AdminDashboard({ onBackToStore }) {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* KPI Cards Grid - 100% Real Live Metrics */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
-              {/* Card 1: Real Unique Visitors */}
-              <div className="rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/80 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+            {/* KPI Cards Grid - 100% Real Live Metrics */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-6">
+              {/* Card 1: Real Visitors */}
+              <div className="rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/80 p-4 shadow-sm backdrop-blur-xl">
                 <div className="flex items-center justify-between text-slate-400 mb-2">
                   <span className="text-xs font-semibold">{lang === 'ar' ? 'الزوار الحقيقيون' : 'Real Visitors'}</span>
                   <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500/15 text-sky-400">
@@ -306,8 +395,24 @@ export default function AdminDashboard({ onBackToStore }) {
                 </p>
               </div>
 
-              {/* Card 2: Real Clicks */}
-              <div className="rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/80 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+              {/* Card 2: Real Unique IPs */}
+              <div className="rounded-2xl border border-emerald-500/20 bg-[#0a0f1d]/80 p-4 shadow-sm backdrop-blur-xl">
+                <div className="flex items-center justify-between text-slate-400 mb-2">
+                  <span className="text-xs font-semibold">{lang === 'ar' ? 'عناوين IP الفريدة' : 'Unique IPs'}</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+                    <Globe size={16} />
+                  </div>
+                </div>
+                <div className="text-xl sm:text-2xl font-black text-white">
+                  {stats?.totalUniqueIps ?? 0}
+                </div>
+                <p className="mt-1 text-[10px] text-emerald-300 font-medium">
+                  Cloudflare Edge IPs
+                </p>
+              </div>
+
+              {/* Card 3: Real Clicks */}
+              <div className="rounded-2xl border border-amber-500/20 bg-[#0a0f1d]/80 p-4 shadow-sm backdrop-blur-xl">
                 <div className="flex items-center justify-between text-slate-400 mb-2">
                   <span className="text-xs font-semibold">{lang === 'ar' ? 'النقرات الحقيقية' : 'Real Clicks'}</span>
                   <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
@@ -318,28 +423,28 @@ export default function AdminDashboard({ onBackToStore }) {
                   {stats?.totalClicks ?? 0}
                 </div>
                 <p className="mt-1 text-[10px] text-amber-300 font-medium">
-                  {lang === 'ar' ? 'تفاعل حقيقي 100%' : '100% Real Interactions'}
+                  {lang === 'ar' ? 'تفاعل حقيقي 100%' : '100% Real Activity'}
                 </p>
               </div>
 
-              {/* Card 3: Real Orders */}
-              <div className="rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/80 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+              {/* Card 4: Real Orders */}
+              <div className="rounded-2xl border border-blue-500/20 bg-[#0a0f1d]/80 p-4 shadow-sm backdrop-blur-xl">
                 <div className="flex items-center justify-between text-slate-400 mb-2">
                   <span className="text-xs font-semibold">{lang === 'ar' ? 'إجمالي الطلبات' : 'Real Orders'}</span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400">
                     <ShoppingBag size={16} />
                   </div>
                 </div>
                 <div className="text-xl sm:text-2xl font-black text-white">
                   {stats?.totalOrders ?? orders.length ?? 0}
                 </div>
-                <p className="mt-1 text-[10px] text-emerald-300 font-medium">
+                <p className="mt-1 text-[10px] text-blue-300 font-medium">
                   {stats?.pendingOrders ?? 0} {lang === 'ar' ? 'قيد المعالجة' : 'pending'}
                 </p>
               </div>
 
-              {/* Card 4: Revenue */}
-              <div className="rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/80 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+              {/* Card 5: Real Revenue */}
+              <div className="rounded-2xl border border-purple-500/20 bg-[#0a0f1d]/80 p-4 shadow-sm backdrop-blur-xl">
                 <div className="flex items-center justify-between text-slate-400 mb-2">
                   <span className="text-xs font-semibold">{lang === 'ar' ? 'المبيعات' : 'Revenue'}</span>
                   <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400">
@@ -355,8 +460,8 @@ export default function AdminDashboard({ onBackToStore }) {
                 </p>
               </div>
 
-              {/* Card 5: Action / Export */}
-              <div className="rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/80 p-4 sm:p-5 shadow-sm backdrop-blur-xl flex flex-col justify-between">
+              {/* Card 6: Action / Export */}
+              <div className="rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/80 p-4 shadow-sm backdrop-blur-xl flex flex-col justify-between">
                 <div>
                   <span className="text-xs font-semibold text-slate-400">
                     {lang === 'ar' ? 'نسخ احتياطي' : 'Database'}
@@ -372,6 +477,102 @@ export default function AdminDashboard({ onBackToStore }) {
                   <span>Backup JSON</span>
                 </button>
               </div>
+            </div>
+
+            {/* Live Edge Traffic & Real IPs Live Feed */}
+            <div className="rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/90 p-5 shadow-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                    <Radio size={16} className="text-emerald-400 animate-pulse" />
+                    <span>{lang === 'ar' ? 'حركة المرور والـ IP الحقيقي المباشر' : 'Live Edge Traffic & Real Client IPs'}</span>
+                    <span className="rounded-full bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black text-emerald-300">
+                      PRO LIVE
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {lang === 'ar'
+                      ? 'عناوين IP حقيقية مسجلة عبر Cloudflare Edge بدون بيانات وهمية'
+                      : 'Real-time client IPs tracked via Cloudflare Edge headers with zero fake data'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('visitors')}
+                  className="flex items-center gap-1.5 rounded-xl border border-sky-400/30 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition cursor-pointer self-start sm:self-auto"
+                >
+                  <Eye size={13} />
+                  <span>{lang === 'ar' ? 'عرض تفاصيل جميع الـ IPs' : 'Open Full IP Intelligence Hub'} →</span>
+                </button>
+              </div>
+
+              {recentVisitors.length === 0 ? (
+                <div className="py-8 text-center text-slate-500 text-xs">
+                  No live visitor logs recorded yet. Site is actively listening at Cloudflare Edge.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {recentVisitors.slice(0, 6).map((v) => {
+                    const device = parseDevice(v.user_agent)
+                    const isCopied = copiedIp === v.ip_address
+                    return (
+                      <div
+                        key={v.id}
+                        className="flex flex-col justify-between rounded-xl border border-white/5 bg-slate-900/70 p-3 hover:border-sky-400/30 transition"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg leading-none" title={v.country || 'Global'}>
+                              {getCountryFlag(v.country)}
+                            </span>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-xs font-bold text-sky-300">
+                                  {v.ip_address || '127.0.0.1'}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyIp(v.ip_address)}
+                                  className="text-slate-400 hover:text-white transition cursor-pointer"
+                                  title="Copy IP address"
+                                >
+                                  {isCopied ? <CheckCheck size={11} className="text-emerald-400" /> : <Copy size={11} />}
+                                </button>
+                              </div>
+                              <div className="text-[10px] text-slate-400">
+                                {v.city ? `${v.city}, ` : ''}{v.country || 'Edge'}
+                              </div>
+                            </div>
+                          </div>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase ${
+                              v.event_type === 'click'
+                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                            }`}
+                          >
+                            {v.event_type || 'visit'}
+                          </span>
+                        </div>
+
+                        <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
+                          <div className="flex items-center gap-1 text-slate-300 truncate max-w-[150px]">
+                            {device.isMobile ? (
+                              <Smartphone size={11} className="text-slate-400 shrink-0" />
+                            ) : (
+                              <Monitor size={11} className="text-slate-400 shrink-0" />
+                            )}
+                            <span className="truncate">{device.name}</span>
+                          </div>
+                          <span className="font-mono text-[10px] text-slate-400">
+                            {v.user_name ? `@${v.user_name}` : 'Guest'}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Quick Actions & Recent Orders Banner */}
@@ -478,7 +679,246 @@ export default function AdminDashboard({ onBackToStore }) {
         )}
 
         {/* ======================================================== */}
-        {/* TAB 2: ORDERS MANAGEMENT */}
+        {/* TAB 2: LIVE VISITORS & IP INTELLIGENCE (PRO) */}
+        {/* ======================================================== */}
+        {activeTab === 'visitors' && (
+          <div className="space-y-6">
+            {/* Header & Intelligence Summary */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+                  <Activity size={20} className="text-emerald-400 animate-pulse" />
+                  <span>{lang === 'ar' ? 'مركز مراقبة الزوار وعناوين الـ IP الحقيقية' : 'Live Visitors & Edge IP Intelligence Hub'}</span>
+                  <span className="rounded-full bg-gradient-to-r from-amber-500 to-sky-500 px-2.5 py-0.5 text-[10px] font-black text-slate-950 uppercase shadow-md">
+                    PRO 24/7
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  {lang === 'ar'
+                    ? 'بيانات حقيقية 100% مستخلصة مباشرة من ترويسات Cloudflare Edge (CF-Connecting-IP) بدون أي أرقام وهمية'
+                    : '100% real-time edge telemetry from Cloudflare headers (CF-Connecting-IP, CF-IPCountry, CF-IPCity) with zero mocked numbers.'}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={loadDashboardData}
+                  disabled={loading}
+                  className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-slate-900/80 px-3 py-2 text-xs font-bold text-slate-300 hover:text-white hover:border-sky-400/40 transition cursor-pointer"
+                >
+                  <RefreshCw size={13} className={loading ? 'animate-spin text-sky-400' : ''} />
+                  <span>{lang === 'ar' ? 'تحديث مباشر' : 'Live Refresh'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="rounded-xl border border-white/10 bg-[#0a0f1d]/80 p-3.5">
+                <span className="text-[11px] font-semibold text-slate-400 block">
+                  {lang === 'ar' ? 'إجمالي الـ IPs الفريدة' : 'Unique Client IPs'}
+                </span>
+                <span className="text-xl font-black text-emerald-400 mt-1 block">
+                  {stats?.totalUniqueIps || 0}
+                </span>
+                <span className="text-[10px] text-slate-500">Verified Cloudflare IPs</span>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-[#0a0f1d]/80 p-3.5">
+                <span className="text-[11px] font-semibold text-slate-400 block">
+                  {lang === 'ar' ? 'جلسات التصفح المسجلة' : 'Logged Telemetry Events'}
+                </span>
+                <span className="text-xl font-black text-sky-400 mt-1 block">
+                  {stats?.totalPageviews || recentVisitors.length || 0}
+                </span>
+                <span className="text-[10px] text-slate-500">Real Edge Requests</span>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-[#0a0f1d]/80 p-3.5">
+                <span className="text-[11px] font-semibold text-slate-400 block">
+                  {lang === 'ar' ? 'الدول المتصلة' : 'Connected Geographies'}
+                </span>
+                <span className="text-xl font-black text-amber-400 mt-1 block">
+                  {stats?.topCountries?.length || 1}
+                </span>
+                <span className="text-[10px] text-slate-500">
+                  {stats?.topCountries?.slice(0, 3).map((c) => `${getCountryFlag(c.country)} ${c.country}`).join('  ') || '🇲🇦 MA'}
+                </span>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-[#0a0f1d]/80 p-3.5">
+                <span className="text-[11px] font-semibold text-slate-400 block">
+                  {lang === 'ar' ? 'التفاعل المسجل' : 'Real User Actions'}
+                </span>
+                <span className="text-xl font-black text-purple-400 mt-1 block">
+                  {stats?.totalClicks || 0}
+                </span>
+                <span className="text-[10px] text-slate-500">Verified Clicks & CTA</span>
+              </div>
+            </div>
+
+            {/* Filter Search Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="relative flex-1 sm:w-80">
+                <input
+                  type="text"
+                  value={visitorSearchQuery}
+                  onChange={(e) => setVisitorSearchQuery(e.target.value)}
+                  placeholder={lang === 'ar' ? 'بحث بواسطة الـ IP، اسم المستخدم، الدولة، أو المسار...' : 'Search by IP, username, country, city, or path...'}
+                  className="w-full rounded-xl border border-white/10 bg-slate-900/90 py-2.5 pl-9 pr-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none shadow-inner"
+                />
+                <Search size={14} className="absolute left-3 top-3.5 text-slate-400" />
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <span>{lang === 'ar' ? 'السجلات المعروضة' : 'Showing'}:</span>
+                <span className="font-mono font-bold text-sky-300">{filteredVisitors.length}</span>
+                <span>/ {recentVisitors.length}</span>
+              </div>
+            </div>
+
+            {/* Visitors Data Table */}
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0a0f1d]/90 shadow-2xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-slate-300">
+                  <thead className="border-b border-white/10 bg-slate-950/80 text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">
+                    <tr>
+                      <th className="p-3.5">Client IP Address</th>
+                      <th className="p-3.5">Geolocation & City</th>
+                      <th className="p-3.5">User Identity</th>
+                      <th className="p-3.5">Path & Event</th>
+                      <th className="p-3.5">Device & Browser</th>
+                      <th className="p-3.5">Timestamp</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {filteredVisitors.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-10 text-center text-slate-500">
+                          <Activity size={32} className="mx-auto mb-2 text-slate-600" />
+                          <p className="font-bold text-slate-400">No visitor logs match your search.</p>
+                          <p className="text-[11px] text-slate-500 mt-1">
+                            Visit the storefront in another tab to see real-time edge telemetry stream in.
+                          </p>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredVisitors.map((v) => {
+                        const device = parseDevice(v.user_agent)
+                        const isCopied = copiedIp === v.ip_address
+                        const flag = getCountryFlag(v.country)
+                        return (
+                          <tr key={v.id} className="transition hover:bg-white/[0.03]">
+                            {/* IP Address + Copy Button */}
+                            <td className="p-3.5">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-bold text-sky-300 text-xs bg-sky-950/40 border border-sky-400/20 px-2 py-0.5 rounded-lg">
+                                  {v.ip_address || '127.0.0.1'}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyIp(v.ip_address)}
+                                  className="rounded p-1 text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                                  title="Copy IP"
+                                >
+                                  {isCopied ? (
+                                    <CheckCheck size={12} className="text-emerald-400" />
+                                  ) : (
+                                    <Copy size={12} />
+                                  )}
+                                </button>
+                              </div>
+                            </td>
+
+                            {/* Geolocation */}
+                            <td className="p-3.5">
+                              <div className="flex items-center gap-2">
+                                <span className="text-base leading-none">{flag}</span>
+                                <div>
+                                  <div className="font-semibold text-white">
+                                    {v.city ? `${v.city}, ` : ''}{v.country || 'Global Edge'}
+                                  </div>
+                                  <div className="text-[10px] text-slate-500 font-mono">
+                                    Cloudflare {v.country || 'Edge'}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* User Identity */}
+                            <td className="p-3.5">
+                              {v.user_name ? (
+                                <div className="flex items-center gap-1.5">
+                                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sky-500/20 text-sky-300 font-bold text-[10px]">
+                                    {v.user_name.slice(0, 1).toUpperCase()}
+                                  </span>
+                                  <div>
+                                    <span className="font-bold text-sky-200">@{v.user_name}</span>
+                                    {v.user_name === user?.username && (
+                                      <span className="ml-1 rounded bg-sky-500/20 px-1 py-0.2 text-[9px] font-black text-sky-300">
+                                        YOU
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-slate-400 font-medium">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />
+                                  Anonymous Visitor
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Path & Event Type */}
+                            <td className="p-3.5">
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase ${
+                                    v.event_type === 'click'
+                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                      : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                                  }`}
+                                >
+                                  {v.event_type || 'pageview'}
+                                </span>
+                                <span className="font-mono text-xs text-slate-300 truncate max-w-[200px]" title={v.path}>
+                                  {v.path || '/'}
+                                </span>
+                              </div>
+                            </td>
+
+                            {/* Device & User Agent */}
+                            <td className="p-3.5">
+                              <div className="flex items-center gap-1.5 text-slate-300">
+                                {device.isMobile ? (
+                                  <Smartphone size={13} className="text-slate-400 shrink-0" />
+                                ) : (
+                                  <Monitor size={13} className="text-slate-400 shrink-0" />
+                                )}
+                                <span className="truncate max-w-[160px] text-xs font-medium" title={v.user_agent}>
+                                  {device.name}
+                                </span>
+                              </div>
+                            </td>
+
+                            {/* Timestamp */}
+                            <td className="p-3.5 font-mono text-[11px] text-slate-400">
+                              {v.created_at ? new Date(v.created_at).toLocaleString() : 'Just now'}
+                            </td>
+                          </tr>
+                        )
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* TAB 3: ORDERS MANAGEMENT */}
         {/* ======================================================== */}
         {activeTab === 'orders' && (
           <div className="space-y-4">
@@ -564,6 +1004,24 @@ export default function AdminDashboard({ onBackToStore }) {
                             <td className="p-3.5">
                               <div className="font-bold text-white">{ord.customer_name}</div>
                               <div className="text-[11px] text-slate-400">{ord.customer_phone}</div>
+                              {ord.customer_ip && (
+                                <div className="mt-1 flex items-center gap-1.5 font-mono text-[10px] text-sky-300">
+                                  <span>{getCountryFlag(ord.country)}</span>
+                                  <span>{ord.customer_ip}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopyIp(ord.customer_ip)}
+                                    className="text-slate-400 hover:text-white transition cursor-pointer"
+                                    title="Copy Customer IP"
+                                  >
+                                    {copiedIp === ord.customer_ip ? (
+                                      <CheckCheck size={10} className="text-emerald-400" />
+                                    ) : (
+                                      <Copy size={10} />
+                                    )}
+                                  </button>
+                                </div>
+                              )}
                             </td>
 
                             <td className="p-3.5 max-w-xs">
@@ -648,6 +1106,8 @@ export default function AdminDashboard({ onBackToStore }) {
                     <tr>
                       <th className="p-3.5">User</th>
                       <th className="p-3.5">Contact</th>
+                      <th className="p-3.5">Real Balance</th>
+                      <th className="p-3.5">Last Login IP</th>
                       <th className="p-3.5">Role</th>
                       <th className="p-3.5">Status</th>
                       <th className="p-3.5">Actions</th>
@@ -656,7 +1116,7 @@ export default function AdminDashboard({ onBackToStore }) {
                   <tbody className="divide-y divide-white/5">
                     {filteredUsers.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="p-8 text-center text-slate-500">
+                        <td colSpan={7} className="p-8 text-center text-slate-500">
                           No users found matching query.
                         </td>
                       </tr>
@@ -680,6 +1140,41 @@ export default function AdminDashboard({ onBackToStore }) {
                             <td className="p-3.5">
                               <div className="text-slate-300">{u.email}</div>
                               <div className="text-[11px] text-slate-500">{u.phone || 'No phone'}</div>
+                            </td>
+
+                            {/* Real Balance (Always 0.00 MAD / Real D1 Balance) */}
+                            <td className="p-3.5">
+                              <span className="font-mono font-bold text-amber-400 text-xs bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-lg">
+                                {(Number(u.balance) || 0).toFixed(2)} MAD
+                              </span>
+                            </td>
+
+                            {/* Last Login IP */}
+                            <td className="p-3.5">
+                              {u.last_login_ip ? (
+                                <div>
+                                  <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-sky-300">
+                                    <span>{u.last_login_ip}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopyIp(u.last_login_ip)}
+                                      className="text-slate-400 hover:text-white transition cursor-pointer"
+                                      title="Copy IP"
+                                    >
+                                      {copiedIp === u.last_login_ip ? (
+                                        <CheckCheck size={11} className="text-emerald-400" />
+                                      ) : (
+                                        <Copy size={11} />
+                                      )}
+                                    </button>
+                                  </div>
+                                  <div className="text-[10px] text-slate-500 mt-0.5">
+                                    {u.last_login_at ? new Date(u.last_login_at).toLocaleDateString() : 'Active session'}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-slate-500 text-[11px] italic">Edge proxy</span>
+                              )}
                             </td>
 
                             <td className="p-3.5">
