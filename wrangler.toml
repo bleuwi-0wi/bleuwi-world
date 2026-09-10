@@ -1,0 +1,19 @@
+name = "bleuwi-world"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "dist"
+
+# Cloudflare D1 Database Binding
+# In Cloudflare Pages Functions, this database is accessed via: env.DB
+[[d1_databases]]
+binding = "DB"
+database_name = "bleuwi-db"
+database_id = "fc790ee8-1a85-419b-bc9d-1571036a49e3"
+
+[vars]
+JWT_SECRET = "bleuwi_jwt_super_secret_key_2026_production"
+NODE_ENV = "production"
+ADMIN_SECRET_PATH = "/bleuwi-x7k9q2-control"
+# CUSTOM_DOMAIN = "bleuwiworld.shop" # Uncomment once custom domain is connected in Cloudflare Pages
+BLOCK_PAGES_DEV = "false" # Set to "true" or set CUSTOM_DOMAIN to block bleuwi-world.pages.dev
+
+

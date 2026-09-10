@@ -28,6 +28,7 @@ import {
 import { orderPresets, getSecureWhatsAppUrl, openWhatsAppChat, WHATSAPP_DIRECT_LINK } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
 import { getOrderRateLimitStatus, recordOrderSubmission, MAX_ORDERS_PER_DAY } from '../utils/orderAntiSpam'
+import { api } from '../services/api'
 
 import imgGta from '../assets/game-gta-v.jpeg'
 import imgRedDead from '../assets/game-red-dead-2.jpeg'
@@ -676,6 +677,28 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
     setCopiedText(true)
     setTimeout(() => setCopiedText(false), 2500)
     setIsSubmitting(true)
+
+    // Concurrently record order to Cloudflare D1 database for the Admin Dashboard
+    try {
+      const rawPrice = activeProduct?.price ? parseFloat(String(activeProduct.price).replace(/[^0-9.]/g, '')) || 50 : 50
+      api.createOrder({
+        customerName: cleanName,
+        customerPhone: 'WhatsApp Client',
+        items: [{
+          id: activeProduct?.title || chosenItem,
+          title: chosenProductTitle,
+          price: rawPrice,
+          quantity: 1,
+          category: currentPreset.category,
+        }],
+        totalPrice: rawPrice,
+        currency: 'MAD',
+        notes: details.trim(),
+      }).catch(() => {})
+    } catch (e) {
+      // Ignore background recording errors
+    }
+
     setTimeout(() => {
       setIsSubmitting(false)
       openWhatsAppChat(generatedMessage)

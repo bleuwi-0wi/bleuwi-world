@@ -1,16 +1,55 @@
-import { useState } from 'react'
-import { Globe, Menu, Settings as SettingsIcon, X, Flame, ShieldCheck, ShoppingBag, Coins, BookOpen, Gem, HelpCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import {
+  Globe,
+  Menu,
+  Settings as SettingsIcon,
+  X,
+  Flame,
+  ShieldCheck,
+  ShoppingBag,
+  Coins,
+  BookOpen,
+  Gem,
+  HelpCircle,
+  User,
+  Shield,
+  LogOut,
+  Package,
+  ChevronDown,
+  LayoutDashboard,
+} from 'lucide-react'
 import BrandMark from './BrandMark'
 import { useLanguage } from '../context/LanguageContext'
 import { useShop, CURRENCY_RATES } from '../context/ShopContext'
+import { useAuth } from '../context/AuthContext'
 import { WHATSAPP_DIRECT_LINK } from '../data/links'
+import { api } from '../services/api'
 
-export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) {
+export default function Header({ onHomeClick, activeShowcase, onOpenSettings, onOpenAdmin }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false)
+  const [liveBannerText, setLiveBannerText] = useState('')
+
   const { lang, setLang, t, isRTL } = useLanguage()
   const { currency, setCurrency, totalItemsCount, openCart } = useShop()
+  const { user, isAdmin, logout, openAuthModal, openUserOrdersModal } = useAuth()
 
-  const closeMenu = () => setMenuOpen(false)
+  // Fetch live announcement override if set by admin
+  useEffect(() => {
+    api.getSettings().then((settings) => {
+      if (settings) {
+        const key = `banner_announcement_${lang}`
+        if (settings[key]) {
+          setLiveBannerText(settings[key])
+        }
+      }
+    }).catch(() => {})
+  }, [lang])
+
+  const closeMenu = () => {
+    setMenuOpen(false)
+    setUserDropdownOpen(false)
+  }
 
   const handleNavClick = (e, target) => {
     closeMenu()
@@ -53,6 +92,15 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
 
   const currentCurrConf = CURRENCY_RATES[currency] || CURRENCY_RATES.MAD
 
+  const defaultBanner =
+    lang === 'ar'
+      ? '⚡ نعمل 24/7 مع ضمان 100% (استبدال فوري ودعم فني متواصل)'
+      : lang === 'fr'
+      ? '⚡ SERVICE 24/7 AVEC GARANTIE OR 100% (Remplacement immédiat & support)'
+      : lang === 'es'
+      ? '⚡ SERVICIO 24/7 CON GARANTÍA DORADA 100% (Reemplazo instantáneo & soporte)'
+      : '⚡ WE WORK 24/7 WITH 100% GUARANTEE (Instant Swap & 24/7 Support)'
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#05070d]/90 backdrop-blur-xl">
       {/* Top 24/7 Service & 100% Guarantee Announcement Bar */}
@@ -71,13 +119,7 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
             <span>24/7 ONLINE</span>
           </span>
           <span className="text-white/95 font-extrabold tracking-wide">
-            {lang === 'ar'
-              ? '⚡ نعمل 24/7 مع ضمان 100% (استبدال فوري ودعم فني متواصل)'
-              : lang === 'fr'
-              ? '⚡ SERVICE 24/7 AVEC GARANTIE OR 100% (Remplacement immédiat & support)'
-              : lang === 'es'
-              ? '⚡ SERVICIO 24/7 CON GARANTÍA DORADA 100% (Reemplazo instantáneo & soporte)'
-              : '⚡ WE WORK 24/7 WITH 100% GUARANTEE (Instant Swap & 24/7 Support)'}
+            {liveBannerText || defaultBanner}
           </span>
           <span className="hidden min-[620px]:inline-block rounded-md bg-emerald-400/25 border border-emerald-400/40 px-2 py-0.5 text-[10px] text-emerald-200 font-bold group-hover:bg-white group-hover:text-slate-950 transition-colors">
             {lang === 'ar' ? 'تواصل عبر واتساب ←' : lang === 'fr' ? 'WhatsApp Direct ←' : lang === 'es' ? 'WhatsApp Directo ←' : 'Chat on WhatsApp →'}
@@ -163,8 +205,99 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           </a>
         </nav>
 
-        {/* Desktop Action Controls: Currency + Cart + Language + Settings */}
+        {/* Desktop Action Controls: Auth + Currency + Cart + Language + Settings */}
         <div className="hidden items-center gap-2.5 md:flex">
+          {/* User Auth Button / Dropdown */}
+          {user ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="inline-flex items-center gap-2 rounded-full border border-sky-400/40 bg-sky-500/15 py-1.5 pl-2 pr-3 text-xs font-bold text-sky-200 transition hover:bg-sky-500/25 hover:text-white cursor-pointer shadow-sm shadow-sky-500/10"
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 to-blue-600 text-slate-950 font-black text-[11px]">
+                  {(user.fullName || user.username || 'U')[0].toUpperCase()}
+                </div>
+                <span className="max-w-[100px] truncate">{user.fullName || user.username}</span>
+                {isAdmin ? (
+                  <span className="rounded-full bg-purple-500/20 border border-purple-400/40 px-1.5 py-0.2 text-[9px] text-purple-300 font-black">
+                    ADMIN
+                  </span>
+                ) : (
+                  <ChevronDown size={12} className="text-slate-400" />
+                )}
+              </button>
+
+              {/* User Dropdown Menu */}
+              {userDropdownOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-56 rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/95 p-2 shadow-2xl backdrop-blur-2xl animate-scaleIn z-50"
+                  dir={isRTL ? 'rtl' : 'ltr'}
+                >
+                  <div className="border-b border-white/10 px-3 py-2">
+                    <p className="text-xs font-black text-white">{user.fullName || user.username}</p>
+                    <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                    <div className="mt-1 flex items-center justify-between text-[10px]">
+                      <span className="text-emerald-400 font-bold">
+                        {user.balance || 0} {currency}
+                      </span>
+                      <span className="text-sky-300 capitalize font-medium">{user.role}</span>
+                    </div>
+                  </div>
+
+                  <div className="py-1 space-y-0.5">
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserDropdownOpen(false)
+                          if (onOpenAdmin) onOpenAdmin()
+                        }}
+                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold text-amber-300 transition hover:bg-amber-500/15 cursor-pointer"
+                      >
+                        <LayoutDashboard size={14} className="text-amber-400" />
+                        <span>{lang === 'ar' ? 'لوحة تحكم الأدمن' : 'Admin Dashboard'}</span>
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserDropdownOpen(false)
+                        openUserOrdersModal()
+                      }}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white cursor-pointer"
+                    >
+                      <Package size={14} className="text-sky-400" />
+                      <span>{lang === 'ar' ? 'طلباتي السابقة' : 'My Orders'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserDropdownOpen(false)
+                        logout()
+                      }}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-rose-300 transition hover:bg-rose-500/15 cursor-pointer"
+                    >
+                      <LogOut size={14} />
+                      <span>{lang === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => openAuthModal('login')}
+              className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/40 bg-gradient-to-r from-sky-500/20 to-blue-600/20 px-3.5 py-1.5 text-xs font-bold text-sky-200 transition hover:border-sky-400 hover:bg-sky-500/30 hover:text-white cursor-pointer shadow-sm shadow-sky-500/10"
+            >
+              <User size={13} className="text-sky-300" />
+              <span>{lang === 'ar' ? 'دخول / تسجيل' : 'Sign In'}</span>
+            </button>
+          )}
+
           {/* Currency Switcher Pill */}
           <button
             type="button"
@@ -215,8 +348,35 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
           </button>
         </div>
 
-        {/* Mobile controls: Currency + Cart + Language + Settings + Hamburger */}
+        {/* Mobile controls: Auth + Currency + Cart + Language + Settings + Hamburger */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
+          {/* Mobile Auth Button */}
+          {user ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (isAdmin && onOpenAdmin) {
+                  onOpenAdmin()
+                } else {
+                  openUserOrdersModal()
+                }
+              }}
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 to-blue-600 text-slate-950 font-black text-[11px] shadow-sm"
+              title={user.fullName || user.username}
+            >
+              {(user.fullName || user.username || 'U')[0].toUpperCase()}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => openAuthModal('login')}
+              className="rounded-lg border border-sky-400/30 bg-sky-500/15 p-1.5 text-sky-200 cursor-pointer"
+              title="Sign In"
+            >
+              <User size={15} />
+            </button>
+          )}
+
           {/* Mobile Currency toggle */}
           <button
             type="button"
@@ -280,6 +440,69 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings }) 
       {menuOpen && (
         <nav id="mobile-menu" className="border-t border-white/[0.06] bg-[#080b14] px-6 py-5 md:hidden" aria-label="Mobile navigation">
           <div className="mx-auto flex max-w-7xl flex-col gap-1">
+            {/* User status card on top of mobile menu */}
+            {user ? (
+              <div className="mb-3 rounded-xl border border-sky-400/20 bg-sky-950/40 p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-white text-sm">{user.fullName || user.username}</div>
+                    <div className="text-xs text-slate-400">{user.email}</div>
+                  </div>
+                  {isAdmin && (
+                    <span className="rounded-full bg-purple-500/20 border border-purple-400/40 px-2 py-0.5 text-[10px] text-purple-300 font-black">
+                      ADMIN
+                    </span>
+                  )}
+                </div>
+                <div className="mt-3 flex gap-2">
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMenu()
+                        if (onOpenAdmin) onOpenAdmin()
+                      }}
+                      className="flex-1 rounded-lg bg-amber-500/20 border border-amber-400/40 py-1.5 text-center text-xs font-bold text-amber-300"
+                    >
+                      Admin Panel
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeMenu()
+                      openUserOrdersModal()
+                    }}
+                    className="flex-1 rounded-lg bg-sky-500/20 border border-sky-400/40 py-1.5 text-center text-xs font-bold text-sky-300"
+                  >
+                    My Orders
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeMenu()
+                      logout()
+                    }}
+                    className="rounded-lg bg-rose-500/20 border border-rose-400/40 px-3 py-1.5 text-center text-xs font-bold text-rose-300"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  closeMenu()
+                  openAuthModal('login')
+                }}
+                className="mb-3 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 py-2.5 text-xs font-bold text-white shadow-md shadow-sky-500/20 cursor-pointer"
+              >
+                <User size={15} />
+                <span>{lang === 'ar' ? 'تسجيل الدخول / حساب جديد' : 'Sign In / Register'}</span>
+              </button>
+            )}
+
             <a
               className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
               href="#home"
