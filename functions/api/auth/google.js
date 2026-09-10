@@ -159,6 +159,7 @@ export async function onRequestPost({ request, env }) {
           id: user.id,
           email: user.email,
           role: 'admin',
+          isPreAuth: true,
           stage: 'pre_2fa_verification',
         },
         env.JWT_SECRET,

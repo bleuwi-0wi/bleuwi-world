@@ -551,52 +551,6 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                   </div>
                 </div>
 
-                {/* 8 One-Time Backup Recovery Codes */}
-                {backupCodes && backupCodes.length > 0 && (
-                  <div className="mt-3 rounded-xl border border-amber-500/30 bg-amber-950/25 p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-300">
-                        <Shield size={13} className="text-amber-400" />
-                        <span>
-                          {lang === 'ar'
-                            ? 'رموز الاسترداد الاحتياطية (8 للاستخدام لمرة واحدة)'
-                            : 'Backup Recovery Codes (8 One-Time)'}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (navigator.clipboard) {
-                            navigator.clipboard.writeText(backupCodes.join('\n'))
-                          }
-                          setCopiedBackupCodes(true)
-                          setTimeout(() => setCopiedBackupCodes(false), 2000)
-                        }}
-                        className="flex items-center gap-1 text-[10px] font-bold text-amber-400 hover:text-amber-200 cursor-pointer"
-                      >
-                        <Copy size={11} />
-                        <span>{copiedBackupCodes ? (lang === 'ar' ? 'تم النسخ ✓' : 'Copied ✓') : (lang === 'ar' ? 'نسخ الكل' : 'Copy All')}</span>
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-1.5 font-mono text-[11px] text-center">
-                      {backupCodes.map((code, idx) => (
-                        <div
-                          key={idx}
-                          className="rounded-lg bg-black/50 border border-amber-500/20 py-1 px-2 text-slate-200 font-bold select-all tracking-wider"
-                        >
-                          {code}
-                        </div>
-                      ))}
-                    </div>
-
-                    <p className="mt-2 text-[10px] text-slate-400 leading-normal">
-                      {lang === 'ar'
-                        ? 'احفظ هذه الرموز بأمان. إذا فقدت تطبيق المصادقة، يمكنك استخدام أي رمز لمرة واحدة لاستعادة الحساب.'
-                        : 'Save these codes safely. If you lose your authenticator app, each code can be used once to access your account.'}
-                    </p>
-                  </div>
-                )}
               </div>
             ) : (
               /* RETURNING ADMIN LOGIN FLOW (No QR code, no secret exposed) */

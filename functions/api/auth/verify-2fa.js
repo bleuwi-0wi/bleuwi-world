@@ -176,8 +176,10 @@ export async function onRequestPost({ request, env }) {
     // Strict Security Guard: Verify role from database record
     const effectiveRole = user.role === 'admin' ? 'admin' : 'user'
 
-    // Clean up any legacy OTP codes
-    await env.DB.prepare('DELETE FROM two_factor_codes WHERE user_id = ?').bind(userId).run()
+    // Clean up any legacy OTP codes (ignore if table doesn't exist)
+    try {
+      await env.DB.prepare('DELETE FROM two_factor_codes WHERE user_id = ?').bind(userId).run()
+    } catch (e) {}
 
     // Issue 7-day authenticated JWT session
     const token = await createJWT(
