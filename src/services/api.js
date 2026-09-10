@@ -17,7 +17,7 @@ const INITIAL_SETTINGS = {
   banner_announcement_en: '⚡ WE WORK 24/7 WITH 100% GUARANTEE (Instant Swap & 24/7 Support)',
   banner_announcement_fr: '⚡ SERVICE 24/7 AVEC GARANTIE OR 100% (Remplacement immédiat & support)',
   banner_announcement_es: '⚡ SERVICIO 24/7 CON GARANTÍA DORADA 100% (Reemplazo instantáneo & soporte)',
-  whatsapp_support_phone: '212762635898',
+  whatsapp_support_phone: '212762635587',
   maintenance_mode: 'false',
 }
 

@@ -21,9 +21,9 @@ import iconDiscord from '../assets/icon-discord.png'
 import iconKick from '../assets/icon-kick.jpeg'
 
 // Official WhatsApp Phone Number and Direct Links for BLEUWI
-export const WHATSAPP_RAW_PHONE = '212762635898'
-export const WHATSAPP_FORMATTED_PHONE = '+212 762-635898'
-export const WHATSAPP_DIRECT_LINK = 'https://wa.me/212762635898'
+export const WHATSAPP_RAW_PHONE = '212762635587'
+export const WHATSAPP_FORMATTED_PHONE = '+212 762-635587'
+export const WHATSAPP_DIRECT_LINK = 'https://wa.me/212762635587'
 export const WHATSAPP_NUMBER = WHATSAPP_DIRECT_LINK
 
 // Security helper: Generates direct, pre-filled WhatsApp URL with message automatically inserted
@@ -58,7 +58,7 @@ export const openWhatsAppChat = (message = '') => {
 }
 
 export const links = [
-  { name: 'WhatsApp', description: 'Direct message BLEUWI (+212 762-635898).', icon: MessageCircle, image: iconWhatsApp, href: WHATSAPP_DIRECT_LINK },
+  { name: 'WhatsApp', description: 'Direct message BLEUWI (+212 762-635587).', icon: MessageCircle, image: iconWhatsApp, href: WHATSAPP_DIRECT_LINK },
   { name: 'YouTube', description: 'Watch the latest videos and streams.', icon: Video, image: iconYouTube, href: 'https://www.youtube.com/@blue_bleuwi' },
   { name: 'Instagram', description: 'Behind the scenes, captured daily.', icon: Camera, image: iconInstagram, href: 'https://www.instagram.com/blue.bluewi/' },
   { name: 'TikTok', description: 'Short-form moments from the world.', icon: Music2, image: iconTikTok, href: 'https://www.tiktok.com/@bleuwi_wizi0' },
