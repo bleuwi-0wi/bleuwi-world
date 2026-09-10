@@ -25,7 +25,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 
 export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
-  const { login, loginWithGoogle, verify2FA, resend2FA, signup } = useAuth()
+  const { login, loginWithGoogle, verify2FA, resend2FA, signup, authNotice } = useAuth()
   const { lang, isRTL } = useLanguage()
 
   const [activeTab, setActiveTab] = useState(initialTab)
@@ -38,6 +38,20 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
   )
   const [errorMsg, setErrorMsg] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
+
+  // Anti-Bot Verification State
+  const [isHumanVerified, setIsHumanVerified] = useState(false)
+  const [isVerifyingBot, setIsVerifyingBot] = useState(false)
+  const [botTrap, setBotTrap] = useState('')
+
+  const handleVerifyBot = () => {
+    if (isHumanVerified || isVerifyingBot) return
+    setIsVerifyingBot(true)
+    setTimeout(() => {
+      setIsVerifyingBot(false)
+      setIsHumanVerified(true)
+    }, 650)
+  }
 
   // 2FA Challenge State (Admins Only)
   const [is2FAMode, setIs2FAMode] = useState(false)
@@ -73,6 +87,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
     setIs2FAMode(false)
     setIsFirstTimeSetup(false)
     setDigits(['', '', '', '', '', ''])
+    setIsHumanVerified(false)
+    setIsVerifyingBot(false)
+    setBotTrap('')
   }, [initialTab, isOpen])
 
   // Countdown timer for 2FA expiration
@@ -107,10 +124,23 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
     e.preventDefault()
     setErrorMsg('')
     setSuccessMsg('')
+
+    if (!isHumanVerified) {
+      setErrorMsg(
+        lang === 'ar'
+          ? 'يرجى تأكيد التحقق البشري (أنا لست برنامج روبوت) قبل تسجيل الدخول.'
+          : 'Please complete the human verification check before signing in.'
+      )
+      return
+    }
+
     setLoading(true)
 
     try {
-      const res = await login(loginIdentifier, loginPassword)
+      const res = await login(loginIdentifier, loginPassword, {
+        human_verified: true,
+        website_bot_trap_check: botTrap,
+      })
       if (res && res.requires2FA) {
         setIs2FAMode(true)
         setPreAuthToken(res.preAuthToken)
@@ -224,6 +254,16 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
     e.preventDefault()
     setErrorMsg('')
     setSuccessMsg('')
+
+    if (!isHumanVerified) {
+      setErrorMsg(
+        lang === 'ar'
+          ? 'يرجى تأكيد التحقق البشري (أنا لست برنامج روبوت) قبل إنشاء الحساب.'
+          : 'Please complete the human verification check before creating an account.'
+      )
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -233,6 +273,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
         email: signupEmail,
         phone: '',
         password: signupPassword,
+        human_verified: true,
+        website_bot_trap_check: botTrap,
       })
       setSuccessMsg(lang === 'ar' ? 'تم إنشاء الحساب بنجاح! مرحباً بك.' : 'Account created successfully! Welcome.')
     } catch (err) {
@@ -481,6 +523,21 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
           <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300">
             <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
             <span className="leading-snug">{successMsg}</span>
+          </div>
+        )}
+
+        {/* Mandatory Order Action Notice */}
+        {authNotice && (
+          <div className="mb-5 flex items-start gap-2.5 rounded-2xl border border-amber-400/40 bg-amber-950/40 p-3.5 text-xs text-amber-200 shadow-lg shadow-amber-500/10 animate-pulse">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/30">
+              <Lock size={14} />
+            </div>
+            <div>
+              <span className="font-black text-white block mb-0.5">
+                {lang === 'ar' ? '⚠️ تسجيل الدخول إلزامي للمتابعة' : '⚠️ Authentication Required'}
+              </span>
+              <span className="text-[11px] text-amber-100/90 leading-relaxed block">{authNotice}</span>
+            </div>
           </div>
         )}
 
@@ -945,10 +1002,67 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                   </span>
                 </div>
 
+                {/* Anti-Bot Human Verification Widget */}
+                <div className="rounded-2xl border border-sky-400/30 bg-slate-900/90 p-3 shadow-inner">
+                  <div className="flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={handleVerifyBot}
+                      className={`flex items-center gap-3 transition-all cursor-pointer ${
+                        isHumanVerified ? 'pointer-events-none' : ''
+                      }`}
+                    >
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-lg border transition-all ${
+                          isHumanVerified
+                            ? 'border-emerald-400 bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/30'
+                            : isVerifyingBot
+                            ? 'border-sky-400 bg-sky-500/20'
+                            : 'border-slate-500 bg-slate-800 hover:border-sky-400'
+                        }`}
+                      >
+                        {isHumanVerified ? (
+                          <CheckCircle2 size={16} className="text-white" />
+                        ) : isVerifyingBot ? (
+                          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-sky-400 border-t-transparent" />
+                        ) : null}
+                      </div>
+                      <div className="text-left">
+                        <span className="text-xs font-bold text-white block">
+                          {isHumanVerified
+                            ? (lang === 'ar' ? 'تم التحقق بنجاح (إنسان حقيقي ✓)' : 'Verification Complete ✓')
+                            : isVerifyingBot
+                            ? (lang === 'ar' ? 'جارٍ التحقق الأمني...' : 'Verifying human session...')
+                            : (lang === 'ar' ? 'أنا لست برنامج روبوت (اضغط للتحقق)' : 'Verify you are human')}
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          {lang === 'ar' ? 'درع الأمان ضد الهجمات الآلية' : 'Edge Anti-Bot Challenge'}
+                        </span>
+                      </div>
+                    </button>
+                    <div className="shrink-0 flex flex-col items-end opacity-80">
+                      <ShieldCheck size={20} className={isHumanVerified ? 'text-emerald-400' : 'text-sky-400'} />
+                      <span className="text-[8px] font-mono text-slate-400 uppercase tracking-tighter">EDGE SHIELD</span>
+                    </div>
+                  </div>
+
+                  {/* Hidden honeypot trap input */}
+                  <input
+                    type="text"
+                    name="website_bot_trap_check"
+                    value={botTrap}
+                    onChange={(e) => setBotTrap(e.target.value)}
+                    style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }}
+                    tabIndex="-1"
+                    autoComplete="off"
+                    aria-hidden="true"
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 py-3 text-xs sm:text-sm font-black text-white shadow-lg shadow-sky-500/25 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+                  disabled={loading || !isHumanVerified}
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 py-3 text-xs sm:text-sm font-black text-white shadow-lg shadow-sky-500/25 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">
@@ -1044,10 +1158,67 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                   </div>
                 </div>
 
+                {/* Anti-Bot Human Verification Widget for Signup */}
+                <div className="rounded-2xl border border-sky-400/30 bg-slate-900/90 p-3 shadow-inner">
+                  <div className="flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={handleVerifyBot}
+                      className={`flex items-center gap-3 transition-all cursor-pointer ${
+                        isHumanVerified ? 'pointer-events-none' : ''
+                      }`}
+                    >
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-lg border transition-all ${
+                          isHumanVerified
+                            ? 'border-emerald-400 bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/30'
+                            : isVerifyingBot
+                            ? 'border-sky-400 bg-sky-500/20'
+                            : 'border-slate-500 bg-slate-800 hover:border-sky-400'
+                        }`}
+                      >
+                        {isHumanVerified ? (
+                          <CheckCircle2 size={16} className="text-white" />
+                        ) : isVerifyingBot ? (
+                          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-sky-400 border-t-transparent" />
+                        ) : null}
+                      </div>
+                      <div className="text-left">
+                        <span className="text-xs font-bold text-white block">
+                          {isHumanVerified
+                            ? (lang === 'ar' ? 'تم التحقق بنجاح (إنسان حقيقي ✓)' : 'Verification Complete ✓')
+                            : isVerifyingBot
+                            ? (lang === 'ar' ? 'جارٍ التحقق الأمني...' : 'Verifying human session...')
+                            : (lang === 'ar' ? 'أنا لست برنامج روبوت (اضغط للتحقق)' : 'Verify you are human')}
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          {lang === 'ar' ? 'درع الأمان ضد الهجمات الآلية' : 'Edge Anti-Bot Challenge'}
+                        </span>
+                      </div>
+                    </button>
+                    <div className="shrink-0 flex flex-col items-end opacity-80">
+                      <ShieldCheck size={20} className={isHumanVerified ? 'text-emerald-400' : 'text-sky-400'} />
+                      <span className="text-[8px] font-mono text-slate-400 uppercase tracking-tighter">EDGE SHIELD</span>
+                    </div>
+                  </div>
+
+                  {/* Hidden honeypot trap input */}
+                  <input
+                    type="text"
+                    name="website_bot_trap_check"
+                    value={botTrap}
+                    onChange={(e) => setBotTrap(e.target.value)}
+                    style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }}
+                    tabIndex="-1"
+                    autoComplete="off"
+                    aria-hidden="true"
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-sky-600 py-2.5 text-xs sm:text-sm font-black text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+                  disabled={loading || !isHumanVerified}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-sky-600 py-2.5 text-xs sm:text-sm font-black text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">

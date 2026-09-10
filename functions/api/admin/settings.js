@@ -1,9 +1,8 @@
-// Cloudflare Pages Function: /api/admin/settings
 import {
   jsonResponse,
   errorResponse,
   handleOptions,
-  getAuthUser,
+  requireMasterAdmin,
 } from '../utils.js'
 
 export async function onRequestOptions() {
@@ -34,12 +33,12 @@ export async function onRequestGet({ env }) {
   }
 }
 
-// POST /api/admin/settings - update settings (admin only)
+// POST /api/admin/settings - update settings (master admin only)
 export async function onRequestPost({ request, env }) {
   try {
-    const authUser = await getAuthUser(request, env)
-    if (!authUser || authUser.role !== 'admin') {
-      return errorResponse('Forbidden: Admin access required', 403)
+    const authUser = await requireMasterAdmin(request, env)
+    if (!authUser) {
+      return errorResponse('Forbidden: Master Admin privileges required', 403)
     }
 
     if (!env || !env.DB) {

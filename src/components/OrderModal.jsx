@@ -24,9 +24,11 @@ import {
   AlertCircle,
   Loader2,
   Maximize2,
+  Phone,
 } from 'lucide-react'
 import { orderPresets, getSecureWhatsAppUrl, openWhatsAppChat, WHATSAPP_DIRECT_LINK } from '../data/links'
 import { useLanguage } from '../context/LanguageContext'
+import { useAuth } from '../context/AuthContext'
 import { getOrderRateLimitStatus, recordOrderSubmission, MAX_ORDERS_PER_DAY } from '../utils/orderAntiSpam'
 import { api } from '../services/api'
 
@@ -455,10 +457,19 @@ const categoryIcons = {
 
 export default function OrderModal({ isOpen, onClose, initialData = {} }) {
   const { t, lang, isRTL } = useLanguage()
+  const { user } = useAuth()
 
   const [name, setName] = useState(() => {
     try {
-      return localStorage.getItem('bleuwi_customer_name') || ''
+      return user?.fullName || user?.username || localStorage.getItem('bleuwi_customer_name') || ''
+    } catch {
+      return ''
+    }
+  })
+
+  const [phone, setPhone] = useState(() => {
+    try {
+      return user?.phone || localStorage.getItem('bleuwi_customer_phone') || ''
     } catch {
       return ''
     }
@@ -473,15 +484,26 @@ export default function OrderModal({ isOpen, onClose, initialData = {} }) {
 
   // Anti-Spam & Validation State
   const [nameError, setNameError] = useState(false)
+  const [phoneError, setPhoneError] = useState(false)
   const [itemError, setItemError] = useState(false)
   const [spamError, setSpamError] = useState('')
   const [rateLimitInfo, setRateLimitInfo] = useState(() => getOrderRateLimitStatus())
   const [isSubmitting, setIsSubmitting] = useState(false)
   const nameInputRef = useRef(null)
+  const phoneInputRef = useRef(null)
 
-  // Sync initialData when modal opens
+  // Sync initialData and user data when modal opens
   useEffect(() => {
     if (!isOpen) return
+
+    if (user) {
+      if (!name && (user.fullName || user.username)) {
+        setName(user.fullName || user.username)
+      }
+      if (!phone && user.phone) {
+        setPhone(user.phone)
+      }
+    }
 
     let matchedCategoryKey = 'Sell Games'
     if (initialData.categoryKey && orderPresets[initialData.categoryKey]) {
@@ -516,10 +538,11 @@ export default function OrderModal({ isOpen, onClose, initialData = {} }) {
     setCopiedText(false)
     setPreviewZoom(false)
     setNameError(false)
+    setPhoneError(false)
     setItemError(false)
     setSpamError('')
     setRateLimitInfo(getOrderRateLimitStatus())
-  }, [isOpen, initialData])
+  }, [isOpen, initialData, user])
 
   // Save name when changed (sanitized & length capped)
   const handleNameChange = (val) => {
@@ -534,6 +557,21 @@ export default function OrderModal({ isOpen, onClose, initialData = {} }) {
       // ignore
     }
   }
+
+  // Save phone when changed
+  const handlePhoneChange = (val) => {
+    const clean = String(val || '').slice(0, 30)
+    setPhone(clean)
+    if (clean.trim().length >= 6) {
+      setPhoneError(false)
+    }
+    try {
+      localStorage.setItem('bleuwi_customer_phone', clean)
+    } catch {
+      // ignore
+    }
+  }
+
 
   // Handle category change
   const handleCategorySelect = (key) => {
@@ -612,7 +650,8 @@ export default function OrderModal({ isOpen, onClose, initialData = {} }) {
 *• المنتج المطلوب:* ${chosenProductTitle}${productPriceTag}
 *• المنصة:* ${activeProduct.platform || 'PC / Digital'}
 *• القسم:* ${currentPreset.sessionName} (${currentPreset.category})
-*• اسم العميل:* ${cleanName}${details.trim() ? `\n*• الملاحظات:* ${details.trim()}` : ''}
+*• اسم العميل:* ${cleanName}
+*• رقم الواتساب:* ${phone.trim() || 'مباشر'}${details.trim() ? `\n*• الملاحظات:* ${details.trim()}` : ''}
 
 يرجى تزويدي بمعلومات الدفع (CIH / التجاري وفا / كاش بلوس / بايبال / كريبتو) لتأكيد وتفعيل الطلب فوراً!`
     : `*Hello BLEUWI!*
@@ -620,7 +659,8 @@ export default function OrderModal({ isOpen, onClose, initialData = {} }) {
 *• Product Ordered:* ${chosenProductTitle}${productPriceTag}
 *• Platform:* ${activeProduct.platform || 'PC / Digital'}
 *• Service Category:* ${currentPreset.sessionName} (${currentPreset.category})
-*• Customer Name:* ${cleanName}${details.trim() ? `\n*• Notes:* ${details.trim()}` : ''}
+*• Customer Name:* ${cleanName}
+*• Customer WhatsApp:* ${phone.trim() || 'Direct'}${details.trim() ? `\n*• Notes:* ${details.trim()}` : ''}
 
 Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPal / Crypto) to confirm and activate my order now!`
 
@@ -637,14 +677,25 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
       return
     }
 
-    // 2. Strict Product / Item Selection Validation (Mandatory)
+    // 2. Strict Customer WhatsApp Phone Validation (Mandatory)
+    const trimmedPhone = phone.trim()
+    if (!trimmedPhone || trimmedPhone.length < 6) {
+      setPhoneError(true)
+      if (phoneInputRef.current) {
+        phoneInputRef.current.focus()
+        phoneInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+      return
+    }
+
+    // 3. Strict Product / Item Selection Validation (Mandatory)
     const effectiveItem = selectedGame === 'Other' && customGame.trim() ? customGame.trim() : (selectedGame || '')
     if (!effectiveItem || effectiveItem.trim().length < 2) {
       setItemError(true)
       return
     }
 
-    // 3. Anti-Spam Rate Limiter (Max 10 orders per day + 15s cooldown)
+    // 4. Anti-Spam Rate Limiter (Max 10 orders per day + 15s cooldown)
     const rateStatus = getOrderRateLimitStatus()
     setRateLimitInfo(rateStatus)
 
@@ -668,6 +719,7 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
 
     // Passed all checks: clear errors and record order
     setNameError(false)
+    setPhoneError(false)
     setItemError(false)
     setSpamError('')
     recordOrderSubmission()
@@ -683,7 +735,8 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
       const rawPrice = activeProduct?.price ? parseFloat(String(activeProduct.price).replace(/[^0-9.]/g, '')) || 50 : 50
       api.createOrder({
         customerName: cleanName,
-        customerPhone: 'WhatsApp Client',
+        customerPhone: trimmedPhone,
+        customerEmail: user?.email || null,
         items: [{
           id: activeProduct?.title || chosenItem,
           title: chosenProductTitle,
@@ -704,6 +757,7 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
       openWhatsAppChat(generatedMessage)
     }, 350)
   }
+
 
   const handleCopyTextMessage = () => {
     navigator.clipboard.writeText(generatedMessage)
@@ -906,6 +960,7 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
 
             {/* 3. Customer Info Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {/* Customer Name */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between">
                   <span>
@@ -942,7 +997,47 @@ Please send me the payment instructions (CIH Bank / Attijari / Cash Plus / PayPa
                 )}
               </div>
 
+              {/* Customer WhatsApp Phone */}
               <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-emerald-400 font-bold">WhatsApp</span>
+                    <span>{lang === 'ar' ? 'رقم هاتفك' : 'Phone Number'}</span>
+                    <span className="text-sky-400">*</span>
+                  </span>
+                  {phoneError && (
+                    <span className="text-[10px] font-bold text-rose-400 animate-pulse">
+                      {lang === 'ar' ? 'مطلوب إجباري' : 'Required'}
+                    </span>
+                  )}
+                </label>
+                <div className="relative">
+                  <div className={`pointer-events-none absolute inset-y-0 ${isRTL ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center ${phoneError ? 'text-rose-400' : 'text-emerald-400'}`}>
+                    <Phone size={14} />
+                  </div>
+                  <input
+                    ref={phoneInputRef}
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => handlePhoneChange(e.target.value)}
+                    placeholder={lang === 'ar' ? '+212 6XX-XXXXXX أو 06...' : '+212 6XX-XXXXXX'}
+                    className={`w-full rounded-xl border py-2.5 ${isRTL ? 'pr-9 pl-3.5' : 'pl-9 pr-3.5'} text-xs text-white placeholder-slate-500 font-mono transition-all duration-200 ${
+                      phoneError
+                        ? 'border-rose-500 bg-rose-500/10 focus:border-rose-400 focus:ring-2 focus:ring-rose-500/40 ring-1 ring-rose-500'
+                        : 'border-white/10 bg-white/[0.04] focus:border-emerald-400 focus:bg-white/[0.07] focus:outline-none focus:ring-1 focus:ring-emerald-400'
+                    }`}
+                  />
+                </div>
+                {phoneError && (
+                  <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-rose-400 animate-fade-up">
+                    <AlertCircle size={13} className="shrink-0 text-rose-400" />
+                    <span>{lang === 'ar' ? '⚠️ يرجى إدخال رقم واتساب صالح للتواصل معك فوراً!' : '⚠️ Please enter a valid WhatsApp phone number!'}</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Order Notes / In-game ID */}
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
                   {t('notesLabel')}
                 </label>

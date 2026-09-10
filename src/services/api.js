@@ -121,11 +121,11 @@ export const api = {
   // ----------------------------------------------------
   // AUTHENTICATION WITH TWO-FACTOR (+2FA)
   // ----------------------------------------------------
-  async login(identifier, password) {
+  async login(identifier, password, extra = {}) {
     try {
       const res = await request('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ identifier, password, ...extra }),
       })
       if (res.token) this.setToken(res.token)
       return res

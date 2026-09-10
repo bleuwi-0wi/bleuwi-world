@@ -1,9 +1,8 @@
-// Cloudflare Pages Function: /api/admin/stats (100% Real Analytics, No Fake Data)
 import {
   jsonResponse,
   errorResponse,
   handleOptions,
-  getAuthUser,
+  requireMasterAdmin,
 } from '../utils.js'
 
 export async function onRequestOptions() {
@@ -12,10 +11,10 @@ export async function onRequestOptions() {
 
 export async function onRequestGet({ request, env }) {
   try {
-    const authUser = await getAuthUser(request, env)
-    // Strict Guard: ONLY role=admin is allowed into admin dashboard
-    if (!authUser || authUser.role !== 'admin') {
-      return errorResponse('Forbidden: Unauthorized administrator access', 403)
+    const authUser = await requireMasterAdmin(request, env)
+    // Strict Guard: ONLY Master Admin is allowed into admin dashboard
+    if (!authUser) {
+      return errorResponse('Forbidden: Master Admin privileges required', 403)
     }
 
     if (!env || !env.DB) {

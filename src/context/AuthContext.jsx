@@ -27,12 +27,15 @@ export function AuthProvider({ children }) {
     checkAuth()
   }, [checkAuth])
 
-  const login = async (identifier, password) => {
-    const res = await api.login(identifier, password)
+  const [authNotice, setAuthNotice] = useState('')
+
+  const login = async (identifier, password, extra = {}) => {
+    const res = await api.login(identifier, password, extra)
     // If 2FA is required, we do NOT set the user yet — modal will show 2FA screen
     if (res && res.user && !res.requires2FA) {
       setUser(res.user)
       setAuthModalOpen(false)
+      setAuthNotice('')
     }
     return res
   }
@@ -42,6 +45,7 @@ export function AuthProvider({ children }) {
     if (res && res.user && !res.requires2FA) {
       setUser(res.user)
       setAuthModalOpen(false)
+      setAuthNotice('')
     }
     return res
   }
@@ -51,6 +55,7 @@ export function AuthProvider({ children }) {
     if (res && res.user) {
       setUser(res.user)
       setAuthModalOpen(false)
+      setAuthNotice('')
     }
     return res
   }
@@ -64,6 +69,7 @@ export function AuthProvider({ children }) {
     if (res && res.user) {
       setUser(res.user)
       setAuthModalOpen(false)
+      setAuthNotice('')
     }
     return res
   }
@@ -77,13 +83,15 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const openAuthModal = (tab = 'login') => {
+  const openAuthModal = (tab = 'login', notice = '') => {
     setAuthModalTab(tab)
+    setAuthNotice(notice)
     setAuthModalOpen(true)
   }
 
   const closeAuthModal = () => {
     setAuthModalOpen(false)
+    setAuthNotice('')
   }
 
   const openUserOrdersModal = () => {
@@ -109,12 +117,14 @@ export function AuthProvider({ children }) {
     refreshUser: checkAuth,
     authModalOpen,
     authModalTab,
+    authNotice,
     openAuthModal,
     closeAuthModal,
     userOrdersModalOpen,
     openUserOrdersModal,
     closeUserOrdersModal,
   }
+
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

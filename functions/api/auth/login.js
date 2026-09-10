@@ -24,7 +24,16 @@ export async function onRequestOptions() {
 export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json()
-    const { identifier, password } = body
+    const { identifier, password, website_bot_trap_check, human_verified } = body
+
+    // 1. Anti-Bot Trap Defense
+    if (website_bot_trap_check && String(website_bot_trap_check).trim().length > 0) {
+      return errorResponse('Automated bot request blocked by Edge Security.', 403)
+    }
+
+    if (human_verified === false) {
+      return errorResponse('Please complete the interactive human verification check before logging in.', 400)
+    }
 
     if (!identifier || !password) {
       return errorResponse('Email/Username and Password are required.', 400)
@@ -61,11 +70,18 @@ export async function onRequestPost({ request, env }) {
       return errorResponse('Invalid email/username or password.', 401)
     }
 
+    // Master Admin Whitelist: only damimehdi / admin@bleuwi.world can have admin role
+    const isMasterAdminAccount =
+      (user.username && user.username.toLowerCase() === 'damimehdi') ||
+      (user.email && user.email.toLowerCase() === 'admin@bleuwi.world')
+
+    const effectiveRole = (user.role === 'admin' && isMasterAdminAccount) ? 'admin' : 'user'
+
     // ========================================================
-    // REQUIREMENT 1: 2FA APPLIES ONLY TO ADMINS
+    // REQUIREMENT 1: 2FA APPLIES ONLY TO MASTER ADMIN
     // Regular users log in directly without any 2FA flow!
     // ========================================================
-    if (user.role !== 'admin') {
+    if (effectiveRole !== 'admin') {
       const clientIp =
         request.headers.get('cf-connecting-ip') ||
         request.headers.get('x-forwarded-for') ||

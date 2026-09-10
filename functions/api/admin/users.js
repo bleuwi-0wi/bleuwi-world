@@ -1,9 +1,8 @@
-// Cloudflare Pages Function: /api/admin/users
 import {
   jsonResponse,
   errorResponse,
   handleOptions,
-  getAuthUser,
+  requireMasterAdmin,
 } from '../utils.js'
 
 export async function onRequestOptions() {
@@ -13,9 +12,9 @@ export async function onRequestOptions() {
 // GET /api/admin/users - list all users
 export async function onRequestGet({ request, env }) {
   try {
-    const authUser = await getAuthUser(request, env)
-    if (!authUser || authUser.role !== 'admin') {
-      return errorResponse('Forbidden: Unauthorized admin access', 403)
+    const authUser = await requireMasterAdmin(request, env)
+    if (!authUser) {
+      return errorResponse('Forbidden: Master Admin privileges required', 403)
     }
 
     if (!env || !env.DB) {
@@ -48,9 +47,9 @@ export async function onRequestGet({ request, env }) {
 // PATCH /api/admin/users - update role, status, or balance
 export async function onRequestPatch({ request, env }) {
   try {
-    const authUser = await getAuthUser(request, env)
-    if (!authUser || authUser.role !== 'admin') {
-      return errorResponse('Forbidden: Unauthorized admin access', 403)
+    const authUser = await requireMasterAdmin(request, env)
+    if (!authUser) {
+      return errorResponse('Forbidden: Master Admin privileges required', 403)
     }
 
     const body = await request.json()

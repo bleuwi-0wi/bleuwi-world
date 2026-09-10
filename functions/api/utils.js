@@ -237,3 +237,25 @@ export async function getAuthUser(request, env) {
 
   return payload
 }
+
+/**
+ * Master Admin Whitelist Check: strictly locks down admin privileges to damimehdi / admin@bleuwi.world
+ */
+export function isMasterAdmin(user) {
+  if (!user) return false
+  const cleanUsername = String(user.username || '').trim().toLowerCase()
+  const cleanEmail = String(user.email || '').trim().toLowerCase()
+  const isMasterIdentity = cleanUsername === 'damimehdi' || cleanEmail === 'admin@bleuwi.world'
+  return user.role === 'admin' && isMasterIdentity
+}
+
+/**
+ * Strict Master Admin Middleware: returns user if authorized, or null
+ */
+export async function requireMasterAdmin(request, env) {
+  const user = await getAuthUser(request, env)
+  if (!isMasterAdmin(user)) {
+    return null
+  }
+  return user
+}

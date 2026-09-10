@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { LanguageProvider } from './context/LanguageContext'
+import { LanguageProvider, useLanguage } from './context/LanguageContext'
 import { ShopProvider } from './context/ShopContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Header from './components/Header'
@@ -44,7 +44,10 @@ function MainApp() {
 
   const [orderModalOpen, setOrderModalOpen] = useState(false)
   const [orderModalData, setOrderModalData] = useState({})
+  const [pendingOrderData, setPendingOrderData] = useState(null)
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
+
+  const { lang } = useLanguage()
 
   const {
     user,
@@ -57,10 +60,32 @@ function MainApp() {
     closeUserOrdersModal,
   } = useAuth()
 
+  // Mandatory Login Before Purchase: Guard all purchases
   const handleOpenOrder = (data = {}) => {
+    if (!user) {
+      setPendingOrderData(data)
+      openAuthModal(
+        'login',
+        lang === 'ar'
+          ? 'يرجى تسجيل الدخول أو إنشاء حساب لإتمام عملية الشراء ومتابعة طلبك عبر واتساب.'
+          : 'Please sign in or create an account to complete your purchase and track your order.'
+      )
+      return
+    }
     setOrderModalData(data)
     setOrderModalOpen(true)
   }
+
+  // Auto-resume order immediately once authenticated
+  useEffect(() => {
+    if (user && pendingOrderData) {
+      const resume = pendingOrderData
+      setPendingOrderData(null)
+      setOrderModalData(resume)
+      setOrderModalOpen(true)
+    }
+  }, [user, pendingOrderData])
+
 
   const handleCloseOrder = () => {
     setOrderModalOpen(false)

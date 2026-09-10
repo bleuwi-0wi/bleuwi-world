@@ -14,6 +14,8 @@ import {
 } from 'lucide-react'
 import { useShop, CURRENCY_RATES } from '../context/ShopContext'
 import { useLanguage } from '../context/LanguageContext'
+import { useAuth } from '../context/AuthContext'
+import { api } from '../services/api'
 
 export default function CartDrawer() {
   const { 
@@ -32,6 +34,7 @@ export default function CartDrawer() {
     checkoutViaWhatsApp 
   } = useShop()
 
+  const { user, openAuthModal } = useAuth()
   const { lang, isRTL, t } = useLanguage()
   const [customerNote, setCustomerNote] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -39,12 +42,44 @@ export default function CartDrawer() {
   if (!isCartOpen) return null
 
   const handleCheckout = () => {
+    // Mandatory Login Check
+    if (!user) {
+      closeCart()
+      openAuthModal(
+        'login',
+        lang === 'ar'
+          ? 'يرجى تسجيل الدخول أو إنشاء حساب لإتمام عملية الشراء ومتابعة طلبك عبر واتساب.'
+          : 'Please sign in or create an account to complete your purchase and track your order.'
+      )
+      return
+    }
+
     setIsSubmitting(true)
+
+    // Ingest order directly into Cloudflare D1
+    try {
+      api.createOrder({
+        customerName: user.fullName || user.username,
+        customerPhone: user.phone || 'WhatsApp Client',
+        customerEmail: user.email,
+        items: cart.map((item) => ({
+          id: item.id,
+          title: `${item.name}${item.variantName ? ` (${item.variantName})` : ''}`,
+          price: item.priceMAD,
+          quantity: item.quantity,
+        })),
+        totalPrice: totalPriceMAD,
+        currency: 'MAD',
+        notes: customerNote.trim(),
+      }).catch(() => {})
+    } catch (e) {}
+
     setTimeout(() => {
       checkoutViaWhatsApp(customerNote)
       setIsSubmitting(false)
     }, 250)
   }
+
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">

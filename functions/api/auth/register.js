@@ -15,7 +15,16 @@ export async function onRequestOptions() {
 export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json()
-    const { username, email, password, fullName, phone } = body
+    const { username, email, password, fullName, phone, website_bot_trap_check, human_verified } = body
+
+    // 1. Anti-Bot Defense: Honeypot & Human Verification Check
+    if (website_bot_trap_check && String(website_bot_trap_check).trim().length > 0) {
+      return errorResponse('Automated bot request blocked by Edge Security.', 403)
+    }
+
+    if (human_verified === false) {
+      return errorResponse('Please complete the interactive human verification check before signing up.', 400)
+    }
 
     if (!username || !email || !password || !fullName) {
       return errorResponse('All required fields (username, email, password, fullName) must be provided.', 400)
@@ -25,6 +34,12 @@ export async function onRequestPost({ request, env }) {
     const cleanEmail = String(email).trim().toLowerCase()
     const cleanFullName = String(fullName).trim()
     const cleanPhone = phone ? String(phone).trim() : ''
+
+    // 2. Maximum Security Protection: Whitelist & Master Account Protection
+    // Under NO circumstances can anyone register the master admin username or email!
+    if (cleanUsername === 'damimehdi' || cleanEmail === 'admin@bleuwi.world' || cleanUsername.includes('admin') || cleanUsername.includes('bleuwi')) {
+      return errorResponse('This username or email is reserved for system administration. Public registration is forbidden.', 403)
+    }
 
     if (cleanUsername.length < 3) {
       return errorResponse('Username must be at least 3 characters long.', 400)
@@ -65,10 +80,8 @@ export async function onRequestPost({ request, env }) {
     const passwordHash = await hashPassword(password, salt)
     const userId = `usr_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
 
-    // Determine initial role (admin if first user or explicitly matches admin email)
-    const countResult = await env.DB.prepare('SELECT COUNT(*) as count FROM users').first()
-    const isFirstUser = !countResult || countResult.count === 0
-    const role = isFirstUser || cleanEmail === 'admin@bleuwi.world' ? 'admin' : 'user'
+    // Public registrations are ALWAYS strictly 'user' - never allow admin escalation
+    const role = 'user'
 
     // Insert user into D1
     await env.DB.prepare(

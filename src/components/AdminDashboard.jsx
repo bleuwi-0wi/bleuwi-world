@@ -35,6 +35,7 @@ import {
   Smartphone,
   Eye,
   Radio,
+  X,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
@@ -60,6 +61,49 @@ export default function AdminDashboard({ onBackToStore }) {
   const [visitorSearchQuery, setVisitorSearchQuery] = useState('')
   const [copiedIp, setCopiedIp] = useState(null)
 
+  // Done & Save Operations State
+  const [completingOrder, setCompletingOrder] = useState(null)
+  const [fulfillmentNotes, setFulfillmentNotes] = useState('')
+  const [savingDone, setSavingDone] = useState(false)
+  const [viewingNotesOrder, setViewingNotesOrder] = useState(null)
+
+  const getDurationText = (created_at, completed_at, minutes) => {
+    if (minutes != null) return `${minutes} min`
+    if (completed_at && created_at) {
+      const diff = Math.max(1, Math.round((new Date(completed_at) - new Date(created_at)) / 60000))
+      return `${diff} min`
+    }
+    if (created_at) {
+      const diff = Math.max(1, Math.round((Date.now() - new Date(created_at)) / 60000))
+      return `${diff} min`
+    }
+    return '—'
+  }
+
+  const handleOpenDoneModal = (ord) => {
+    setCompletingOrder(ord)
+    setFulfillmentNotes(ord.fulfillment_notes || ord.notes || '')
+  }
+
+  const handleSaveDoneOrder = async () => {
+    if (!completingOrder) return
+    setSavingDone(true)
+    try {
+      await api.updateAdminOrder(completingOrder.id, {
+        status: 'completed',
+        fulfillmentNotes: fulfillmentNotes.trim(),
+      })
+      notify(`Order ${completingOrder.order_number || completingOrder.id} marked as DONE & SAVED!`)
+      setCompletingOrder(null)
+      setFulfillmentNotes('')
+      loadDashboardData()
+    } catch (err) {
+      notify(err.message || 'Failed to save completed order')
+    } finally {
+      setSavingDone(false)
+    }
+  }
+
   // Copy IP Helper with feedback
   const handleCopyIp = (ip) => {
     if (!ip) return
@@ -72,6 +116,7 @@ export default function AdminDashboard({ onBackToStore }) {
       notify(`IP: ${ip}`)
     }
   }
+
 
   // Country Code to Flag Emoji helper
   const getCountryFlag = (cc) => {
@@ -996,14 +1041,27 @@ export default function AdminDashboard({ onBackToStore }) {
                           <tr key={ord.id} className="transition hover:bg-white/[0.02]">
                             <td className="p-3.5 font-mono font-bold text-sky-300">
                               {ord.order_number || ord.id}
-                              <div className="text-[10px] text-slate-500 font-sans font-normal">
-                                {new Date(ord.created_at).toLocaleDateString()}
+                              <div className="text-[10px] text-slate-400 font-sans font-normal mt-0.5">
+                                📅 {new Date(ord.created_at).toLocaleDateString()}
+                              </div>
+                              <div className="text-[10px] text-slate-500 font-mono">
+                                ⏱️ {new Date(ord.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </div>
                             </td>
 
                             <td className="p-3.5">
-                              <div className="font-bold text-white">{ord.customer_name}</div>
-                              <div className="text-[11px] text-slate-400">{ord.customer_phone}</div>
+                              <div className="font-bold text-white text-sm">{ord.customer_name}</div>
+                              {cleanPhone && (
+                                <a
+                                  href={waUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 hover:text-emerald-300 underline mt-0.5"
+                                >
+                                  <Phone size={10} />
+                                  <span>{ord.customer_phone}</span>
+                                </a>
+                              )}
                               {ord.customer_ip && (
                                 <div className="mt-1 flex items-center gap-1.5 font-mono text-[10px] text-sky-300">
                                   <span>{getCountryFlag(ord.country)}</span>
@@ -1030,6 +1088,11 @@ export default function AdminDashboard({ onBackToStore }) {
                                   <span className="text-sky-400 font-bold">{it.quantity || 1}x</span> {it.title}
                                 </div>
                               ))}
+                              {ord.notes && (
+                                <div className="mt-1 text-[10px] text-slate-400 italic bg-white/[0.02] p-1 rounded">
+                                  Note: {ord.notes}
+                                </div>
+                              )}
                             </td>
 
                             <td className="p-3.5 font-extrabold text-amber-400 text-sm">
@@ -1037,28 +1100,70 @@ export default function AdminDashboard({ onBackToStore }) {
                             </td>
 
                             <td className="p-3.5">
-                              <select
-                                value={ord.status}
-                                onChange={(e) => handleUpdateOrderStatus(ord.id, e.target.value)}
-                                disabled={actionLoading}
-                                className="rounded-lg border border-white/10 bg-slate-900 py-1 px-2 text-xs font-bold text-white focus:outline-none cursor-pointer"
-                              >
-                                <option value="pending">🟡 Pending</option>
-                                <option value="processing">🔵 Processing</option>
-                                <option value="completed">🟢 Completed</option>
-                                <option value="cancelled">🔴 Cancelled</option>
-                              </select>
+                              {ord.status === 'completed' ? (
+                                <div className="space-y-1">
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black text-emerald-300">
+                                    <CheckCircle2 size={11} />
+                                    <span>COMPLETED</span>
+                                  </span>
+                                  <div className="flex items-center gap-1 text-[10px] font-mono text-sky-300 font-bold">
+                                    <Clock size={10} />
+                                    <span>{getDurationText(ord.created_at, ord.completed_at, ord.time_to_complete_minutes)}</span>
+                                  </div>
+                                  <div className="text-[9px] text-slate-400 font-mono">
+                                    By @{ord.completed_by || 'damimehdi'}
+                                  </div>
+                                  {ord.fulfillment_notes && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setViewingNotesOrder(ord)}
+                                      className="text-[10px] text-amber-400 hover:text-amber-300 underline font-semibold block cursor-pointer"
+                                    >
+                                      View Delivery Note ↗
+                                    </button>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <select
+                                    value={ord.status}
+                                    onChange={(e) => handleUpdateOrderStatus(ord.id, e.target.value)}
+                                    disabled={actionLoading}
+                                    className="rounded-lg border border-white/10 bg-slate-900 py-1 px-2 text-xs font-bold text-white focus:outline-none cursor-pointer"
+                                  >
+                                    <option value="pending">🟡 Pending</option>
+                                    <option value="processing">🔵 Processing</option>
+                                    <option value="completed">🟢 Completed</option>
+                                    <option value="cancelled">🔴 Cancelled</option>
+                                  </select>
+                                  <div className="text-[10px] font-mono text-amber-400/90">
+                                    ⏱️ {getDurationText(ord.created_at)}
+                                  </div>
+                                </div>
+                              )}
                             </td>
 
                             <td className="p-3.5">
-                              <div className="flex items-center gap-1.5">
+                              <div className="flex flex-col gap-1.5">
+                                {ord.status !== 'completed' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenDoneModal(ord)}
+                                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-3 py-1.5 text-xs font-black text-white shadow-md shadow-emerald-600/30 hover:brightness-110 active:scale-95 transition cursor-pointer"
+                                    title="Mark sale as completed and save duration"
+                                  >
+                                    <CheckCircle2 size={13} />
+                                    <span>{lang === 'ar' ? 'إتمام وحفظ العملية' : 'Done & Save'}</span>
+                                  </button>
+                                )}
+
                                 {cleanPhone && (
                                   <a
                                     href={waUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/15 px-2 py-1 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/30"
-                                    title="Contact on WhatsApp"
+                                    className="inline-flex items-center justify-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-1 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/30 transition"
+                                    title="Open customer WhatsApp chat"
                                   >
                                     <Phone size={11} />
                                     <span>WhatsApp</span>
@@ -1067,6 +1172,7 @@ export default function AdminDashboard({ onBackToStore }) {
                               </div>
                             </td>
                           </tr>
+
                         )
                       })
                     )}
@@ -1393,7 +1499,183 @@ export default function AdminDashboard({ onBackToStore }) {
             </div>
           </div>
         )}
+
+        {/* MODAL 1: MARK DONE & SAVE (إتمام وحفظ العملية) */}
+        {completingOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+            <div className="fixed inset-0" onClick={() => !savingDone && setCompletingOrder(null)} />
+            <div className="relative w-full max-w-lg rounded-3xl border border-emerald-400/30 bg-[#0a0f1d] p-6 sm:p-7 shadow-[0_0_60px_rgba(16,185,129,0.25)] backdrop-blur-2xl z-10 text-white animate-scaleIn">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    <CheckCircle2 size={22} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-white">
+                      {lang === 'ar' ? 'إتمام وحفظ العملية في قاعدة البيانات' : 'Mark Order as Done & Save'}
+                    </h3>
+                    <p className="text-[11px] text-emerald-300">
+                      {lang === 'ar' ? 'حساب تلقائي لمدة المعاملة وحفظ سجل التسليم' : 'Calculates turnaround & saves permanent audit log'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCompletingOrder(null)}
+                  disabled={savingDone}
+                  className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Order Brief */}
+              <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-3.5 mb-4 space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Order Number:</span>
+                  <span className="font-mono font-bold text-sky-300 text-sm">{completingOrder.order_number || completingOrder.id}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Customer:</span>
+                  <span className="font-bold text-white">{completingOrder.customer_name} ({completingOrder.customer_phone})</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Total Price:</span>
+                  <span className="font-extrabold text-amber-400 text-sm">{completingOrder.total_price} {completingOrder.currency || 'MAD'}</span>
+                </div>
+                <div className="flex items-center justify-between pt-1 border-t border-white/5">
+                  <span className="text-slate-400">WhatsApp Order Time:</span>
+                  <span className="font-mono text-slate-300">{new Date(completingOrder.created_at).toLocaleTimeString()}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-emerald-400 font-bold">Turnaround Duration:</span>
+                  <span className="font-mono font-black text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+                    ⏱️ {getDurationText(completingOrder.created_at)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Fulfillment Notes Textarea */}
+              <div className="mb-5">
+                <label className="block text-xs font-bold text-slate-200 mb-1.5 flex items-center justify-between">
+                  <span>{lang === 'ar' ? 'ملاحظات التسليم / المفاتيح الرقمية / إثبات التحويل:' : 'Fulfillment Notes / Digital Keys / Codes Delivered:'}</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Optional</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={fulfillmentNotes}
+                  onChange={(e) => setFulfillmentNotes(e.target.value)}
+                  placeholder={
+                    lang === 'ar'
+                      ? 'مثال: تم إرسال مفتاح ويندوز 11 برو (XXXX-YYYY-ZZZZ) أو تم شحن 1080 جوهرة بالآيدي واستلام المبلغ عبر CIH Bank...'
+                      : 'e.g. Sent Windows 11 Pro Key: W269N-WFGWX... or Diamonds top-up completed. Payment verified via CIH Bank.'
+                  }
+                  className="w-full rounded-xl border border-white/10 bg-slate-900/80 p-3 text-xs text-white placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
+                />
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setCompletingOrder(null)}
+                  disabled={savingDone}
+                  className="flex-1 rounded-xl border border-white/10 bg-white/5 py-2.5 text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer"
+                >
+                  {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveDoneOrder}
+                  disabled={savingDone}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-2.5 text-xs font-black text-white shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-98 transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  {savingDone ? (
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <span>Saving...</span>
+                    </span>
+                  ) : (
+                    <>
+                      <CheckCircle2 size={15} />
+                      <span>{lang === 'ar' ? '💾 حفظ وتأكيد إتمام العملية' : '💾 Confirm & Save Done'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL 2: VIEW DELIVERY NOTES (عرض تفاصيل التسليم) */}
+        {viewingNotesOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+            <div className="fixed inset-0" onClick={() => setViewingNotesOrder(null)} />
+            <div className="relative w-full max-w-md rounded-3xl border border-sky-400/30 bg-[#0a0f1d] p-6 shadow-2xl z-10 text-white animate-scaleIn">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold text-sky-400 text-sm">
+                    {viewingNotesOrder.order_number || viewingNotesOrder.id}
+                  </span>
+                  <span className="rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-black">
+                    DONE
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setViewingNotesOrder(null)}
+                  className="text-slate-400 hover:text-white p-1 cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-3 text-xs mb-4">
+                <div className="rounded-xl bg-slate-950 p-3 border border-white/5 space-y-1.5">
+                  <div className="flex justify-between text-slate-400">
+                    <span>Customer:</span>
+                    <span className="font-bold text-white">{viewingNotesOrder.customer_name}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Turnaround Duration:</span>
+                    <span className="font-bold text-emerald-400">
+                      ⏱️ {getDurationText(viewingNotesOrder.created_at, viewingNotesOrder.completed_at, viewingNotesOrder.time_to_complete_minutes)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Completed At:</span>
+                    <span className="font-mono text-slate-300">
+                      {viewingNotesOrder.completed_at ? new Date(viewingNotesOrder.completed_at).toLocaleString() : '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Completed By:</span>
+                    <span className="font-mono text-sky-300">@{viewingNotesOrder.completed_by || 'damimehdi'}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                    Delivery Notes & Given Keys:
+                  </label>
+                  <div className="rounded-xl border border-white/10 bg-black/60 p-3 text-xs text-sky-200 font-mono whitespace-pre-wrap select-all">
+                    {viewingNotesOrder.fulfillment_notes || viewingNotesOrder.notes || 'No notes recorded.'}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setViewingNotesOrder(null)}
+                className="w-full rounded-xl bg-slate-800 hover:bg-slate-700 py-2 text-xs font-bold text-white cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
 }
+
