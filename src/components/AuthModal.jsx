@@ -56,9 +56,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
   const [signupFullName, setSignupFullName] = useState('')
   const [signupUsername, setSignupUsername] = useState('')
   const [signupEmail, setSignupEmail] = useState('')
-  const [signupPhone, setSignupPhone] = useState('')
   const [signupPassword, setSignupPassword] = useState('')
-  const [phonePrefix, setPhonePrefix] = useState('+212')
 
   const inputRefs = useRef([])
 
@@ -223,12 +221,11 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
     setLoading(true)
 
     try {
-      const fullPhone = signupPhone.trim() ? `${phonePrefix} ${signupPhone.trim()}` : ''
       await signup({
         fullName: signupFullName,
         username: signupUsername,
         email: signupEmail,
-        phone: fullPhone,
+        phone: '',
         password: signupPassword,
       })
       setSuccessMsg(lang === 'ar' ? 'تم إنشاء الحساب بنجاح! مرحباً بك.' : 'Account created successfully! Welcome.')
@@ -714,39 +711,6 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                       placeholder="you@email.com"
                       className="w-full rounded-xl border border-white/10 bg-slate-900/60 py-2 px-3 text-xs sm:text-sm text-white placeholder-slate-500 transition focus:border-sky-400 focus:outline-none"
                     />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-300">
-                    {lang === 'ar' ? 'رقم الهاتف' : 'Phone'}
-                  </label>
-                  <div className="flex gap-1.5">
-                    <select
-                      value={phonePrefix}
-                      onChange={(e) => setPhonePrefix(e.target.value)}
-                      className="rounded-xl border border-white/10 bg-slate-900/90 py-2 px-2 text-xs font-bold text-sky-300 focus:outline-none"
-                    >
-                      <option value="+212">🇲🇦 +212 (MA)</option>
-                      <option value="+966">🇸🇦 +966 (SA)</option>
-                      <option value="+971">🇦🇪 +971 (AE)</option>
-                      <option value="+33">🇫🇷 +33 (FR)</option>
-                      <option value="+34">🇪🇸 +34 (ES)</option>
-                      <option value="+1">🇺🇸 +1 (US)</option>
-                    </select>
-                    <div className="relative flex-1">
-                      <input
-                        type="tel"
-                        value={signupPhone}
-                        onChange={(e) => setSignupPhone(e.target.value)}
-                        placeholder="612345678"
-                        className="w-full rounded-xl border border-white/10 bg-slate-900/60 py-2 px-8 text-xs sm:text-sm text-white placeholder-slate-500 transition focus:border-sky-400 focus:outline-none"
-                      />
-                      <Phone
-                        size={15}
-                        className={`absolute top-2.5 text-slate-400 ${isRTL ? 'right-2.5' : 'left-2.5'}`}
-                      />
-                    </div>
                   </div>
                 </div>
 
