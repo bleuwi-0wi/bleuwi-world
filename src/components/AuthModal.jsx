@@ -817,12 +817,28 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
               </button>
 
               {/* Optional Config Box for Admin/Owner Google OAuth Client ID */}
+              {/* Subtle Setup Link for Site Owner */}
+              <div className="mt-2 text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowGoogleConfig(!showGoogleConfig)}
+                  className="inline-flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-sky-400 transition cursor-pointer"
+                >
+                  <Settings size={12} className="text-sky-400" />
+                  <span>
+                    {lang === 'ar'
+                      ? '⚙️ إعداد Google Client ID الخاص بك'
+                      : '⚙️ Configure Your Google Client ID'}
+                  </span>
+                </button>
+              </div>
+
               {showGoogleConfig && (
-                <div className="mt-3 rounded-2xl border border-sky-500/30 bg-sky-950/50 p-3 text-xs animate-fadeIn shadow-lg">
+                <div className="mt-3 rounded-2xl border border-sky-500/30 bg-sky-950/60 p-4 text-xs animate-fadeIn shadow-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-bold text-sky-300 flex items-center gap-1.5">
                       <Settings size={13} className="text-sky-400" />
-                      <span>{lang === 'ar' ? 'إعداد Google Client ID' : 'Google Client ID Setup'}</span>
+                      <span>{lang === 'ar' ? 'إعداد Google OAuth 2.0 Client ID' : 'Google OAuth 2.0 Client ID Setup'}</span>
                     </span>
                     <button
                       type="button"
@@ -832,18 +848,42 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                       <X size={13} />
                     </button>
                   </div>
+
                   <p className="text-[11px] text-slate-300 mb-2 leading-relaxed">
                     {lang === 'ar'
-                      ? 'لتفعيل تسجيل الدخول المباشر بـ Google، الصق معرف Client ID المنشأ من Google Cloud Console:'
-                      : 'To enable direct Google Sign-In, paste your Client ID from Google Cloud Console:'}
+                      ? 'لحل خطأ (Error 401: invalid_client)، أنشئ معرف مجاني من Google Cloud Console والصقه هنا:'
+                      : 'To fix (Error 401: invalid_client), create a free client ID in Google Cloud Console and paste it here:'}
                   </p>
+
+                  <div className="mb-2.5 rounded-lg bg-black/50 border border-white/10 p-2 text-[10px] text-slate-400 leading-normal space-y-1">
+                    <div>
+                      <span className="text-sky-400 font-bold">1. </span>
+                      {lang === 'ar' ? 'افتح:' : 'Open:'}{' '}
+                      <a
+                        href="https://console.cloud.google.com/apis/credentials"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sky-300 underline font-mono"
+                      >
+                        console.cloud.google.com/apis/credentials
+                      </a>
+                    </div>
+                    <div>
+                      <span className="text-sky-400 font-bold">2. </span>
+                      {lang === 'ar' ? 'أضف في Authorized JavaScript origins:' : 'Add to Authorized JavaScript origins:'}
+                      <span className="block font-mono text-amber-300 font-bold bg-black/60 px-1.5 py-0.5 rounded mt-0.5 select-all">
+                        https://bleuwi-world.pages.dev
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="flex gap-2">
                     <input
                       type="text"
                       placeholder="xxxx.apps.googleusercontent.com"
                       value={customClientId}
                       onChange={(e) => setCustomClientId(e.target.value)}
-                      className="flex-1 rounded-lg bg-black/60 border border-sky-500/40 px-2.5 py-1.5 text-[11px] text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-sky-400"
+                      className="flex-1 rounded-lg bg-black/70 border border-sky-500/40 px-2.5 py-2 text-[11px] text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-sky-400"
                     />
                     <button
                       type="button"
@@ -851,7 +891,11 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                         if (typeof window !== 'undefined') {
                           if (customClientId.trim()) {
                             localStorage.setItem('bleuwi_google_client_id', customClientId.trim())
-                            setSuccessMsg(lang === 'ar' ? 'تم حفظ Client ID! جرب الدخول الآن.' : 'Client ID saved! Try signing in now.')
+                            setSuccessMsg(
+                              lang === 'ar'
+                                ? 'تم حفظ Client ID بنجاح! اضغط على زر Google للتسجيل الآن.'
+                                : 'Client ID saved! Click Google button to sign in now.'
+                            )
                           } else {
                             localStorage.removeItem('bleuwi_google_client_id')
                             setSuccessMsg(lang === 'ar' ? 'تمت استعادة الإعداد الافتراضي.' : 'Reset to default.')
@@ -859,7 +903,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                         }
                         setShowGoogleConfig(false)
                       }}
-                      className="rounded-lg bg-sky-500 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-sky-400 cursor-pointer shrink-0"
+                      className="rounded-lg bg-sky-500 px-3.5 py-2 text-[11px] font-bold text-white hover:bg-sky-400 transition cursor-pointer shrink-0"
                     >
                       {lang === 'ar' ? 'حفظ' : 'Save'}
                     </button>
