@@ -24,12 +24,13 @@ import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 
 export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
-  const { login, verify2FA, resend2FA, signup } = useAuth()
+  const { login, loginWithGoogle, verify2FA, resend2FA, signup } = useAuth()
   const { lang, isRTL } = useLanguage()
 
   const [activeTab, setActiveTab] = useState(initialTab)
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
 
@@ -234,6 +235,122 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Google OAuth / Google Identity Services Sign-In
+  const handleGoogleSignIn = async () => {
+    setErrorMsg('')
+    setSuccessMsg('')
+    setGoogleLoading(true)
+
+    const clientId =
+      import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+      '683918239182-bleuwiworld.apps.googleusercontent.com'
+
+    // 1. Try Google Identity Services (GIS) OAuth2 Token Client (Opens Account Chooser Popup)
+    if (typeof window !== 'undefined' && window.google?.accounts?.oauth2) {
+      try {
+        const tokenClient = window.google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: 'email profile openid',
+          prompt: 'select_account',
+          callback: async (tokenResponse) => {
+            if (tokenResponse && tokenResponse.access_token) {
+              try {
+                const res = await loginWithGoogle({ accessToken: tokenResponse.access_token })
+                if (res?.requires2FA) {
+                  setPreAuthToken(res.preAuthToken)
+                  setIs2FAMode(true)
+                  if (res.isFirstTimeSetup) {
+                    setIsFirstTimeSetup(true)
+                    setTotpSecret(res.totpSecret || '')
+                    setQrCodeUrl(res.qrCodeUrl || '')
+                    setBackupCodes(res.backupCodes || [])
+                  }
+                } else {
+                  setSuccessMsg(
+                    lang === 'ar'
+                      ? 'تم تسجيل الدخول بحساب Google بنجاح!'
+                      : 'Signed in with Google successfully!'
+                  )
+                }
+              } catch (apiErr) {
+                setErrorMsg(apiErr.message || 'Google authentication failed.')
+              } finally {
+                setGoogleLoading(false)
+              }
+            } else {
+              setGoogleLoading(false)
+            }
+          },
+          error_callback: (err) => {
+            setGoogleLoading(false)
+            if (err?.type !== 'popup_closed') {
+              setErrorMsg(
+                lang === 'ar'
+                  ? 'تم إلغاء نافذة Google.'
+                  : 'Google Sign-In was cancelled.'
+              )
+            }
+          },
+        })
+        tokenClient.requestAccessToken({ prompt: 'select_account' })
+        return
+      } catch (err) {
+        console.warn('GIS TokenClient initialization error:', err)
+      }
+    }
+
+    // 2. Fallback: Google One-Tap / ID Token
+    if (typeof window !== 'undefined' && window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response) => {
+            if (response && response.credential) {
+              try {
+                const res = await loginWithGoogle({ credential: response.credential })
+                if (res?.requires2FA) {
+                  setPreAuthToken(res.preAuthToken)
+                  setIs2FAMode(true)
+                  if (res.isFirstTimeSetup) {
+                    setIsFirstTimeSetup(true)
+                    setTotpSecret(res.totpSecret || '')
+                    setQrCodeUrl(res.qrCodeUrl || '')
+                    setBackupCodes(res.backupCodes || [])
+                  }
+                } else {
+                  setSuccessMsg(
+                    lang === 'ar'
+                      ? 'تم تسجيل الدخول بحساب Google بنجاح!'
+                      : 'Signed in with Google successfully!'
+                  )
+                }
+              } catch (apiErr) {
+                setErrorMsg(apiErr.message || 'Google authentication failed.')
+              } finally {
+                setGoogleLoading(false)
+              }
+            }
+          },
+        })
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            setGoogleLoading(false)
+          }
+        })
+        return
+      } catch (err) {
+        console.warn('GIS ID initialization error:', err)
+      }
+    }
+
+    setErrorMsg(
+      lang === 'ar'
+        ? 'جاري تهيئة خدمة Google... يرجى إعادة المحاولة خلال ثوانٍ.'
+        : 'Initializing Google service... Please try again in a few seconds.'
+    )
+    setGoogleLoading(false)
   }
 
   return (
@@ -580,6 +697,57 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
               >
                 {lang === 'ar' ? 'حساب جديد' : 'Sign Up'}
               </button>
+            </div>
+
+            {/* GOOGLE SIGN IN BUTTON */}
+            <div className="mb-5">
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading || loading}
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-white/20 bg-white py-3 px-4 text-xs sm:text-sm font-black text-slate-950 shadow-md transition hover:bg-slate-100 active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+              >
+                {googleLoading ? (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900 border-t-transparent" />
+                ) : (
+                  <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                    />
+                  </svg>
+                )}
+                <span>
+                  {activeTab === 'signup'
+                    ? lang === 'ar'
+                      ? 'التسجيل السريع بحساب Google'
+                      : 'Sign up with Google'
+                    : lang === 'ar'
+                      ? 'الدخول المباشر بحساب Google'
+                      : 'Sign in with Google'}
+                </span>
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="relative mb-5 flex items-center justify-center">
+              <div className="grow border-t border-white/10" />
+              <span className="shrink px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                {lang === 'ar' ? 'أو عبر البريد الإلكتروني' : 'OR WITH EMAIL'}
+              </span>
+              <div className="grow border-t border-white/10" />
             </div>
 
             {/* LOGIN FORM */}

@@ -37,6 +37,15 @@ export function AuthProvider({ children }) {
     return res
   }
 
+  const loginWithGoogle = async (credentialOrToken) => {
+    const res = await api.loginWithGoogle(credentialOrToken)
+    if (res && res.user && !res.requires2FA) {
+      setUser(res.user)
+      setAuthModalOpen(false)
+    }
+    return res
+  }
+
   const verify2FA = async (preAuthToken, code) => {
     const res = await api.verify2FA(preAuthToken, code)
     if (res && res.user) {
@@ -92,6 +101,7 @@ export function AuthProvider({ children }) {
     loading,
     isAdmin,
     login,
+    loginWithGoogle,
     verify2FA,
     resend2FA,
     signup,

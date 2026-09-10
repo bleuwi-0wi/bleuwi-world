@@ -167,6 +167,15 @@ export const api = {
     }
   },
 
+  async loginWithGoogle(payload) {
+    const res = await request('/api/auth/google', {
+      method: 'POST',
+      body: JSON.stringify(typeof payload === 'string' ? { credential: payload } : payload),
+    })
+    if (res.token) this.setToken(res.token)
+    return res
+  },
+
   async verify2FA(preAuthToken, code) {
     try {
       const res = await request('/api/auth/verify-2fa', {

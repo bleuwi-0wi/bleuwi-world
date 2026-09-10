@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS users (
     balance REAL NOT NULL DEFAULT 0.0,
     status TEXT NOT NULL DEFAULT 'active', -- 'active' or 'banned'
     two_factor_enabled INTEGER NOT NULL DEFAULT 1, -- 2FA enabled
+    google_id TEXT UNIQUE,
+    auth_provider TEXT DEFAULT 'local', -- 'local' or 'google'
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
