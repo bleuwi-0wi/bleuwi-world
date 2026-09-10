@@ -320,8 +320,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                   setIs2FAMode(true)
                   if (res.isFirstTimeSetup) {
                     setIsFirstTimeSetup(true)
-                    setTotpSecret(res.totpSecret || '')
-                    setQrCodeUrl(res.qrCodeUrl || '')
+                    setTotpSecret(res.totpSecret || res.secret || '')
+                    let qr = res.qrCodeUrl || ''
+                    if (qr && qr.startsWith('otpauth://')) {
+                      qr = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qr)}`
+                    }
+                    setQrCodeUrl(qr)
                     setBackupCodes(res.backupCodes || [])
                   }
                 } else {
@@ -387,8 +391,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                   setIs2FAMode(true)
                   if (res.isFirstTimeSetup) {
                     setIsFirstTimeSetup(true)
-                    setTotpSecret(res.totpSecret || '')
-                    setQrCodeUrl(res.qrCodeUrl || '')
+                    setTotpSecret(res.totpSecret || res.secret || '')
+                    let qr = res.qrCodeUrl || ''
+                    if (qr && qr.startsWith('otpauth://')) {
+                      qr = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qr)}`
+                    }
+                    setQrCodeUrl(qr)
                     setBackupCodes(res.backupCodes || [])
                   }
                 } else {

@@ -180,13 +180,17 @@ export async function onRequestPost({ request, env }) {
           .bind(encryptedSecret, JSON.stringify(hashedCodes), user.id)
           .run()
 
+        const qrCodeImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(otpauthUrl)}`
+
         return jsonResponse({
           success: true,
           requires2FA: true,
           isFirstTimeSetup: true,
           preAuthToken,
+          secret: rawSecret,
           totpSecret: rawSecret,
-          qrCodeUrl: otpauthUrl,
+          otpAuthUri: otpauthUrl,
+          qrCodeUrl: qrCodeImageUrl,
           backupCodes: rawBackupCodes,
           message: 'Admin 2FA setup required. Scan QR code or copy key.',
         })
