@@ -302,7 +302,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
     const clientId =
       (storedClientId && storedClientId.trim()) ||
       import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-      '683918239182-bleuwiworld.apps.googleusercontent.com'
+      '160522009330-aqq1p9dailjapo0hn41iujgocmvmhamd.apps.googleusercontent.com'
 
     // 1. Try Google Identity Services (GIS) OAuth2 Token Client (Opens Account Chooser Popup)
     if (typeof window !== 'undefined' && window.google?.accounts?.oauth2) {
