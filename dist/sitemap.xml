@@ -169,14 +169,6 @@
     <priority>0.80</priority>
   </url>
 
-  <!-- 10. Game Panels & Custom Tools -->
-  <url>
-    <loc>https://bleuwiworld.shop/?showcase=panels</loc>
-    <lastmod>2026-09-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
-  </url>
-
   <!-- 11. Design & Web Development -->
   <url>
     <loc>https://bleuwiworld.shop/?showcase=design</loc>
