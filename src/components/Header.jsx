@@ -17,6 +17,9 @@ import {
   Package,
   ChevronDown,
   LayoutDashboard,
+  Home,
+  Star,
+  CreditCard,
 } from 'lucide-react'
 import BrandMark from './BrandMark'
 import { useLanguage } from '../context/LanguageContext'
@@ -127,125 +130,244 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
         </a>
       </div>
 
-      <div className="mx-auto flex h-16 sm:h-20 max-w-7xl items-center justify-between px-3.5 sm:px-6 lg:px-8">
-        {/* Brand Logo */}
+      <div className="mx-auto flex h-16 sm:h-20 max-w-[1600px] w-full items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
+        {/* Brand Logo with clear spacing & glowing badge */}
         <a
-          className="flex items-center gap-2 sm:gap-3 cursor-pointer"
+          className="group flex items-center gap-2.5 sm:gap-3 cursor-pointer shrink-0 py-1"
           href="#home"
           onClick={handleLogoClick}
           aria-label="BLEUWI WORLD home"
         >
-          <BrandMark size="small" />
-          <span className="text-xs sm:text-sm font-semibold tracking-[0.14em] sm:tracking-[0.18em] text-white">
-            BLEUWI <span className="text-sky-300">WORLD</span>
-          </span>
+          <div className="relative">
+            <div className="absolute -inset-1 rounded-full bg-sky-500/25 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <BrandMark size="small" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs sm:text-sm font-black tracking-[0.16em] sm:tracking-[0.2em] text-white group-hover:text-sky-200 transition-colors">
+              BLEUWI <span className="text-sky-400">WORLD</span>
+            </span>
+            <span className="hidden xl:inline-block text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+              {lang === 'ar' ? 'المتجر الرقمي الرسمي' : 'Official Store'}
+            </span>
+          </div>
         </a>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-6 lg:gap-7 md:flex" aria-label="Primary navigation">
-          <a
-            className="nav-link cursor-pointer"
-            href="#home"
-            onClick={(e) => handleNavClick(e, 'home')}
-          >
-            {t('navHome')}
-          </a>
-          <a
-            className="nav-link cursor-pointer flex items-center gap-1.5 text-amber-300 hover:text-amber-200"
-            href="#hot-sellers"
-            onClick={(e) => handleNavClick(e, 'hot-sellers')}
-          >
-            <Flame size={14} className="text-amber-400 animate-pulse" />
-            <span>{lang === 'ar' ? 'الأكثر مبيعاً' : lang === 'fr' ? 'Top Ventes' : lang === 'es' ? 'Más Vendidos' : 'Hot Sellers'}</span>
-          </a>
-          <a
-            className="nav-link cursor-pointer flex items-center gap-1.5 text-amber-400 hover:text-amber-300"
-            href="#diamond-calculator"
-            onClick={(e) => handleNavClick(e, 'diamond-calculator')}
-          >
-            <Gem size={14} className="text-amber-400" />
-            <span>{lang === 'ar' ? 'حاسبة فري فاير' : lang === 'fr' ? 'Calculateur FF' : lang === 'es' ? 'Calculadora FF' : 'FF Calculator'}</span>
-          </a>
-          <a
-            className="nav-link cursor-pointer flex items-center gap-1.5 text-sky-300 hover:text-sky-200"
-            href="#windows-advisor"
-            onClick={(e) => handleNavClick(e, 'windows-advisor')}
-          >
-            <ShieldCheck size={14} className="text-sky-400" />
-            <span>{lang === 'ar' ? 'مستشار ويندوز' : lang === 'fr' ? 'Conseiller Clés' : lang === 'es' ? 'Asesor Claves' : 'Key Advisor'}</span>
-          </a>
-          <a
-            className="nav-link cursor-pointer"
-            href="#payments"
-            onClick={(e) => handleNavClick(e, 'payments')}
-          >
-            {lang === 'ar' ? 'طرق الدفع' : lang === 'fr' ? 'Paiements' : lang === 'es' ? 'Pagos' : 'Payments'}
-          </a>
-          <a
-            className="nav-link cursor-pointer flex items-center gap-1.5 text-slate-300 hover:text-white"
-            href="#faq-section"
-            onClick={(e) => handleNavClick(e, 'faq-section')}
-          >
-            <HelpCircle size={14} className="text-sky-400" />
-            <span>{lang === 'ar' ? 'الأسئلة الشائعة' : lang === 'fr' ? 'FAQ' : lang === 'es' ? 'Preguntas' : 'FAQ'}</span>
-          </a>
-          <a
-            className="nav-link cursor-pointer"
-            href="#reviews"
-            onClick={(e) => handleNavClick(e, 'reviews')}
-          >
-            {lang === 'ar' ? 'التقييمات' : lang === 'fr' ? 'Avis' : lang === 'es' ? 'Opiniones' : 'Reviews'}
-          </a>
-          <a
-            className="nav-link cursor-pointer"
-            href="#links"
-            onClick={(e) => handleNavClick(e, 'links')}
-          >
-            {t('navLinks')}
-          </a>
+        {/* Desktop Navigation Dock: Organized Glassmorphic Capsule */}
+        <nav
+          className="hidden lg:flex items-center gap-0.5 xl:gap-1 rounded-full border border-white/[0.08] bg-[#090e1d]/85 px-2 py-1 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-2xl shrink-0"
+          aria-label="Primary navigation"
+        >
+          {/* Store & Deals */}
+          <div className="flex items-center gap-0.5">
+            <a
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 2xl:px-3 py-1.5 text-[11px] 2xl:text-xs font-semibold text-slate-300 transition-all duration-200 hover:bg-white/[0.08] hover:text-white cursor-pointer"
+              href="#home"
+              onClick={(e) => handleNavClick(e, 'home')}
+              title={t('navHome')}
+            >
+              <Home size={14} className="text-sky-400 shrink-0" />
+              <span>{t('navHome')}</span>
+            </a>
+
+            <a
+              className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/35 bg-gradient-to-r from-amber-500/15 to-orange-500/15 px-2.5 2xl:px-3 py-1.5 text-[11px] 2xl:text-xs font-bold text-amber-300 transition-all duration-200 hover:border-amber-400/60 hover:bg-amber-500/25 hover:text-amber-200 shadow-[0_0_12px_rgba(251,191,36,0.18)] cursor-pointer"
+              href="#hot-sellers"
+              onClick={(e) => handleNavClick(e, 'hot-sellers')}
+              title="Hot Sellers"
+            >
+              <Flame size={14} className="text-amber-400 animate-pulse shrink-0" />
+              <span>{lang === 'ar' ? 'الأكثر مبيعاً' : lang === 'fr' ? 'Top Ventes' : lang === 'es' ? 'Más Vendidos' : 'Hot Sellers'}</span>
+              <span className="hidden sm:inline-block rounded-full bg-amber-400/25 border border-amber-400/40 px-1.5 py-0.2 text-[8px] 2xl:text-[9px] font-black text-amber-200 uppercase">
+                HOT
+              </span>
+            </a>
+          </div>
+
+          {/* Subtle Vertical Divider */}
+          <div className="mx-0.5 h-3.5 w-[1px] bg-white/10" aria-hidden="true" />
+
+          {/* Interactive Tools */}
+          <div className="flex items-center gap-0.5">
+            <a
+              className="inline-flex items-center gap-1.5 rounded-full px-2 2xl:px-2.5 py-1.5 text-[11px] 2xl:text-xs font-semibold text-slate-300 transition-all duration-200 hover:bg-purple-500/15 hover:text-purple-300 cursor-pointer"
+              href="#diamond-calculator"
+              onClick={(e) => handleNavClick(e, 'diamond-calculator')}
+              title={lang === 'ar' ? 'حاسبة فري فاير' : 'FF Calculator'}
+            >
+              <Gem size={14} className="text-purple-400 shrink-0" />
+              <span>{lang === 'ar' ? 'حاسبة فري فاير' : lang === 'fr' ? 'Calculateur FF' : lang === 'es' ? 'Calculadora FF' : 'FF Calculator'}</span>
+            </a>
+
+            <a
+              className="inline-flex items-center gap-1.5 rounded-full px-2 2xl:px-2.5 py-1.5 text-[11px] 2xl:text-xs font-semibold text-slate-300 transition-all duration-200 hover:bg-emerald-500/15 hover:text-emerald-300 cursor-pointer"
+              href="#windows-advisor"
+              onClick={(e) => handleNavClick(e, 'windows-advisor')}
+              title={lang === 'ar' ? 'مستشار ويندوز' : 'Key Advisor'}
+            >
+              <ShieldCheck size={14} className="text-emerald-400 shrink-0" />
+              <span>{lang === 'ar' ? 'مستشار ويندوز' : lang === 'fr' ? 'Conseiller Clés' : lang === 'es' ? 'Asesor Claves' : 'Key Advisor'}</span>
+            </a>
+          </div>
+
+          {/* Subtle Vertical Divider */}
+          <div className="mx-0.5 h-3.5 w-[1px] bg-white/10" aria-hidden="true" />
+
+          {/* Trust, Payments & Community */}
+          <div className="flex items-center gap-0.5">
+            <a
+              className="inline-flex items-center gap-1.5 rounded-full px-2 2xl:px-2.5 py-1.5 text-[11px] 2xl:text-xs font-semibold text-slate-300 transition-all duration-200 hover:bg-amber-400/10 hover:text-amber-300 cursor-pointer"
+              href="#reviews"
+              onClick={(e) => handleNavClick(e, 'reviews')}
+              title={lang === 'ar' ? 'التقييمات' : 'Reviews'}
+            >
+              <Star size={14} className="text-amber-300 fill-amber-400/25 shrink-0" />
+              <span>{lang === 'ar' ? 'التقييمات' : lang === 'fr' ? 'Avis' : lang === 'es' ? 'Opiniones' : 'Reviews'}</span>
+            </a>
+
+            <a
+              className="inline-flex max-xl:hidden items-center gap-1.5 rounded-full px-2 2xl:px-2.5 py-1.5 text-[11px] 2xl:text-xs font-semibold text-slate-300 transition-all duration-200 hover:bg-sky-500/15 hover:text-sky-300 cursor-pointer"
+              href="#payments"
+              onClick={(e) => handleNavClick(e, 'payments')}
+              title={lang === 'ar' ? 'طرق الدفع' : 'Payments'}
+            >
+              <CreditCard size={14} className="text-sky-400 shrink-0" />
+              <span>{lang === 'ar' ? 'طرق الدفع' : lang === 'fr' ? 'Paiements' : lang === 'es' ? 'Pagos' : 'Payments'}</span>
+            </a>
+
+            <a
+              className="inline-flex max-xl:hidden items-center gap-1.5 rounded-full px-2 2xl:px-2.5 py-1.5 text-[11px] 2xl:text-xs font-semibold text-slate-300 transition-all duration-200 hover:bg-indigo-500/15 hover:text-indigo-300 cursor-pointer"
+              href="#faq-section"
+              onClick={(e) => handleNavClick(e, 'faq-section')}
+              title={lang === 'ar' ? 'الأسئلة الشائعة' : 'FAQ'}
+            >
+              <HelpCircle size={14} className="text-indigo-400 shrink-0" />
+              <span>{lang === 'ar' ? 'الأسئلة الشائعة' : lang === 'fr' ? 'FAQ' : lang === 'es' ? 'Preguntas' : 'FAQ'}</span>
+            </a>
+
+            <a
+              className="inline-flex max-xl:hidden items-center gap-1.5 rounded-full px-2 2xl:px-2.5 py-1.5 text-[11px] 2xl:text-xs font-semibold text-slate-300 transition-all duration-200 hover:bg-teal-500/15 hover:text-teal-300 cursor-pointer"
+              href="#links"
+              onClick={(e) => handleNavClick(e, 'links')}
+              title={t('navLinks')}
+            >
+              <BookOpen size={14} className="text-teal-400 shrink-0" />
+              <span>{t('navLinks')}</span>
+            </a>
+          </div>
         </nav>
 
-        {/* Desktop Action Controls: Auth + Currency + Cart + Language + Settings */}
-        <div className="hidden items-center gap-2.5 md:flex">
-          {/* User Auth Button / Dropdown */}
+
+        {/* Desktop Action Controls: Unified Preferences + Cart CTA + User Profile */}
+        <div className="hidden items-center gap-2.5 md:flex shrink-0">
+          {/* Preferences Cluster: Currency + Language + Settings in a single sleek capsule */}
+          <div className="flex items-center rounded-full border border-white/[0.08] bg-[#090e1d]/80 p-1 shadow-inner shadow-white/5 backdrop-blur-xl">
+            {/* Currency Pill */}
+            <button
+              type="button"
+              onClick={cycleCurrency}
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold text-slate-300 transition-all duration-200 hover:bg-white/[0.08] hover:text-white cursor-pointer"
+              title={lang === 'ar' ? `العملة الحالية: ${currency} (انقر للتبديل)` : `Currency: ${currency} (click to cycle)`}
+            >
+              <span className="text-sm">{currentCurrConf.flag}</span>
+              <span className="font-extrabold">{currency}</span>
+            </button>
+
+            {/* Divider */}
+            <div className="h-3.5 w-[1px] bg-white/10" aria-hidden="true" />
+
+            {/* Language Pill */}
+            <button
+              type="button"
+              onClick={cycleLanguage}
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold text-slate-300 transition-all duration-200 hover:bg-white/[0.08] hover:text-white cursor-pointer"
+              title={LANG_CONFIG[lang]?.label || 'Language'}
+            >
+              <span className="text-sm">{LANG_CONFIG[lang]?.flag || '🌐'}</span>
+              <span className="font-extrabold">{LANG_CONFIG[lang]?.code || 'LANG'}</span>
+            </button>
+
+            {/* Divider */}
+            <div className="h-3.5 w-[1px] bg-white/10" aria-hidden="true" />
+
+            {/* Settings Quick Icon */}
+            <button
+              type="button"
+              onClick={onOpenSettings}
+              className="group inline-flex items-center justify-center rounded-full p-1.5 text-slate-400 transition-all duration-200 hover:bg-white/[0.08] hover:text-sky-300 cursor-pointer"
+              title={t('navSettings')}
+              aria-label="Settings"
+            >
+              <SettingsIcon size={14} className="group-hover:rotate-90 transition-transform duration-300" />
+            </button>
+          </div>
+
+          {/* Cart CTA Button - Prominent & Glowing */}
+          <button
+            type="button"
+            onClick={openCart}
+            className="group relative inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-gradient-to-r from-emerald-500/20 via-teal-500/15 to-emerald-500/25 px-3.5 py-1.5 text-xs font-extrabold text-emerald-300 transition-all duration-200 hover:border-emerald-400 hover:bg-emerald-500/30 hover:shadow-[0_0_20px_rgba(16,185,129,0.35)] cursor-pointer shadow-sm shadow-emerald-500/15"
+            title={lang === 'ar' ? 'سلة المشتريات' : 'Shopping Cart'}
+            aria-label="Shopping Cart"
+          >
+            <ShoppingBag size={14} className="text-emerald-400 group-hover:scale-110 transition-transform duration-200" />
+            <span>{lang === 'ar' ? 'السلة' : 'Cart'}</span>
+            <span
+              className={`flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full text-[10px] font-black transition-all ${
+                totalItemsCount > 0
+                  ? 'bg-emerald-400 text-slate-950 shadow-md shadow-emerald-400/50 animate-pulse'
+                  : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+              }`}
+            >
+              {totalItemsCount}
+            </span>
+          </button>
+
+          {/* User Account Capsule / Login */}
           {user ? (
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="inline-flex items-center gap-2 rounded-full border border-sky-400/40 bg-sky-500/15 py-1.5 pl-2 pr-3 text-xs font-bold text-sky-200 transition hover:bg-sky-500/25 hover:text-white cursor-pointer shadow-sm shadow-sky-500/10"
+                className={`inline-flex items-center gap-2 rounded-full border transition-all duration-200 py-1 pl-1.5 pr-3 text-xs font-bold cursor-pointer shadow-sm ${
+                  userDropdownOpen
+                    ? 'border-sky-400 bg-sky-500/25 text-white shadow-[0_0_18px_rgba(56,189,248,0.25)]'
+                    : 'border-sky-400/30 bg-gradient-to-r from-sky-500/15 to-blue-600/15 text-sky-200 hover:border-sky-400 hover:bg-sky-500/20 hover:text-white shadow-sky-500/10'
+                }`}
               >
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 to-blue-600 text-slate-950 font-black text-[11px]">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 text-slate-950 font-black text-[11px] shadow-sm">
                   {(user.fullName || user.username || 'U')[0].toUpperCase()}
                 </div>
-                <span className="max-w-[100px] truncate">{user.fullName || user.username}</span>
+                <span className="max-w-[100px] truncate font-extrabold">{user.fullName || user.username}</span>
                 {isAdmin ? (
-                  <span className="rounded-full bg-purple-500/20 border border-purple-400/40 px-1.5 py-0.2 text-[9px] text-purple-300 font-black">
+                  <span className="rounded-full bg-gradient-to-r from-purple-500/30 to-indigo-500/30 border border-purple-400/50 px-2 py-0.5 text-[9px] text-purple-200 font-black tracking-wider uppercase shadow-[0_0_10px_rgba(168,85,247,0.3)]">
                     ADMIN
                   </span>
                 ) : (
-                  <ChevronDown size={12} className="text-slate-400" />
+                  <ChevronDown
+                    size={12}
+                    className={`text-slate-400 transition-transform duration-200 ${userDropdownOpen ? 'rotate-180 text-sky-400' : ''}`}
+                  />
                 )}
               </button>
 
               {/* User Dropdown Menu */}
               {userDropdownOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-56 rounded-2xl border border-sky-400/20 bg-[#0a0f1d]/95 p-2 shadow-2xl backdrop-blur-2xl animate-scaleIn z-50"
+                  className="absolute right-0 mt-2 w-60 rounded-2xl border border-sky-400/25 bg-[#090e1d]/95 p-2 shadow-2xl backdrop-blur-2xl animate-scaleIn z-50 divide-y divide-white/[0.07]"
                   dir={isRTL ? 'rtl' : 'ltr'}
                 >
-                  <div className="border-b border-white/10 px-3 py-2">
+                  <div className="px-3 py-2.5">
                     <p className="text-xs font-black text-white">{user.fullName || user.username}</p>
                     <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
-                    <div className="mt-1 flex items-center justify-between text-[10px]">
-                      <span className="text-emerald-400 font-bold">
+                    <div className="mt-2 flex items-center justify-between rounded-lg bg-white/[0.04] border border-white/[0.06] px-2.5 py-1.5 text-[10px]">
+                      <span className="text-slate-400 font-medium">{lang === 'ar' ? 'الرصيد' : 'Balance'}:</span>
+                      <span className="text-emerald-400 font-black text-xs">
                         {user.balance || 0} {currency}
                       </span>
-                      <span className="text-sky-300 capitalize font-medium">{user.role}</span>
                     </div>
                   </div>
 
-                  <div className="py-1 space-y-0.5">
+                  <div className="py-1.5 space-y-1">
                     {isAdmin && (
                       <button
                         type="button"
@@ -266,7 +388,7 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
                         setUserDropdownOpen(false)
                         openUserOrdersModal()
                       }}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white cursor-pointer"
                     >
                       <Package size={14} className="text-sky-400" />
                       <span>{lang === 'ar' ? 'طلباتي السابقة' : 'My Orders'}</span>
@@ -278,7 +400,7 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
                         setUserDropdownOpen(false)
                         logout()
                       }}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-rose-300 transition hover:bg-rose-500/15 cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/15 cursor-pointer"
                     >
                       <LogOut size={14} />
                       <span>{lang === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}</span>
@@ -291,61 +413,12 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
             <button
               type="button"
               onClick={() => openAuthModal('login')}
-              className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/40 bg-gradient-to-r from-sky-500/20 to-blue-600/20 px-3.5 py-1.5 text-xs font-bold text-sky-200 transition hover:border-sky-400 hover:bg-sky-500/30 hover:text-white cursor-pointer shadow-sm shadow-sky-500/10"
+              className="inline-flex items-center gap-2 rounded-full border border-sky-400/40 bg-gradient-to-r from-sky-500/20 via-blue-600/25 to-sky-500/20 px-4 py-1.5 text-xs font-black text-white transition-all duration-200 hover:border-sky-300 hover:shadow-[0_0_20px_rgba(56,189,248,0.35)] hover:scale-102 cursor-pointer shadow-sm shadow-sky-500/15"
             >
               <User size={13} className="text-sky-300" />
-              <span>{lang === 'ar' ? 'دخول / تسجيل' : 'Sign In'}</span>
+              <span>{lang === 'ar' ? 'دخول / حساب' : 'Sign In'}</span>
             </button>
           )}
-
-          {/* Currency Switcher Pill */}
-          <button
-            type="button"
-            onClick={cycleCurrency}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-white cursor-pointer"
-            title={lang === 'ar' ? `العملة الحالية: ${currency} (انقر للتبديل)` : `Currency: ${currency} (click to cycle)`}
-          >
-            <span className="text-sm">{currentCurrConf.flag}</span>
-            <span className="font-bold">{currency}</span>
-          </button>
-
-          {/* Cart Drawer Trigger Button */}
-          <button
-            type="button"
-            onClick={openCart}
-            className="relative inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-500/15 px-3.5 py-1.5 text-xs font-bold text-sky-200 transition hover:border-sky-400 hover:bg-sky-500/25 hover:text-white cursor-pointer shadow-sm shadow-sky-500/10"
-            title={lang === 'ar' ? 'سلة المشتريات' : 'Shopping Cart'}
-            aria-label="Shopping Cart"
-          >
-            <ShoppingBag size={14} className="text-sky-300" />
-            <span>{lang === 'ar' ? 'السلة' : 'Cart'}</span>
-            {totalItemsCount > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-black text-slate-950 shadow-md animate-scaleIn">
-                {totalItemsCount}
-              </span>
-            )}
-          </button>
-
-          {/* Quick Language Switcher Button (AR, EN, FR, ES) */}
-          <button
-            type="button"
-            onClick={cycleLanguage}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-white cursor-pointer"
-            title={LANG_CONFIG[lang]?.label || 'Language'}
-          >
-            <span className="text-sm">{LANG_CONFIG[lang]?.flag || '🌐'}</span>
-            <span className="font-bold">{LANG_CONFIG[lang]?.code || 'LANG'}</span>
-          </button>
-
-          {/* Settings Button */}
-          <button
-            type="button"
-            onClick={onOpenSettings}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-white cursor-pointer"
-            title={t('navSettings')}
-          >
-            <SettingsIcon size={14} className="text-sky-300" />
-          </button>
         </div>
 
         {/* Mobile controls: Auth + Currency + Cart + Language + Settings + Hamburger */}
@@ -503,93 +576,107 @@ export default function Header({ onHomeClick, activeShowcase, onOpenSettings, on
               </button>
             )}
 
-            <a
-              className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
-              href="#home"
-              onClick={(e) => handleNavClick(e, 'home')}
-            >
-              {t('navHome')}
-            </a>
-            <a
-              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-amber-300 transition hover:bg-white/[0.06] hover:text-amber-200 cursor-pointer"
-              href="#hot-sellers"
-              onClick={(e) => handleNavClick(e, 'hot-sellers')}
-            >
-              <Flame size={15} className="text-amber-400 animate-pulse" />
-              <span>{lang === 'ar' ? 'الأكثر مبيعاً' : lang === 'fr' ? 'Top Ventes' : lang === 'es' ? 'Más Vendidos' : 'Hot Sellers'}</span>
-            </a>
-            <a
-              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-amber-400 transition hover:bg-white/[0.06] hover:text-amber-300 cursor-pointer"
-              href="#diamond-calculator"
-              onClick={(e) => handleNavClick(e, 'diamond-calculator')}
-            >
-              <Gem size={15} className="text-amber-400" />
-              <span>{lang === 'ar' ? 'حاسبة فري فاير' : lang === 'fr' ? 'Calculateur FF' : lang === 'es' ? 'Calculadora FF' : 'FF Calculator'}</span>
-            </a>
-            <a
-              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-sky-300 transition hover:bg-white/[0.06] hover:text-sky-200 cursor-pointer"
-              href="#windows-advisor"
-              onClick={(e) => handleNavClick(e, 'windows-advisor')}
-            >
-              <ShieldCheck size={15} className="text-sky-400" />
-              <span>{lang === 'ar' ? 'مستشار ويندوز' : lang === 'fr' ? 'Conseiller Clés' : lang === 'es' ? 'Asesor Claves' : 'Windows Key Advisor'}</span>
-            </a>
-            <a
-              className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
-              href="#payments"
-              onClick={(e) => handleNavClick(e, 'payments')}
-            >
-              {lang === 'ar' ? 'طرق الدفع' : lang === 'fr' ? 'Paiements' : lang === 'es' ? 'Pagos' : 'Payments'}
-            </a>
-            <a
-              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
-              href="#faq-section"
-              onClick={(e) => handleNavClick(e, 'faq-section')}
-            >
-              <HelpCircle size={15} className="text-sky-400" />
-              <span>{lang === 'ar' ? 'الأسئلة الشائعة' : lang === 'fr' ? 'FAQ' : lang === 'es' ? 'Preguntas Frecuentes' : 'FAQ'}</span>
-            </a>
-            <a
-              className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
-              href="#reviews"
-              onClick={(e) => handleNavClick(e, 'reviews')}
-            >
-              {lang === 'ar' ? 'التقييمات' : lang === 'fr' ? 'Avis' : lang === 'es' ? 'Opiniones' : 'Reviews'}
-            </a>
-            <a
-              className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/[0.06] hover:text-white cursor-pointer"
-              href="#links"
-              onClick={(e) => handleNavClick(e, 'links')}
-            >
-              {t('navLinks')}
-            </a>
-            <button
-              type="button"
-              onClick={() => {
-                closeMenu()
-                openCart()
-              }}
-              className="flex items-center justify-between rounded-lg px-3 py-3 text-left text-sm font-semibold text-emerald-300 transition hover:bg-white/[0.06] cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <ShoppingBag size={16} />
-                <span>{lang === 'ar' ? 'سلة المشتريات' : 'Shopping Cart'}</span>
-              </div>
-              <span className="rounded-full bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 text-xs text-emerald-200 font-bold">
-                {totalItemsCount}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeMenu()
-                onOpenSettings()
-              }}
-              className="flex items-center gap-2 rounded-lg px-3 py-3 text-left text-sm font-medium text-sky-300 transition hover:bg-white/[0.06] cursor-pointer"
-            >
-              <SettingsIcon size={16} />
-              <span>{t('navSettings')}</span>
-            </button>
+            <div className="space-y-1">
+              <a
+                className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.08] hover:text-white cursor-pointer"
+                href="#home"
+                onClick={(e) => handleNavClick(e, 'home')}
+              >
+                <Home size={16} className="text-sky-400" />
+                <span>{t('navHome')}</span>
+              </a>
+              <a
+                className="flex items-center justify-between rounded-xl bg-amber-400/10 border border-amber-400/25 px-3.5 py-2.5 text-sm font-bold text-amber-300 transition hover:bg-amber-400/20 hover:text-amber-200 cursor-pointer"
+                href="#hot-sellers"
+                onClick={(e) => handleNavClick(e, 'hot-sellers')}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Flame size={16} className="text-amber-400 animate-pulse" />
+                  <span>{lang === 'ar' ? 'الأكثر مبيعاً' : lang === 'fr' ? 'Top Ventes' : lang === 'es' ? 'Más Vendidos' : 'Hot Sellers'}</span>
+                </div>
+                <span className="rounded-full bg-amber-400/25 px-2 py-0.5 text-[10px] font-black text-amber-200 uppercase">
+                  HOT
+                </span>
+              </a>
+              <a
+                className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-purple-300 transition hover:bg-purple-500/15 cursor-pointer"
+                href="#diamond-calculator"
+                onClick={(e) => handleNavClick(e, 'diamond-calculator')}
+              >
+                <Gem size={16} className="text-purple-400" />
+                <span>{lang === 'ar' ? 'حاسبة فري فاير' : lang === 'fr' ? 'Calculateur FF' : lang === 'es' ? 'Calculadora FF' : 'FF Calculator'}</span>
+              </a>
+              <a
+                className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/15 cursor-pointer"
+                href="#windows-advisor"
+                onClick={(e) => handleNavClick(e, 'windows-advisor')}
+              >
+                <ShieldCheck size={16} className="text-emerald-400" />
+                <span>{lang === 'ar' ? 'مستشار ويندوز' : lang === 'fr' ? 'Conseiller Clés' : lang === 'es' ? 'Asesor Claves' : 'Key Advisor'}</span>
+              </a>
+              <a
+                className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/[0.08] hover:text-white cursor-pointer"
+                href="#reviews"
+                onClick={(e) => handleNavClick(e, 'reviews')}
+              >
+                <Star size={16} className="text-amber-300" />
+                <span>{lang === 'ar' ? 'التقييمات' : lang === 'fr' ? 'Avis' : lang === 'es' ? 'Opiniones' : 'Reviews'}</span>
+              </a>
+              <a
+                className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/[0.08] hover:text-white cursor-pointer"
+                href="#payments"
+                onClick={(e) => handleNavClick(e, 'payments')}
+              >
+                <CreditCard size={16} className="text-sky-400" />
+                <span>{lang === 'ar' ? 'طرق الدفع' : lang === 'fr' ? 'Paiements' : lang === 'es' ? 'Pagos' : 'Payments'}</span>
+              </a>
+              <a
+                className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/[0.08] hover:text-white cursor-pointer"
+                href="#faq-section"
+                onClick={(e) => handleNavClick(e, 'faq-section')}
+              >
+                <HelpCircle size={16} className="text-indigo-400" />
+                <span>{lang === 'ar' ? 'الأسئلة الشائعة' : lang === 'fr' ? 'FAQ' : lang === 'es' ? 'Preguntas' : 'FAQ'}</span>
+              </a>
+              <a
+                className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/[0.08] hover:text-white cursor-pointer"
+                href="#links"
+                onClick={(e) => handleNavClick(e, 'links')}
+              >
+                <BookOpen size={16} className="text-teal-400" />
+                <span>{t('navLinks')}</span>
+              </a>
+            </div>
+
+            <div className="pt-2 mt-2 border-t border-white/[0.08] space-y-1">
+              <button
+                type="button"
+                onClick={() => {
+                  closeMenu()
+                  openCart()
+                }}
+                className="flex w-full items-center justify-between rounded-xl bg-emerald-500/15 border border-emerald-500/30 px-3.5 py-2.5 text-sm font-bold text-emerald-300 transition hover:bg-emerald-500/25 cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <ShoppingBag size={16} className="text-emerald-400" />
+                  <span>{lang === 'ar' ? 'سلة المشتريات' : 'Shopping Cart'}</span>
+                </div>
+                <span className="rounded-full bg-emerald-400 text-slate-950 px-2 py-0.5 text-xs font-black">
+                  {totalItemsCount}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  closeMenu()
+                  onOpenSettings()
+                }}
+                className="flex w-full items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-sky-300 transition hover:bg-white/[0.08] cursor-pointer"
+              >
+                <SettingsIcon size={16} />
+                <span>{t('navSettings')}</span>
+              </button>
+            </div>
           </div>
         </nav>
       )}
