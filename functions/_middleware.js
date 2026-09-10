@@ -83,6 +83,14 @@ export async function onRequest(context) {
   const adminSecretPath = env.ADMIN_SECRET_PATH || '/bleuwi-x7k9q2-control'
 
   // =========================================================================
+  // ALLOW BACKEND API ROUTES (/api/*) TO REACH PAGES FUNCTIONS DIRECTLY
+  // Master Admin API endpoints (/api/admin/*) are strictly guarded with JWT & D1
+  // =========================================================================
+  if (normalized.startsWith('/api/')) {
+    return next()
+  }
+
+  // =========================================================================
   // SUITE 1 & 2: FORBIDDEN ADMIN PATHS & BYPASS ATTEMPTS
   // =========================================================================
   const forbiddenAdminPaths = [
@@ -98,8 +106,6 @@ export async function onRequest(context) {
     '/wp-admin',
     '/wp-login.php',
     '/admin.php',
-    '/api/admin',
-    '/api/v1/admin',
     '/backend',
   ]
 

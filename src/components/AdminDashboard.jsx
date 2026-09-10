@@ -174,7 +174,15 @@ export default function AdminDashboard({ onBackToStore }) {
         api.getSettings(),
         api.getAdminReviews(),
       ])
-      setStats(statsRes?.stats || null)
+      setStats(
+        statsRes?.stats
+          ? {
+              ...statsRes.stats,
+              recentVisitors: statsRes.recentVisitors || [],
+              topCountries: statsRes.topCountries || [],
+            }
+          : statsRes || null
+      )
       setOrders(ordersRes || [])
       setUsers(usersRes || [])
       setSettings(settingsRes || {})

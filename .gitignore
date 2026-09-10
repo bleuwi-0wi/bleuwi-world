@@ -6,4 +6,6 @@ node_modules
 
 work/
 .cache/
-
+scratch/
+_worker.bundle
+.wrangler/
