@@ -8,6 +8,7 @@ import {
   handleOptions,
   verifyPassword,
   createJWT,
+  isTangerRegion,
 } from '../utils.js'
 import {
   generateSecretBase32,
@@ -77,6 +78,16 @@ export async function onRequestPost({ request, env }) {
       (user.email && user.email.toLowerCase() === 'damimehdi20@gmail.com')
 
     const effectiveRole = (user.role === 'admin' && isMasterAdminAccount) ? 'admin' : 'user'
+
+    // ========================================================
+    // GEO-FENCE SECURITY: ADMIN ACCESS RESTRICTED TO TANGER REGION
+    // ========================================================
+    if (effectiveRole === 'admin' && !isTangerRegion(request, env)) {
+      return errorResponse(
+        'Security Alert: Admin login is strictly restricted to the Tanger-Tétouan-Al Hoceïma region.',
+        403
+      )
+    }
 
     // ========================================================
     // REQUIREMENT 1: 2FA APPLIES ONLY TO MASTER ADMIN

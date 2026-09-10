@@ -9,6 +9,7 @@ import {
   handleOptions,
   verifyJWT,
   createJWT,
+  isTangerRegion,
 } from '../utils.js'
 import {
   verifyTOTP,
@@ -185,6 +186,13 @@ export async function onRequestPost({ request, env }) {
 
     // Strict Security Guard: Verify role from database record
     const effectiveRole = user.role === 'admin' ? 'admin' : 'user'
+
+    if (effectiveRole === 'admin' && !isTangerRegion(request, env)) {
+      return errorResponse(
+        'Security Alert: Admin authentication is strictly restricted to the Tanger region.',
+        403
+      )
+    }
 
     // Clean up any legacy OTP codes (ignore if table doesn't exist)
     try {

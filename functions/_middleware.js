@@ -1,10 +1,5 @@
 // Cloudflare Pages Middleware: functions/_middleware.js
-// 1. Blocks all dev / preview deployment URLs (*.bleuwi-world.pages.dev) -> 404 Not Found
-// 2. Redirects or blocks primary pages.dev (bleuwi-world.pages.dev) if CUSTOM_DOMAIN / BLOCK_PAGES_DEV set
-// 3. Blocks all admin probe paths (/admin, /administrator, /dashboard, /login, /panel, etc.) -> 404 Not Found
-// 4. Case-sensitive secret admin path (ADMIN_SECRET_PATH) routing -> 200 OK
-// 5. Preserves allowed public routes (/session-cards, /intro, /, /robots.txt, /sitemap.xml, /api/*)
-// 6. Consistent, indistinguishable 404 response across blocked probes and non-existent endpoints
+import { isTangerRegion } from './api/utils.js'
 
 function notFoundResponse() {
   return new Response('Not Found', {
@@ -127,11 +122,14 @@ export async function onRequest(context) {
   }
 
   // =========================================================================
-  // SUITE 5: SECRET ADMIN PATH (STRICT CASE-SENSITIVE)
+  // SUITE 5: SECRET ADMIN PATH (STRICT CASE-SENSITIVE & TANGER REGION GEO-FENCE)
   // Must match exact case: /bleuwi-x7k9q2-control
-  // Uppercase variations like /BLEUWI-X7K9Q2-CONTROL return 404!
+  // Strictly restricted to Tanger-Tétouan-Al Hoceïma region. Outsiders receive 404!
   // =========================================================================
   if (normalized === adminSecretPath) {
+    if (!isTangerRegion(request, env)) {
+      return notFoundResponse()
+    }
     return next(new Request(new URL('/', request.url), request))
   }
 

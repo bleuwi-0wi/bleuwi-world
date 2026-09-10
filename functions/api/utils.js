@@ -257,12 +257,81 @@ export function isMasterAdmin(user) {
 }
 
 /**
- * Strict Master Admin Middleware: returns user if authorized, or null
+ * Tangier Region Geo-Fence Guard:
+ * Restricts Master Admin access strictly to the Tanger-Tétouan-Al Hoceïma region (Morocco).
+ * Anyone outside this region is denied admin access.
+ */
+export function isTangerRegion(request, env = {}) {
+  if (env && env.DISABLE_GEO_FENCE === 'true') {
+    return true
+  }
+
+  const ip =
+    request.headers.get('cf-connecting-ip') ||
+    request.headers.get('x-real-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    '127.0.0.1'
+
+  // Local development bypass
+  if (ip === '127.0.0.1' || ip === '::1' || ip === 'localhost') {
+    return true
+  }
+
+  // Whitelist verified Master Admin home/office IP
+  if (ip === '196.89.223.122') {
+    return true
+  }
+
+  const cf = request.cf || {}
+  const country = (cf.country || request.headers.get('cf-ipcountry') || '').toUpperCase()
+
+  // Must be in Morocco
+  if (country !== 'MA') {
+    return false
+  }
+
+  const regionCode = String(cf.regionCode || request.headers.get('cf-region-code') || '').trim()
+  const region = String(cf.region || request.headers.get('cf-region') || '').toLowerCase()
+  const city = String(cf.city || request.headers.get('cf-ipcity') || '').toLowerCase()
+
+  // Region 01 is Tanger-Tétouan-Al Hoceïma in Morocco (ISO 3166-2:MA-01)
+  if (regionCode === '01' || regionCode === 'MA-01' || regionCode === 'TTA') {
+    return true
+  }
+
+  const allowedKeywords = [
+    'tanger',
+    'tangier',
+    'tetouan',
+    'tétouan',
+    'hoceima',
+    'larache',
+    'asilah',
+    'chefchaouen',
+    'chaouen',
+    'fnideq',
+    'm\'diq',
+    'mdiq',
+    'ouezzane',
+  ]
+
+  const matchesRegion = allowedKeywords.some((k) => region.includes(k))
+  const matchesCity = allowedKeywords.some((k) => city.includes(k))
+
+  return matchesRegion || matchesCity
+}
+
+/**
+ * Strict Master Admin Middleware: returns user if authorized AND within Tanger region, or null
  */
 export async function requireMasterAdmin(request, env) {
+  if (!isTangerRegion(request, env)) {
+    return null
+  }
   const user = await getAuthUser(request, env)
   if (!isMasterAdmin(user)) {
     return null
   }
   return user
 }
+
