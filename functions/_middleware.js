@@ -19,6 +19,20 @@ export async function onRequest(context) {
   const hostname = hostHeader.split(':')[0]
 
   // =========================================================================
+  // SUITE 0: ENFORCE HTTPS & CANONICAL DOMAIN REDIRECT
+  // =========================================================================
+  if (url.protocol === 'http:' || request.headers.get('x-forwarded-proto') === 'http') {
+    const secureUrl = new URL(request.url)
+    secureUrl.protocol = 'https:'
+    return Response.redirect(secureUrl.toString(), 301)
+  }
+
+  if (hostname === 'www.bleuwiworld.shop') {
+    const canonicalUrl = `https://bleuwiworld.shop${url.pathname}${url.search}`
+    return Response.redirect(canonicalUrl, 301)
+  }
+
+  // =========================================================================
   // SUITE 3: DEV & PREVIEW DEPLOYMENT LINK BLOCKING
   // =========================================================================
   const hostParts = hostname.split('.')
