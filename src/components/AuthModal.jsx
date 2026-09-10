@@ -598,7 +598,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                       required
                       value={loginIdentifier}
                       onChange={(e) => setLoginIdentifier(e.target.value)}
-                      placeholder="damimehdi20@gmail.com"
+                      placeholder={lang === 'ar' ? 'اسم المستخدم أو البريد الإلكتروني' : 'name@example.com'}
                       className="w-full rounded-xl border border-white/10 bg-slate-900/60 py-2.5 px-10 text-xs sm:text-sm text-white placeholder-slate-500 transition focus:border-sky-400 focus:bg-slate-900 focus:outline-none"
                     />
                     <Mail
@@ -618,7 +618,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                       required
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
-                      placeholder="••••••••••••••••••••"
+                      placeholder={lang === 'ar' ? 'أدخل كلمة المرور' : 'Enter password'}
                       className="w-full rounded-xl border border-white/10 bg-slate-900/60 py-2.5 px-10 text-xs sm:text-sm text-white placeholder-slate-500 transition focus:border-sky-400 focus:bg-slate-900 focus:outline-none"
                     />
                     <Lock

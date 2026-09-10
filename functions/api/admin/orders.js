@@ -14,7 +14,7 @@ export async function onRequestOptions() {
 export async function onRequestGet({ request, env }) {
   try {
     const authUser = await getAuthUser(request, env)
-    if (!authUser || authUser.email.toLowerCase() !== 'damimehdi20@gmail.com') {
+    if (!authUser || authUser.role !== 'admin') {
       return errorResponse('Forbidden: Unauthorized admin access', 403)
     }
 
@@ -49,7 +49,7 @@ export async function onRequestGet({ request, env }) {
 export async function onRequestPatch({ request, env }) {
   try {
     const authUser = await getAuthUser(request, env)
-    if (!authUser || authUser.email.toLowerCase() !== 'damimehdi20@gmail.com') {
+    if (!authUser || authUser.role !== 'admin') {
       return errorResponse('Forbidden: Unauthorized admin access', 403)
     }
 

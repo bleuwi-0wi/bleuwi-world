@@ -13,8 +13,8 @@ export async function onRequestOptions() {
 export async function onRequestGet({ request, env }) {
   try {
     const authUser = await getAuthUser(request, env)
-    // Strict Guard: ONLY damimehdi20@gmail.com is allowed into admin dashboard
-    if (!authUser || authUser.email.toLowerCase() !== 'damimehdi20@gmail.com') {
+    // Strict Guard: ONLY role=admin is allowed into admin dashboard
+    if (!authUser || authUser.role !== 'admin') {
       return errorResponse('Forbidden: Unauthorized administrator access', 403)
     }
 

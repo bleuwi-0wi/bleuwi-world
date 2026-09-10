@@ -456,11 +456,11 @@ export default function AdminDashboard({ onBackToStore }) {
                     </div>
                     <div className="flex items-center justify-between rounded-xl bg-slate-950/60 p-2.5 border border-white/5">
                       <span className="text-slate-400">Recovery Phone:</span>
-                      <span className="font-mono font-bold text-white">+212762635898</span>
+                      <span className="font-mono font-bold text-white">{user?.phone || 'Active on Cloud'}</span>
                     </div>
                     <div className="flex items-center justify-between rounded-xl bg-slate-950/60 p-2.5 border border-white/5">
                       <span className="text-slate-400">Master Admin:</span>
-                      <span className="font-bold text-sky-300">damimehdi20@gmail.com</span>
+                      <span className="font-bold text-sky-300">{user?.email || 'Administrator'}</span>
                     </div>
                     <div className="flex items-center justify-between rounded-xl bg-slate-950/60 p-2.5 border border-white/5">
                       <span className="text-slate-400">Analytics Engine:</span>

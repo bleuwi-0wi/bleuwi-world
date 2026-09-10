@@ -275,7 +275,7 @@ export const api = {
         throw new Error('This username is already taken.')
       }
 
-      const role = cleanEmail === 'damimehdi20@gmail.com' ? 'admin' : 'user'
+      const role = cleanUsername === 'admin' ? 'admin' : 'user'
       const newUser = {
         id: `usr_${Date.now()}`,
         username: cleanUsername,

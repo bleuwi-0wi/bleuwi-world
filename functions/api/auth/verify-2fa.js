@@ -173,8 +173,8 @@ export async function onRequestPost({ request, env }) {
         .run()
     }
 
-    // Strict Security Guard: Only damimehdi20@gmail.com can hold admin permissions
-    const effectiveRole = user.email.toLowerCase() === 'damimehdi20@gmail.com' ? 'admin' : 'user'
+    // Strict Security Guard: Verify role from database record
+    const effectiveRole = user.role === 'admin' ? 'admin' : 'user'
 
     // Clean up any legacy OTP codes
     await env.DB.prepare('DELETE FROM two_factor_codes WHERE user_id = ?').bind(userId).run()
