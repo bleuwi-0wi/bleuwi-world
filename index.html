@@ -369,6 +369,11 @@
         }, { capture: true });
       })();
     </script>
+    <!-- Preconnect for Google Identity Services SDK -->
+    <link rel="preconnect" href="https://accounts.google.com" />
+    <link rel="dns-prefetch" href="https://accounts.google.com" />
+    <!-- Google Identity Services (Sign in with Google SDK) -->
+    <script id="google-identity-services-script" src="https://accounts.google.com/gsi/client" async></script>
   </head>
   <body>
     <!-- Main React App Mount Target -->
@@ -443,8 +448,6 @@
           <p>نقبل الدفع عبر CIH Bank (#32) تحويل فوري، كاش بلوس Cash Plus (#29) ووفاكاش Wafacash (#28) نقداً بدون حساب بنكي، التجاري وفا بنك، البريد بنك، بايبال PayPal (#30)، وبينانس Binance USDT (#31). جميع المشتريات مغطاة بالضمان الذهبي 100% للاستبدال الفوري ودعم فني متواصل 24/7 عبر واتساب: <a href="https://wa.me/212762635587">+212 762-635587</a>.</p>
         </article>
       </main>
-    <!-- Google Identity Services (Sign in with Google SDK) -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -19,6 +19,7 @@ import {
   Smartphone,
   QrCode,
   Copy,
+  Settings,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
@@ -31,6 +32,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [showGoogleConfig, setShowGoogleConfig] = useState(false)
+  const [customClientId, setCustomClientId] = useState(
+    typeof window !== 'undefined' ? localStorage.getItem('bleuwi_google_client_id') || '' : ''
+  )
   const [errorMsg, setErrorMsg] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
 
@@ -237,13 +242,65 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
     }
   }
 
+  // Dynamic async loader for Google Identity Services SDK
+  const ensureGoogleSDK = (timeoutMs = 5000) => {
+    return new Promise((resolve) => {
+      if (typeof window === 'undefined') return resolve(false)
+      if (window.google?.accounts?.oauth2 || window.google?.accounts?.id) {
+        return resolve(true)
+      }
+
+      let script = document.getElementById('google-identity-services-script')
+      if (!script) {
+        script = document.createElement('script')
+        script.id = 'google-identity-services-script'
+        script.src = 'https://accounts.google.com/gsi/client'
+        script.async = true
+        document.head.appendChild(script)
+      }
+
+      let elapsed = 0
+      const interval = setInterval(() => {
+        elapsed += 100
+        if (window.google?.accounts?.oauth2 || window.google?.accounts?.id) {
+          clearInterval(interval)
+          resolve(true)
+        } else if (elapsed >= timeoutMs) {
+          clearInterval(interval)
+          resolve(false)
+        }
+      }, 100)
+    })
+  }
+
+  // Pre-warm Google Identity Services when AuthModal opens
+  useEffect(() => {
+    if (isOpen) {
+      ensureGoogleSDK(3500).catch(() => {})
+    }
+  }, [isOpen])
+
   // Google OAuth / Google Identity Services Sign-In
   const handleGoogleSignIn = async () => {
     setErrorMsg('')
     setSuccessMsg('')
     setGoogleLoading(true)
 
+    // Ensure Google Identity Services SDK is ready (waits up to 5s if still loading)
+    const isReady = await ensureGoogleSDK(5000)
+    if (!isReady) {
+      setGoogleLoading(false)
+      setErrorMsg(
+        lang === 'ar'
+          ? 'تعذر الاتصال بخدمة Google. إذا كنت تستخدم مانع إعلانات (AdBlocker أو Brave Shields) يرجى تعطيله مؤقتاً أو تسجيل الدخول بالبريد مباشرة.'
+          : 'Could not connect to Google service. If using an AdBlocker or Brave Shields, please disable it or sign in with email.'
+      )
+      return
+    }
+
+    const storedClientId = typeof window !== 'undefined' ? localStorage.getItem('bleuwi_google_client_id') : null
     const clientId =
+      (storedClientId && storedClientId.trim()) ||
       import.meta.env.VITE_GOOGLE_CLIENT_ID ||
       '683918239182-bleuwiworld.apps.googleusercontent.com'
 
@@ -285,13 +342,28 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
           },
           error_callback: (err) => {
             setGoogleLoading(false)
-            if (err?.type !== 'popup_closed') {
+            if (err?.type === 'popup_closed') {
+              return
+            }
+            if (
+              err?.type === 'unknown_client_id' ||
+              err?.error === 'invalid_client' ||
+              err?.type === 'invalid_client' ||
+              String(err).includes('client')
+            ) {
+              setShowGoogleConfig(true)
               setErrorMsg(
                 lang === 'ar'
-                  ? 'تم إلغاء نافذة Google.'
-                  : 'Google Sign-In was cancelled.'
+                  ? 'يرجى ربط معرف OAuth Client ID الخاص بموقعك من Google Cloud Console لتفعيل الدخول بحساب Google.'
+                  : 'Please configure your OAuth Client ID from Google Cloud Console to enable Google Sign-In.'
               )
+              return
             }
+            setErrorMsg(
+              lang === 'ar'
+                ? 'تم إلغاء نافذة Google أو حدث خطأ أثناء التحقق.'
+                : 'Google Sign-In was cancelled or encountered an error.'
+            )
           },
         })
         tokenClient.requestAccessToken({ prompt: 'select_account' })
@@ -345,12 +417,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
       }
     }
 
+    setGoogleLoading(false)
     setErrorMsg(
       lang === 'ar'
-        ? 'جاري تهيئة خدمة Google... يرجى إعادة المحاولة خلال ثوانٍ.'
-        : 'Initializing Google service... Please try again in a few seconds.'
+        ? 'تعذر بدء خدمة Google. يرجى تسجيل الدخول بالبريد الإلكتروني.'
+        : 'Could not initialize Google service. Please sign in with email.'
     )
-    setGoogleLoading(false)
   }
 
   return (
@@ -730,7 +802,11 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                   </svg>
                 )}
                 <span>
-                  {activeTab === 'signup'
+                  {googleLoading
+                    ? lang === 'ar'
+                      ? 'جارٍ الاتصال بـ Google...'
+                      : 'Connecting to Google...'
+                    : activeTab === 'signup'
                     ? lang === 'ar'
                       ? 'التسجيل السريع بحساب Google'
                       : 'Sign up with Google'
@@ -739,6 +815,57 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login' }) {
                       : 'Sign in with Google'}
                 </span>
               </button>
+
+              {/* Optional Config Box for Admin/Owner Google OAuth Client ID */}
+              {showGoogleConfig && (
+                <div className="mt-3 rounded-2xl border border-sky-500/30 bg-sky-950/50 p-3 text-xs animate-fadeIn shadow-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-sky-300 flex items-center gap-1.5">
+                      <Settings size={13} className="text-sky-400" />
+                      <span>{lang === 'ar' ? 'إعداد Google Client ID' : 'Google Client ID Setup'}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowGoogleConfig(false)}
+                      className="text-slate-400 hover:text-white p-1"
+                    >
+                      <X size={13} />
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-300 mb-2 leading-relaxed">
+                    {lang === 'ar'
+                      ? 'لتفعيل تسجيل الدخول المباشر بـ Google، الصق معرف Client ID المنشأ من Google Cloud Console:'
+                      : 'To enable direct Google Sign-In, paste your Client ID from Google Cloud Console:'}
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="xxxx.apps.googleusercontent.com"
+                      value={customClientId}
+                      onChange={(e) => setCustomClientId(e.target.value)}
+                      className="flex-1 rounded-lg bg-black/60 border border-sky-500/40 px-2.5 py-1.5 text-[11px] text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-sky-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (typeof window !== 'undefined') {
+                          if (customClientId.trim()) {
+                            localStorage.setItem('bleuwi_google_client_id', customClientId.trim())
+                            setSuccessMsg(lang === 'ar' ? 'تم حفظ Client ID! جرب الدخول الآن.' : 'Client ID saved! Try signing in now.')
+                          } else {
+                            localStorage.removeItem('bleuwi_google_client_id')
+                            setSuccessMsg(lang === 'ar' ? 'تمت استعادة الإعداد الافتراضي.' : 'Reset to default.')
+                          }
+                        }
+                        setShowGoogleConfig(false)
+                      }}
+                      className="rounded-lg bg-sky-500 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-sky-400 cursor-pointer shrink-0"
+                    >
+                      {lang === 'ar' ? 'حفظ' : 'Save'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Divider */}
